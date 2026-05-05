@@ -1,5 +1,5 @@
-import { Activity } from 'lucide-react';
-import type { Stat } from '../data/portfolio';
+import { Activity } from "lucide-react";
+import type { Stat } from "../data/portfolio";
 
 interface StatsCardProps {
   stats: Stat[];
@@ -14,7 +14,11 @@ export default function StatsCard({ stats }: StatsCardProps) {
       </div>
       <div className="p-4 sm:p-5 grid grid-cols-2 sm:grid-cols-2 gap-3">
         {stats.map((stat, i) => (
-          <div key={i} className="opacity-0 animate-slide-up" style={{ animationDelay: `${0.3 + i * 0.08}s` }}>
+          <div
+            key={i}
+            className="opacity-0 animate-slide-up"
+            style={{ animationDelay: `${0.3 + i * 0.08}s` }}
+          >
             <span className="mono-value text-lg sm:text-xl text-terminal-accent text-shadow-glow">
               {stat.value}
             </span>

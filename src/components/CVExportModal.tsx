@@ -93,7 +93,7 @@ ul{padding-left:18px}
 ${profile.experience
   .map(
     (exp) => `<div class="job">
-<div class="job-header"><div><span class="job-title">${exp.role}</span> <span class="job-company">at ${exp.company}</span></div><span class="job-period">${exp.period}</span></div>
+<div class="job-header"><div><span class="job-title">${exp.role}</span>${exp.company ? ` <span class="job-company">at ${exp.company}</span>` : ""}</div><span class="job-period">${exp.period}</span></div>
 <p>${exp.description}</p></div>`,
   )
   .join("")}
@@ -183,7 +183,7 @@ ${certificates.map((c) => `<div class="sidebar-item"><strong>${c.name}</strong><
 ${profile.experience
   .map(
     (exp) => `<div class="job">
-<div class="job-header"><div><span class="job-title">${exp.role}</span> <span class="job-company">at ${exp.company}</span></div><span class="job-period">${exp.period}</span></div>
+<div class="job-header"><div><span class="job-title">${exp.role}</span>${exp.company ? ` <span class="job-company">at ${exp.company}</span>` : ""}</div><span class="job-period">${exp.period}</span></div>
 <p>${exp.description}</p></div>`,
   )
   .join("")}
@@ -251,7 +251,7 @@ ${profile.experience
   .map(
     (exp) => `<div class="job">
 <span class="job-period">${exp.period}</span>
-<div><span class="job-title">${exp.role}</span> <span class="job-company">@ ${exp.company}</span></div>
+<div><span class="job-title">${exp.role}</span>${exp.company ? ` <span class="job-company">@ ${exp.company}</span>` : ""}</div>
 <p>${exp.description}</p>
 </div>`,
   )

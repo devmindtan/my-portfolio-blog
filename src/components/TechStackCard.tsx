@@ -8,12 +8,15 @@ interface TechStackCardProps {
 
 export default function TechStackCard({ techData }: TechStackCardProps) {
   return (
-    <div id="stack" className="col-span-4 sm:col-span-2 card-base card-glow">
+    <div
+      id="stack"
+      className="col-span-4 sm:col-span-2 card-base card-glow h-full flex flex-col"
+    >
       <div className="terminal-header">
         <Cpu size={11} />
         <span>stack.json</span>
       </div>
-      <div className="p-4 sm:p-5 space-y-3 sm:space-y-4 max-h-[450px] overflow-y-auto">
+      <div className="p-4 sm:p-5 space-y-3 sm:space-y-4 overflow-y-auto flex-1 min-h-0">
         {categoryOrder.map((cat) => {
           const items = techData.filter((t) => t.category === cat);
           if (items.length === 0) return null;

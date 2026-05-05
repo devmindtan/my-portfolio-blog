@@ -46,14 +46,6 @@ export default function AvatarCard({ profile }: AvatarCardProps) {
           <p className="text-[11px] text-terminal-text/70 leading-relaxed">
             {profile.summary}
           </p>
-
-          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-x-3 gap-y-1 text-[10px] text-terminal-muted">
-            <span>{profile.location}</span>
-            <span className="text-terminal-border/50 hidden sm:inline">|</span>
-            <span>{profile.email}</span>
-            <span className="text-terminal-border/50 hidden sm:inline">|</span>
-            <span>{profile.website}</span>
-          </div>
         </div>
       </div>
     </div>

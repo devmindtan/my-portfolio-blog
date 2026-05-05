@@ -3,6 +3,7 @@ import WelcomeHero from "./components/WelcomeHero";
 import TerminalHero from "./components/TerminalHero";
 import AvatarCard from "./components/AvatarCard";
 import AboutCard from "./components/AboutCard";
+import ExperienceCard from "./components/ExperienceCard";
 import StatsCard from "./components/StatsCard";
 import TechStackCard from "./components/TechStackCard";
 import PhilosophyCard from "./components/PhilosophyCard";
@@ -115,6 +116,12 @@ function App() {
     setSortDir(dir);
   }, []);
 
+  const handleExperienceProjectQuery = useCallback((projectName: string) => {
+    setSelectedTag(null);
+    setSearchQuery(projectName);
+    setCurrentPage(1);
+  }, []);
+
   return (
     <>
       {showIntro && (
@@ -211,12 +218,26 @@ function App() {
             <AvatarCard profile={profile} />
             <AboutCard profile={profile} />
 
-            {/* Stats + Philosophy */}
-            <StatsCard stats={stats} />
-            <PhilosophyCard principles={principles} />
+            {/* Experience */}
+            <ExperienceCard
+              experience={profile.experience}
+              onProjectQuery={handleExperienceProjectQuery}
+            />
 
-            {/* Certificates + Tech stack */}
-            <TechStackCard techData={techStack} />
+            {/* Stats + Philosophy (left col) + Tech stack (right col) */}
+            <div className="col-span-4 flex flex-col sm:flex-row gap-3 items-stretch">
+              <div className="flex flex-col gap-3 sm:flex-1 h-full">
+                <StatsCard stats={stats} />
+                <div className="flex-1 min-h-0">
+                  <PhilosophyCard principles={principles} />
+                </div>
+              </div>
+              <div className="sm:flex-1">
+                <TechStackCard techData={techStack} />
+              </div>
+            </div>
+
+            {/* Certificates */}
             <CertificatesCard certificates={certificates} />
 
             {/* Section divider */}

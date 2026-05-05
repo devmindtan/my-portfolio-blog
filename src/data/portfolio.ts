@@ -27,7 +27,9 @@ export const categoryLabels: Record<string, string> = {
   be: "backend",
   db: "database",
   infra: "infrastructure",
+  cicd: "ci/cd",
   data: "data",
+  net: "network",
 };
 
 export const categoryOrder = [
@@ -36,7 +38,9 @@ export const categoryOrder = [
   "be",
   "db",
   "infra",
+  "cicd",
   "data",
+  "net",
 ] as const;
 
 export type SortKey = "sort_order" | "title" | "tag" | "created_at";
@@ -91,7 +95,7 @@ export const heroLines: HeroLine[] = [
     cmd: "cat focus.txt",
     output: "distributed systems · real-time data · platform engineering",
   },
-  { prompt: "~", cmd: "uptime", output: "8+ years in production" },
+  { prompt: "~", cmd: "uptime", output: "4+ years in programing" },
 ];
 
 export interface WelcomeLine {
@@ -179,7 +183,7 @@ export const siteConfig: SiteConfig = {
   },
   contact: {
     description:
-      "Available for senior/lead engineering roles, architecture consulting, and technical advisory. Prefer async communication.",
+      "Fresh Graduate | Full-stack Developer & Cloud Native Enthusiast. Available for Fresher Roles & Technical Advisory. Async preferred! ⚡",
     links: [
       {
         label: "github",
@@ -217,6 +221,11 @@ export interface Profile {
     company: string;
     period: string;
     description: string;
+    links?: {
+      label: string;
+      href: string;
+      projectName?: string;
+    }[];
   }[];
   education: {
     degree: string;
@@ -233,18 +242,28 @@ export const profile: Profile = {
   location: "Ho Chi Minh City, VN",
   email: "devmind.tan@gamil.com",
   phone: "+84 942 510 317",
-  website: "",
+  website: "https://my-portfolio-eight-opal-45.vercel.app/",
   linkedin: "linkedin.com/in/devmidtan",
   github: "github.com/devmindtan",
   summary:
     "I build systems that handle real traffic at real scale. Production software that processes millions of transactions, serves millions of users, and stays up when things go wrong. My work sits at the intersection of distributed systems, real-time data pipelines, and platform engineering.",
   experience: [
     {
-      role: "Senior Platform Engineer",
-      company: "TechCorp",
-      period: "2021 - Present",
+      role: "Graduation thesis",
+      company: "",
+      period: "2/2026 - 6/2026",
       description:
-        "Leading platform engineering team building distributed systems handling 2M+ daily transactions. Architected event-driven microservices and real-time data pipelines.",
+        "Develop a project to monitor and predict traffic density using a microservice system.",
+      links: [
+        {
+          label: "github",
+          href: "https://github.com/devmindtan/KLTN_2026",
+        },
+        {
+          label: "website",
+          href: "https://smartcity.devmindtan.uk/",
+        },
+      ],
     },
     {
       role: "Full-Stack Developer",
@@ -252,13 +271,13 @@ export const profile: Profile = {
       period: "2018 - 2021",
       description:
         "Built real-time analytics platforms and streaming data pipelines. Reduced data lag from 24h to under 30s using Flink and Kafka.",
-    },
-    {
-      role: "Software Engineer",
-      company: "CloudBase",
-      period: "2016 - 2018",
-      description:
-        "Developed cloud-native applications and CI/CD infrastructure. Implemented canary deployments and chaos engineering practices.",
+      links: [
+        {
+          label: "Real-time Analytics Pipeline",
+          href: "#projects",
+          projectName: "Real-time Analytics Pipeline",
+        },
+      ],
     },
   ],
   education: [
@@ -271,10 +290,12 @@ export const profile: Profile = {
 };
 
 export const stats: Stat[] = [
-  { value: "8+", label: "years shipping" },
-  { value: "40+", label: "projects" },
-  { value: "12", label: "languages" },
-  { value: "99.9%", label: "uptime avg" },
+  { value: "2+", label: "years shipping" },
+  { value: "20+", label: "projects" },
+  { value: "10+", label: "programming languages" },
+  { value: "100+", label: "commits/month" },
+  { value: "8+ hrs", label: "daily coding" },
+  { value: "high", label: "reliability" },
 ];
 
 export const techStack: TechItem[] = [
@@ -282,16 +303,33 @@ export const techStack: TechItem[] = [
   { name: "Go", category: "lang" },
   { name: "Rust", category: "lang" },
   { name: "Python", category: "lang" },
+  { name: "Java", category: "lang" },
+  { name: "C++", category: "lang" },
+  { name: "C", category: "lang" },
+  { name: "C#", category: "lang" },
   { name: "React", category: "fe" },
+  { name: "Tailwind", category: "fe" },
+  { name: "ShadCN", category: "fe" },
+  { name: "Mantine", category: "fe" },
   { name: "Next.js", category: "fe" },
   { name: "Node.js", category: "be" },
+  { name: "Express", category: "be" },
+  { name: "Flask", category: "be" },
+  { name: "Django", category: "be" },
   { name: "PostgreSQL", category: "db" },
+  { name: "MongoDB", category: "db" },
+  { name: "MySQL", category: "db" },
+  { name: "SQL Server", category: "db" },
   { name: "Redis", category: "db" },
   { name: "Kafka", category: "infra" },
   { name: "Kubernetes", category: "infra" },
   { name: "AWS", category: "infra" },
   { name: "Docker", category: "infra" },
   { name: "Terraform", category: "infra" },
+  { name: "Github Action", category: "cicd" },
+  { name: "Jenkins", category: "cicd" },
+  { name: "Cloudflare", category: "net" },
+  { name: "Tailscale", category: "net" },
   { name: "Flink", category: "data" },
   { name: "ClickHouse", category: "data" },
 ];

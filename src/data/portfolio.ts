@@ -282,9 +282,9 @@ export const profile: Profile = {
   ],
   education: [
     {
-      degree: "B.S. Computer Science",
-      school: "HCMC University of Technology",
-      year: "2016",
+      degree: "B.S. Software Engineer",
+      school: "Van Lang University",
+      year: "2026",
     },
   ],
 };

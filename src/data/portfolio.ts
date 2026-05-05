@@ -85,7 +85,7 @@ export interface SiteConfig {
 }
 
 export const heroLines: HeroLine[] = [
-  { prompt: "~", cmd: "whoami", output: "senior full-stack developer" },
+  { prompt: "~", cmd: "whoami", output: "full-stack developer" },
   {
     prompt: "~",
     cmd: "cat focus.txt",

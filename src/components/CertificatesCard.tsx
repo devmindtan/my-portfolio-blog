@@ -1,10 +1,8 @@
 import { Award, ExternalLink } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import { GlobalWorkerOptions, getDocument } from "pdfjs-dist";
-import pdfWorkerSrc from "pdfjs-dist/build/pdf.worker.min.mjs?url";
 import type { Certificate } from "../data/portfolio";
 
-GlobalWorkerOptions.workerSrc = pdfWorkerSrc;
+let pdfWorkerConfigured = false;
 
 interface CertificatesCardProps {
   certificates: Certificate[];
@@ -233,6 +231,17 @@ function PdfThumb({ url }: { url: string }) {
 
     async function render() {
       try {
+        const [{ getDocument, GlobalWorkerOptions }, workerModule] =
+          await Promise.all([
+            import("pdfjs-dist"),
+            import("pdfjs-dist/build/pdf.worker.min.mjs?url"),
+          ]);
+
+        if (!pdfWorkerConfigured) {
+          GlobalWorkerOptions.workerSrc = workerModule.default;
+          pdfWorkerConfigured = true;
+        }
+
         const pdf = await getDocument({
           url,
           disableRange: true,

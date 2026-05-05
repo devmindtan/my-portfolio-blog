@@ -1,0 +1,129 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  * {
+    font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, monospace;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    background-color: #0a0a0f;
+    color: #c8c8d4;
+    overflow-x: hidden;
+  }
+
+  ::selection {
+    background-color: rgba(0, 229, 160, 0.2);
+    color: #00e5a0;
+  }
+
+  ::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #111118;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #2a2a3a;
+    border-radius: 3px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: #3d3d55;
+  }
+}
+
+@layer components {
+  .card-base {
+    @apply bg-terminal-card border border-terminal-border rounded-sm
+           transition-all duration-300 ease-out
+           hover:border-terminal-borderHover;
+  }
+
+  .card-glow:hover {
+    box-shadow: 0 0 20px rgba(0, 229, 160, 0.06),
+                inset 0 1px 0 rgba(0, 229, 160, 0.05);
+  }
+
+  .terminal-header {
+    @apply flex items-center gap-2 px-4 py-2.5
+           border-b border-terminal-border/50
+           text-terminal-muted text-xs;
+  }
+
+  .terminal-dot {
+    @apply w-2.5 h-2.5 rounded-full;
+  }
+
+  .section-label {
+    @apply text-terminal-muted text-[10px] uppercase tracking-[0.2em] font-medium;
+  }
+
+  .accent-text {
+    @apply text-terminal-accent;
+  }
+
+  .mono-value {
+    @apply font-semibold tabular-nums;
+  }
+
+  .bento-grid {
+    @apply grid gap-3;
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: minmax(0, auto);
+  }
+
+  @media (max-width: 1024px) {
+    .bento-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .bento-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .scanline-overlay {
+    pointer-events: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 2px,
+      rgba(0, 0, 0, 0.03) 2px,
+      rgba(0, 0, 0, 0.03) 4px
+    );
+  }
+}
+
+@layer utilities {
+  .text-shadow-glow {
+    text-shadow: 0 0 8px rgba(0, 229, 160, 0.3);
+  }
+
+  .border-glow {
+    border-color: rgba(0, 229, 160, 0.3);
+  }
+
+  .stagger-1 { animation-delay: 0.05s; }
+  .stagger-2 { animation-delay: 0.1s; }
+  .stagger-3 { animation-delay: 0.15s; }
+  .stagger-4 { animation-delay: 0.2s; }
+  .stagger-5 { animation-delay: 0.25s; }
+  .stagger-6 { animation-delay: 0.3s; }
+  .stagger-7 { animation-delay: 0.35s; }
+  .stagger-8 { animation-delay: 0.4s; }
+}

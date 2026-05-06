@@ -55,7 +55,7 @@ export default function CVExportModal({
     ) as Record<string, number[]>;
 
   const [selected, setSelected] = useState<TemplateKey>("minimal");
-  const [showProjectPicker, setShowProjectPicker] = useState(false);
+  const [showProjectPicker, setShowProjectPicker] = useState(true);
   const [selectedProjectIds, setSelectedProjectIds] = useState<Set<string>>(
     () => getDefaultProjectIds(),
   );
@@ -63,6 +63,10 @@ export default function CVExportModal({
     useState<Record<string, number[]>>(() => getDefaultProjectActionIndexes());
   const [projectSearch, setProjectSearch] = useState("");
   const [projectTagFilter, setProjectTagFilter] = useState<string>("all");
+
+  // Which project's actions are shown in the right panel (wide layout)
+  const [focusedProjectId, setFocusedProjectId] = useState<string | null>(null);
+
   const contentRef = useRef<HTMLDivElement>(null);
   const printRef = useRef<HTMLDivElement>(null);
 
@@ -74,16 +78,13 @@ export default function CVExportModal({
     html { margin: 0; background: #fff !important; }
   `;
 
-  // A4 pages, break-inside rules on [data-cv-item] keep items intact
   const printA4 = useReactToPrint({
     contentRef: printRef,
     documentTitle: docTitle,
     pageStyle: `@page { size: A4 portrait; margin: 20mm 15mm; } ${basePageStyle}`,
   });
 
-  // Preview: open styled HTML in a new tab — no print dialog, purely visual
   const handlePreview = () => {
-    // Preview must use preview DOM only (contentRef), fully independent from print DOM
     if (!contentRef.current) return;
     const content = contentRef.current.outerHTML;
     const win = window.open("", "_blank");
@@ -106,7 +107,6 @@ export default function CVExportModal({
     win.document.close();
   };
 
-  // Download: trigger browser native print dialog → user selects "Save as PDF"
   const handleDownloadPDF = () => printA4();
 
   const allTags = Array.from(new Set(projects.map((p) => p.tag))).sort();
@@ -126,25 +126,24 @@ export default function CVExportModal({
         const next = new Set(prev);
         if (next.has(id)) {
           next.delete(id);
+          // Clear focus if this project was focused
+          setFocusedProjectId((f) => (f === id ? null : f));
         } else if (next.size < 10) {
           next.add(id);
+          // Auto-focus newly added project to show its actions
+          setFocusedProjectId(id);
         }
         return next;
       });
       setSelectedProjectActionIndexes((prev) => {
         const project = projects.find((item) => item.id === id);
         if (!project) return prev;
-
         if (id in prev) {
           const next = { ...prev };
           delete next[id];
           return next;
         }
-
-        return {
-          ...prev,
-          [id]: getAllActionIndexes(project),
-        };
+        return { ...prev, [id]: getAllActionIndexes(project) };
       });
     },
     [projects],
@@ -187,6 +186,174 @@ export default function CVExportModal({
     };
   }, [onClose]);
 
+  const focusedProject = projects.find((p) => p.id === focusedProjectId);
+
+  // Shared search + tag filter bar
+  const SearchBar = (
+    <div className="p-2 border-b border-terminal-border/20 space-y-1.5">
+      <div className="flex items-center gap-1.5 bg-terminal-bg/60 border border-terminal-border/30 rounded-sm px-2 py-1">
+        <Search size={9} className="text-terminal-muted flex-shrink-0" />
+        <input
+          type="text"
+          placeholder="search title or tag…"
+          value={projectSearch}
+          onChange={(e) => setProjectSearch(e.target.value)}
+          className="flex-1 bg-transparent text-[10px] text-terminal-text placeholder:text-terminal-muted/50 outline-none"
+        />
+        {projectSearch && (
+          <button
+            onClick={() => setProjectSearch("")}
+            className="text-terminal-muted hover:text-terminal-error transition-colors text-[9px]"
+          >
+            ✕
+          </button>
+        )}
+      </div>
+      <div className="flex flex-wrap gap-1">
+        {["all", ...allTags].map((tag) => (
+          <button
+            key={tag}
+            onClick={() => setProjectTagFilter(tag)}
+            className={`px-2 py-0.5 text-[8px] rounded-sm border transition-all ${
+              projectTagFilter === tag
+                ? "border-terminal-accent/50 bg-terminal-accent/10 text-terminal-accent"
+                : "border-terminal-border/30 text-terminal-muted hover:text-terminal-text"
+            }`}
+          >
+            {tag}
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+
+  // Project list rows (shared between narrow/wide)
+  const ProjectRows = (
+    <div className="overflow-y-auto max-h-44 sm:max-h-full sm:flex-1">
+      {filteredProjects.length === 0 && (
+        <div className="px-3 py-3 text-[10px] text-terminal-muted text-center">
+          no results
+        </div>
+      )}
+      {filteredProjects.map((proj) => {
+        const checked = selectedProjectIds.has(proj.id);
+        const atMax = selectedProjectIds.size >= 10 && !checked;
+        const isFocused = focusedProjectId === proj.id;
+
+        return (
+          <div
+            key={proj.id}
+            className={`border-b border-terminal-border/20 last:border-0 ${
+              checked
+                ? isFocused
+                  ? "bg-terminal-accent/10"
+                  : "bg-terminal-accent/5"
+                : atMax
+                  ? "opacity-40 cursor-not-allowed"
+                  : "hover:bg-terminal-surface/30"
+            }`}
+          >
+            {/* Row — checkbox + title + tag + focus trigger */}
+            <div className="flex items-center gap-2 px-3 py-2">
+              {/* Checkbox */}
+              <button
+                disabled={atMax}
+                onClick={() => toggleProject(proj.id)}
+                className="flex-shrink-0"
+              >
+                <div
+                  className={`w-3.5 h-3.5 border rounded-[2px] flex items-center justify-center transition-colors ${
+                    checked
+                      ? "border-terminal-accent bg-terminal-accent/20"
+                      : "border-terminal-border/50"
+                  }`}
+                >
+                  {checked && (
+                    <Check size={8} className="text-terminal-accent" />
+                  )}
+                </div>
+              </button>
+
+              {/* Title — clicking focuses on wide layout, toggles expand on narrow */}
+              <button
+                className={`flex-1 text-left text-[10px] truncate transition-colors ${
+                  checked ? "text-terminal-text" : "text-terminal-muted"
+                } ${checked ? "hover:text-terminal-accent" : ""}`}
+                onClick={() => {
+                  if (!checked) return;
+                  setFocusedProjectId((prev) =>
+                    prev === proj.id ? null : proj.id,
+                  );
+                }}
+                disabled={!checked}
+              >
+                {proj.title}
+              </button>
+
+              <span className="text-[9px] text-terminal-muted/50 flex-shrink-0 ml-1">
+                {proj.tag}
+              </span>
+
+              {/* Inline chevron for narrow screens only (sm:hidden) */}
+              {checked && proj.actions.length > 0 && (
+                <button
+                  className="sm:hidden text-terminal-muted hover:text-terminal-accent transition-colors"
+                  onClick={() =>
+                    setFocusedProjectId((prev) =>
+                      prev === proj.id ? null : proj.id,
+                    )
+                  }
+                >
+                  {isFocused ? (
+                    <ChevronUp size={10} />
+                  ) : (
+                    <ChevronDown size={10} />
+                  )}
+                </button>
+              )}
+            </div>
+
+            {/* Inline actions — narrow only (sm:hidden) */}
+            {checked && isFocused && proj.actions.length > 0 && (
+              <div className="sm:hidden px-3 pb-2 pt-0.5 space-y-1.5">
+                <div className="text-[8px] uppercase tracking-wider text-terminal-info/60">
+                  selected actions (
+                  {(selectedProjectActionIndexes[proj.id] ?? []).length}/
+                  {proj.actions.length})
+                </div>
+                <div className="space-y-1">
+                  {proj.actions.map((action, actionIndex) => {
+                    const actionChecked = (
+                      selectedProjectActionIndexes[proj.id] ?? []
+                    ).includes(actionIndex);
+                    return (
+                      <label
+                        key={`${proj.id}-${actionIndex}`}
+                        className="flex items-start gap-2 cursor-pointer"
+                      >
+                        <input
+                          type="checkbox"
+                          className="mt-[2px]"
+                          checked={actionChecked}
+                          onChange={() =>
+                            toggleProjectAction(proj.id, actionIndex)
+                          }
+                        />
+                        <span className="text-[9px] leading-4 text-terminal-muted">
+                          {action}
+                        </span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+
   return (
     <div
       className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
@@ -198,6 +365,7 @@ export default function CVExportModal({
         className="relative w-full sm:max-w-3xl max-h-[90vh] sm:max-h-[85vh] overflow-y-auto card-base rounded-t-sm sm:rounded-sm animate-slide-up"
         onClick={(e) => e.stopPropagation()}
       >
+        {/* Header */}
         <div className="terminal-header sticky top-0 bg-terminal-card z-10">
           <div className="terminal-dot bg-terminal-error/80" />
           <div className="terminal-dot bg-terminal-warning/80" />
@@ -215,6 +383,7 @@ export default function CVExportModal({
         </div>
 
         <div className="p-4 sm:p-6 space-y-5">
+          {/* Template selector */}
           <div>
             <span className="section-label text-terminal-info/70 flex items-center gap-1.5">
               <Palette size={10} />
@@ -246,6 +415,7 @@ export default function CVExportModal({
 
           {/* Project picker */}
           <div>
+            {/* Picker header */}
             <div className="flex items-center justify-between">
               <span className="section-label text-terminal-info/70">
                 projects&nbsp;
@@ -275,6 +445,7 @@ export default function CVExportModal({
                   onClick={() => {
                     setSelectedProjectIds(new Set());
                     setSelectedProjectActionIndexes({});
+                    setFocusedProjectId(null);
                   }}
                   className="text-[9px] text-terminal-muted hover:text-terminal-error transition-colors"
                 >
@@ -292,149 +463,162 @@ export default function CVExportModal({
                 </button>
               </div>
             </div>
+
             {showProjectPicker && (
               <div className="mt-2 border border-terminal-border/30 rounded-sm">
-                {/* Search + tag filter */}
-                <div className="p-2 border-b border-terminal-border/20 space-y-1.5">
-                  <div className="flex items-center gap-1.5 bg-terminal-bg/60 border border-terminal-border/30 rounded-sm px-2 py-1">
-                    <Search
-                      size={9}
-                      className="text-terminal-muted flex-shrink-0"
-                    />
-                    <input
-                      type="text"
-                      placeholder="search title or tag…"
-                      value={projectSearch}
-                      onChange={(e) => setProjectSearch(e.target.value)}
-                      className="flex-1 bg-transparent text-[10px] text-terminal-text placeholder:text-terminal-muted/50 outline-none"
-                    />
-                    {projectSearch && (
-                      <button
-                        onClick={() => setProjectSearch("")}
-                        className="text-terminal-muted hover:text-terminal-error transition-colors text-[9px]"
-                      >
-                        ✕
-                      </button>
-                    )}
+                {/* ── WIDE layout: side-by-side ── */}
+                <div className="hidden sm:flex" style={{ minHeight: "220px" }}>
+                  {/* Left: search + list */}
+                  <div className="flex flex-col w-1/2 border-r border-terminal-border/20">
+                    {SearchBar}
+                    {ProjectRows}
                   </div>
-                  <div className="flex flex-wrap gap-1">
-                    {["all", ...allTags].map((tag) => (
-                      <button
-                        key={tag}
-                        onClick={() => setProjectTagFilter(tag)}
-                        className={`px-2 py-0.5 text-[8px] rounded-sm border transition-all ${
-                          projectTagFilter === tag
-                            ? "border-terminal-accent/50 bg-terminal-accent/10 text-terminal-accent"
-                            : "border-terminal-border/30 text-terminal-muted hover:text-terminal-text"
-                        }`}
-                      >
-                        {tag}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                {/* List */}
-                <div className="overflow-y-auto max-h-44">
-                  {filteredProjects.length === 0 && (
-                    <div className="px-3 py-3 text-[10px] text-terminal-muted text-center">
-                      no results
-                    </div>
-                  )}
-                  {filteredProjects.map((proj) => {
-                    const checked = selectedProjectIds.has(proj.id);
-                    const atMax = selectedProjectIds.size >= 10 && !checked;
-                    const selectedActions =
-                      selectedProjectActionIndexes[proj.id] ?? [];
-                    return (
-                      <div
-                        key={proj.id}
-                        className={`border-b border-terminal-border/20 last:border-0 ${
-                          checked
-                            ? "bg-terminal-accent/5"
-                            : atMax
-                              ? "opacity-40 cursor-not-allowed"
-                              : "hover:bg-terminal-surface/30"
-                        }`}
-                      >
-                        <label className="flex items-center gap-2 px-3 py-2 cursor-pointer transition-colors">
-                          <input
-                            type="checkbox"
-                            className="sr-only"
-                            checked={checked}
-                            disabled={atMax}
-                            onChange={() => toggleProject(proj.id)}
-                          />
-                          <div
-                            className={`w-3.5 h-3.5 border rounded-[2px] flex items-center justify-center flex-shrink-0 transition-colors ${
-                              checked
-                                ? "border-terminal-accent bg-terminal-accent/20"
-                                : "border-terminal-border/50"
-                            }`}
-                          >
-                            {checked && (
-                              <Check
-                                size={8}
-                                className="text-terminal-accent"
-                              />
-                            )}
-                          </div>
-                          <span
-                            className={`text-[10px] flex-1 truncate ${
-                              checked
-                                ? "text-terminal-text"
-                                : "text-terminal-muted"
-                            }`}
-                          >
-                            {proj.title}
-                          </span>
-                          <span className="text-[9px] text-terminal-muted/50 flex-shrink-0 ml-1">
-                            {proj.tag}
-                          </span>
-                        </label>
 
-                        {checked && proj.actions.length > 0 && (
-                          <div className="px-3 pb-2 pt-0.5 space-y-1.5">
-                            <div className="text-[8px] uppercase tracking-wider text-terminal-info/60">
-                              selected actions ({selectedActions.length}/
-                              {proj.actions.length})
+                  {/* Right: action detail panel */}
+                  <div className="flex flex-col w-1/2">
+                    {focusedProject &&
+                    selectedProjectIds.has(focusedProject.id) ? (
+                      <div className="flex flex-col h-full">
+                        {/* Panel header */}
+                        <div className="px-3 py-2 border-b border-terminal-border/20 flex items-center justify-between">
+                          <div className="min-w-0">
+                            <div className="text-[10px] text-terminal-text font-medium truncate">
+                              {focusedProject.title}
                             </div>
-                            <div className="space-y-1">
-                              {proj.actions.map((action, actionIndex) => {
-                                const actionChecked =
-                                  selectedActions.includes(actionIndex);
+                            <div className="text-[8px] uppercase tracking-wider text-terminal-info/60 mt-0.5">
+                              actions (
+                              {
+                                (
+                                  selectedProjectActionIndexes[
+                                    focusedProject.id
+                                  ] ?? []
+                                ).length
+                              }
+                              /{focusedProject.actions.length} selected)
+                            </div>
+                          </div>
+                          <button
+                            onClick={() => setFocusedProjectId(null)}
+                            className="ml-2 flex-shrink-0 text-terminal-muted hover:text-terminal-error transition-colors"
+                          >
+                            <X size={10} />
+                          </button>
+                        </div>
+
+                        {/* Action list */}
+                        <div className="overflow-y-auto flex-1 p-2 space-y-1">
+                          {focusedProject.actions.length === 0 ? (
+                            <div className="text-[9px] text-terminal-muted text-center py-4">
+                              no actions
+                            </div>
+                          ) : (
+                            focusedProject.actions.map(
+                              (action, actionIndex) => {
+                                const actionChecked = (
+                                  selectedProjectActionIndexes[
+                                    focusedProject.id
+                                  ] ?? []
+                                ).includes(actionIndex);
                                 return (
                                   <label
-                                    key={`${proj.id}-${actionIndex}`}
-                                    className="flex items-start gap-2 cursor-pointer"
+                                    key={`${focusedProject.id}-wide-${actionIndex}`}
+                                    className="flex items-start gap-2 cursor-pointer group"
                                   >
-                                    <input
-                                      type="checkbox"
-                                      className="mt-[2px]"
-                                      checked={actionChecked}
-                                      onChange={() =>
+                                    <div
+                                      className={`mt-[2px] w-3 h-3 flex-shrink-0 border rounded-[2px] flex items-center justify-center transition-colors ${
+                                        actionChecked
+                                          ? "border-terminal-accent bg-terminal-accent/20"
+                                          : "border-terminal-border/50 group-hover:border-terminal-accent/40"
+                                      }`}
+                                      onClick={() =>
                                         toggleProjectAction(
-                                          proj.id,
+                                          focusedProject.id,
                                           actionIndex,
                                         )
                                       }
-                                    />
-                                    <span className="text-[9px] leading-4 text-terminal-muted">
+                                    >
+                                      {actionChecked && (
+                                        <Check
+                                          size={7}
+                                          className="text-terminal-accent"
+                                        />
+                                      )}
+                                    </div>
+                                    <span
+                                      className={`text-[9px] leading-4 transition-colors ${
+                                        actionChecked
+                                          ? "text-terminal-text"
+                                          : "text-terminal-muted"
+                                      }`}
+                                      onClick={() =>
+                                        toggleProjectAction(
+                                          focusedProject.id,
+                                          actionIndex,
+                                        )
+                                      }
+                                    >
                                       {action}
                                     </span>
                                   </label>
                                 );
-                              })}
-                            </div>
-                          </div>
-                        )}
+                              },
+                            )
+                          )}
+                        </div>
+
+                        {/* Quick select all/none */}
+                        <div className="px-3 py-1.5 border-t border-terminal-border/20 flex gap-3">
+                          <button
+                            onClick={() =>
+                              setSelectedProjectActionIndexes((prev) => ({
+                                ...prev,
+                                [focusedProject.id]:
+                                  getAllActionIndexes(focusedProject),
+                              }))
+                            }
+                            className="text-[8px] text-terminal-muted hover:text-terminal-accent transition-colors"
+                          >
+                            all
+                          </button>
+                          <button
+                            onClick={() =>
+                              setSelectedProjectActionIndexes((prev) => ({
+                                ...prev,
+                                [focusedProject.id]: [],
+                              }))
+                            }
+                            className="text-[8px] text-terminal-muted hover:text-terminal-error transition-colors"
+                          >
+                            none
+                          </button>
+                        </div>
                       </div>
-                    );
-                  })}
+                    ) : (
+                      /* Empty state */
+                      <div className="flex flex-col items-center justify-center h-full text-center px-4 py-6 gap-1.5">
+                        <div className="text-terminal-muted/40 text-[10px] uppercase tracking-wider">
+                          actions panel
+                        </div>
+                        <div className="text-terminal-muted/30 text-[9px]">
+                          {selectedProjectIds.size === 0
+                            ? "select a project to configure its actions"
+                            : "click a selected project title to edit its actions"}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
+
+                {/* ── NARROW layout: stacked (original) ── */}
+                <div className="sm:hidden">
+                  {SearchBar}
+                  {ProjectRows}
                 </div>
               </div>
             )}
           </div>
 
+          {/* Live preview */}
           <div className="card-base p-4 space-y-2">
             <div className="flex items-center justify-between text-[10px] text-terminal-muted">
               <span>LIVE PREVIEW</span>
@@ -444,7 +628,6 @@ export default function CVExportModal({
               className="border border-terminal-border/30 rounded-sm overflow-auto bg-white"
               style={{ maxHeight: "400px" }}
             >
-              {/* Preview-only render — scrollable but NOT used for capture */}
               <div
                 ref={contentRef}
                 style={{ width: "100%", maxWidth: "100%", margin: "0 auto" }}
@@ -461,7 +644,7 @@ export default function CVExportModal({
             </div>
           </div>
 
-          {/* Off-screen full-height render used for printing — must have explicit white bg */}
+          {/* Off-screen print render */}
           <div
             aria-hidden="true"
             style={{
@@ -485,6 +668,7 @@ export default function CVExportModal({
             </div>
           </div>
 
+          {/* Actions */}
           <div className="flex gap-2">
             <button
               onClick={handlePreview}
@@ -509,6 +693,8 @@ export default function CVExportModal({
   );
 }
 
+// ── CVContent, Section, SidebarSection, SkillsGrid unchanged below ──
+
 function CVContent({
   template,
   profile,
@@ -526,7 +712,6 @@ function CVContent({
 }) {
   if (template === "minimal") {
     const minimalPadding = renderMode === "preview" ? "24px " : "0px";
-
     return (
       <div
         style={{
@@ -539,7 +724,6 @@ function CVContent({
           boxSizing: "border-box",
         }}
       >
-        {/* Header */}
         <div style={{ marginBottom: "20px" }}>
           <h1
             style={{
@@ -572,7 +756,6 @@ function CVContent({
               .join(" • ")}
           </div>
         </div>
-
         <hr
           style={{
             margin: "16px 0",
@@ -580,15 +763,11 @@ function CVContent({
             borderTop: "2px solid #ddd",
           }}
         />
-
-        {/* Summary */}
         <Section title="SUMMARY">
           <p style={{ margin: "0", fontSize: "13px", lineHeight: "1.7" }}>
             {profile.summary}
           </p>
         </Section>
-
-        {/* Experience */}
         <Section title="EXPERIENCE">
           {profile.experience.map((exp, i) => (
             <div key={i} data-cv-item="true" style={{ marginBottom: "14px" }}>
@@ -645,15 +824,11 @@ function CVContent({
             </div>
           ))}
         </Section>
-
-        {/* Skills */}
         {techStack && techStack.length > 0 && (
           <Section title="SKILLS">
             <SkillsGrid techStack={techStack} />
           </Section>
         )}
-
-        {/* Education */}
         {profile.education && profile.education.length > 0 && (
           <Section title="EDUCATION">
             {profile.education.map((edu, i) => (
@@ -663,8 +838,6 @@ function CVContent({
             ))}
           </Section>
         )}
-
-        {/* Projects */}
         {projects.length > 0 && (
           <Section title="PROJECTS">
             {projects.map((proj, i) => (
@@ -702,7 +875,6 @@ function CVContent({
                 >
                   <strong>Problem:</strong> {proj.problem}
                 </p>
-
                 {proj.actions.length > 0 && (
                   <div style={{ margin: "5px 0" }}>
                     <div style={{ fontSize: "13px", fontWeight: "bold" }}>
@@ -747,8 +919,6 @@ function CVContent({
             ))}
           </Section>
         )}
-
-        {/* Certificates */}
         {certificates.length > 0 && (
           <Section title="CERTIFICATIONS">
             {certificates.map((cert, i) => (
@@ -771,8 +941,6 @@ function CVContent({
             ))}
           </Section>
         )}
-
-        {/* Footer */}
         <div
           style={{
             marginTop: "24px",
@@ -803,7 +971,6 @@ function CVContent({
           lineHeight: "1.6",
         }}
       >
-        {/* Sidebar */}
         <div
           style={{
             width: "170px",
@@ -852,7 +1019,6 @@ function CVContent({
           >
             {profile.title}
           </p>
-
           <SidebarSection title="CONTACT">
             <div style={{ fontSize: "9.5px", lineHeight: "1.65" }}>
               {profile.email && (
@@ -870,7 +1036,6 @@ function CVContent({
               )}
             </div>
           </SidebarSection>
-
           {profile.education && profile.education.length > 0 && (
             <SidebarSection title="EDUCATION">
               {profile.education.map((edu, i) => (
@@ -891,7 +1056,6 @@ function CVContent({
               ))}
             </SidebarSection>
           )}
-
           {certificates.length > 0 && (
             <SidebarSection title="CERTIFICATIONS">
               {certificates.map((cert, i) => (
@@ -919,8 +1083,6 @@ function CVContent({
             </SidebarSection>
           )}
         </div>
-
-        {/* Main Content */}
         <div
           style={{
             flex: 1,
@@ -935,7 +1097,6 @@ function CVContent({
               {profile.summary}
             </p>
           </Section>
-
           <Section title="EXPERIENCE">
             {profile.experience.map((exp, i) => (
               <div key={i} data-cv-item="true" style={{ marginBottom: "12px" }}>
@@ -993,7 +1154,6 @@ function CVContent({
               </div>
             ))}
           </Section>
-
           {projects.length > 0 && (
             <Section title="PROJECTS">
               {projects.map((proj, i) => (
@@ -1019,14 +1179,12 @@ function CVContent({
                           fontSize: "12px",
                           color: "#0e6e64",
                           fontWeight: "bold",
-                          marginBottom: "2px",
                           textTransform: "uppercase",
                         }}
                       >
                         - {proj.tag}
                       </span>
                     </div>
-
                     <div
                       style={{
                         fontSize: "12px",
@@ -1038,7 +1196,6 @@ function CVContent({
                       {proj.created_at}
                     </div>
                   </div>
-
                   <p
                     style={{
                       margin: "2px 0",
@@ -1080,8 +1237,6 @@ function CVContent({
                   {proj.results && proj.results.length > 0 && (
                     <p
                       style={{
-                        listStyleType: "disc",
-                        listStylePosition: "outside",
                         margin: "2px 0",
                         fontSize: "13px",
                         lineHeight: "1.5",
@@ -1095,7 +1250,6 @@ function CVContent({
                         .join(" • ")}
                     </p>
                   )}
-
                   <p
                     style={{
                       margin: "2px 0 0 0",
@@ -1109,20 +1263,6 @@ function CVContent({
               ))}
             </Section>
           )}
-
-          {/* Footer */}
-          <div
-            style={{
-              marginTop: "auto",
-              paddingTop: "12px",
-              borderTop: "1px solid rgba(182,220,214,0.25)",
-              fontSize: "9.5px",
-              color: "rgba(190,216,210,0.6)",
-              display: "flex",
-              justifyContent: "space-between",
-              backgroundColor: "transparent",
-            }}
-          ></div>
         </div>
       </div>
     );
@@ -1140,7 +1280,6 @@ function CVContent({
         boxSizing: "border-box",
       }}
     >
-      {/* Header Band */}
       <div
         style={{
           backgroundColor: "#142e5c",
@@ -1177,15 +1316,12 @@ function CVContent({
             .join(" | ")}
         </div>
       </div>
-
-      {/* Body */}
       <div style={{ padding: "0 24px" }}>
         <Section title="SUMMARY">
           <p style={{ margin: "0", fontSize: "13px", lineHeight: "1.6" }}>
             {profile.summary}
           </p>
         </Section>
-
         <Section title="EXPERIENCE">
           {profile.experience.map((exp, i) => (
             <div key={i} data-cv-item="true" style={{ marginBottom: "12px" }}>
@@ -1241,13 +1377,11 @@ function CVContent({
             </div>
           ))}
         </Section>
-
         {techStack && techStack.length > 0 && (
           <Section title="SKILLS">
             <SkillsGrid techStack={techStack} />
           </Section>
         )}
-
         {profile.education && profile.education.length > 0 && (
           <Section title="EDUCATION">
             {profile.education.map((edu, i) => (
@@ -1257,7 +1391,6 @@ function CVContent({
             ))}
           </Section>
         )}
-
         {projects.length > 0 && (
           <Section title="PROJECTS">
             {projects.map((proj, i) => (
@@ -1338,7 +1471,6 @@ function CVContent({
                       .join(" • ")}
                   </p>
                 )}
-
                 <p
                   style={{
                     margin: "2px 0 0 0",
@@ -1352,7 +1484,6 @@ function CVContent({
             ))}
           </Section>
         )}
-
         {certificates.length > 0 && (
           <Section title="CERTIFICATIONS">
             {certificates.map((cert, i) => (
@@ -1366,8 +1497,6 @@ function CVContent({
             ))}
           </Section>
         )}
-
-        {/* Footer */}
         <div
           style={{
             marginTop: "24px",
@@ -1464,7 +1593,6 @@ function SkillsGrid({ techStack }: { techStack: TechItem[] }) {
     cicd: "CI/CD",
     data: "Data",
   };
-
   return (
     <div>
       {categories.map((cat) => {

@@ -13,6 +13,15 @@ export default function ProjectDetailModal({
   onClose,
 }: ProjectDetailModalProps) {
   const { t } = useLanguage();
+
+  const openBlog = useCallback(() => {
+    if (!project?.blogUrl) return;
+    window.history.pushState({}, "", project.blogUrl);
+    window.dispatchEvent(new PopStateEvent("popstate"));
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    onClose();
+  }, [project, onClose]);
+
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -145,6 +154,21 @@ export default function ProjectDetailModal({
               ))}
             </div>
           </div>
+
+          {project.blogUrl && (
+            <div>
+              <span className="text-[12px] section-label text-terminal-warning/70 pr-2">
+                {t("project.blog")}
+              </span>
+              <button
+                onClick={openBlog}
+                className="mt-1.5 inline-flex items-center gap-1.5 text-xs text-terminal-accent hover:text-terminal-text transition-colors"
+              >
+                <ExternalLink size={12} />
+                {project.blogUrl}
+              </button>
+            </div>
+          )}
 
           {/* Insight */}
           <div className="pt-4 border-t border-terminal-border/30">

@@ -10,6 +10,7 @@ import type {
   TechItem,
   WelcomeLine,
 } from "./portfolio.types";
+import { createBlogPostsEn, withBlogUrls } from "./blog.en";
 
 export const categoryLabels: Record<string, string> = {
   lang: "languages",
@@ -97,6 +98,7 @@ export const siteConfig: SiteConfig = {
   brand: "devmindtan.portfolio",
   navLinks: [
     { label: "projects", href: "#projects" },
+    { label: "blog", href: "/blog" },
     { label: "stack", href: "#stack" },
     { label: "contact", href: "#contact" },
   ],
@@ -556,10 +558,35 @@ export const projects: Project[] = [
     sort_order: 14,
     created_at: "2025-03-01",
   },
+  {
+    id: "p15",
+    title: "Video Transcoding Pipeline Test",
+    tag: "media",
+    problem:
+      "Manual transcoding workflow, 8h per video, no adaptive bitrate, $200K/year in compute waste.",
+    actions: [
+      "Built event-driven transcoding with per-title encoding",
+      "Implemented adaptive bitrate ladder optimization",
+      "Created GPU-accelerated preview generation",
+    ],
+    results: [
+      { value: "15min", label: "per video" },
+      { value: "40%", label: "storage saved" },
+      { value: "4K", label: "max resolution" },
+    ],
+    insight: "Per-title encoding pays for itself within a month at scale.",
+    tech: ["Go", "FFmpeg", "AWS", "Kafka"],
+    sort_order: 15,
+    created_at: "2025-03-01",
+  },
 ];
 
+export const blogPosts = createBlogPostsEn(projects);
+const projectsWithBlogUrls = withBlogUrls(projects, blogPosts);
+
 export const portfolioDataEn: PortfolioData = {
-  projects,
+  projects: projectsWithBlogUrls,
+  blogPosts,
   techStack,
   stats,
   profile,

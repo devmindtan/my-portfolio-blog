@@ -1,3 +1,5 @@
+import type { BlogPost } from "./blog.types";
+
 export interface Project {
   id: string;
   title: string;
@@ -7,6 +9,7 @@ export interface Project {
   results: { value: string; label: string }[];
   insight: string;
   tech: string[];
+  blogUrl?: string;
   sort_order: number;
   created_at: string;
 }
@@ -116,6 +119,7 @@ export interface Profile {
 
 export interface PortfolioData {
   projects: Project[];
+  blogPosts: BlogPost[];
   techStack: TechItem[];
   stats: Stat[];
   profile: Profile;

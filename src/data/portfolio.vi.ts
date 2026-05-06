@@ -1,5 +1,7 @@
 import { portfolioDataEn } from "./portfolio.en";
 import type { PortfolioData } from "./portfolio.types";
+import { createBlogPostsVi } from "./blog.vi";
+import { withBlogUrls } from "./blog.en";
 
 const profileVi = {
   ...portfolioDataEn.profile,
@@ -279,6 +281,9 @@ const projectsVi = portfolioDataEn.projects.map((p) => {
   };
 });
 
+const blogPostsVi = createBlogPostsVi(projectsVi, portfolioDataEn.blogPosts);
+const projectsViWithBlogUrls = withBlogUrls(projectsVi, blogPostsVi);
+
 const certificatesVi = portfolioDataEn.certificates.map((cert) => {
   const nameMap: Record<string, string> = {
     "Olympic PMNM Contest 2025": "Cuộc thi Olympic PMNM 2025",
@@ -341,6 +346,7 @@ export const portfolioDataVi: PortfolioData = {
     ...portfolioDataEn.siteConfig,
     navLinks: [
       { label: "dự án", href: "#projects" },
+      { label: "blog", href: "/blog" },
       { label: "công nghệ", href: "#stack" },
       { label: "liên hệ", href: "#contact" },
     ],
@@ -359,5 +365,6 @@ export const portfolioDataVi: PortfolioData = {
     },
   },
 
-  projects: projectsVi,
+  projects: projectsViWithBlogUrls,
+  blogPosts: blogPostsVi,
 };

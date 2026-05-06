@@ -1,15 +1,32 @@
 export const vi: Record<string, string> = {
   // Nav
   "nav.projects": "Dự án",
+  "nav.blog": "BLOG",
   "nav.stack": "Công nghệ",
   "nav.contact": "Liên hệ",
   "nav.exportCv": "Xuất CV",
   "nav.language": "Ngôn ngữ",
   "nav.languageShort": "VI",
 
+  // Settings
+  "settings.open": "Cài đặt",
+  "settings.title": "Cài đặt",
+  "settings.close": "Đóng",
+
   // Sections
   "section.projects": "Dự án nổi bật",
   "section.connect": "Kết nối",
+
+  // Blog
+  "blog.title": "Blog Kỹ Thuật",
+  "blog.subtitle":
+    "Các bài viết chi tiết cho từng dự án: kiến trúc, đánh đổi và hành trình triển khai.",
+  "blog.backHome": "Quay lại portfolio",
+  "blog.readPost": "Đọc bài viết",
+  "blog.backToList": "Quay lại danh sách bài viết",
+  "blog.readTime": "Thời gian đọc",
+  "blog.tags": "Nhãn",
+  "blog.empty": "Không tìm thấy bài blog cho đường dẫn này.",
 
   // Status
   "status.available": "Sẵn sàng cho dự án mới",
@@ -54,6 +71,7 @@ export const vi: Record<string, string> = {
   "project.action": "hành động",
   "project.result": "kết quả",
   "project.techStack": "công nghệ",
+  "project.blog": "bài viết blog",
   "project.clickToClose": "bấm ra ngoài để đóng",
 
   // Filter bar

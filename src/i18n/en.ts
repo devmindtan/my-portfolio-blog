@@ -1,15 +1,32 @@
 export const en: Record<string, string> = {
   // Nav
   "nav.projects": "Projects",
+  "nav.blog": "BLOG",
   "nav.stack": "Stack",
   "nav.contact": "Contact",
   "nav.exportCv": "Export CV",
   "nav.language": "Language",
   "nav.languageShort": "EN",
 
+  // Settings
+  "settings.open": "Settings",
+  "settings.title": "Settings",
+  "settings.close": "Close",
+
   // Sections
   "section.projects": "Selected Work",
   "section.connect": "Connect",
+
+  // Blog
+  "blog.title": "Engineering Blog",
+  "blog.subtitle":
+    "Long-form writeups for each project with architecture choices, trade-offs, and delivery notes.",
+  "blog.backHome": "Back to portfolio",
+  "blog.readPost": "Read post",
+  "blog.backToList": "Back to all posts",
+  "blog.readTime": "Read time",
+  "blog.tags": "Tags",
+  "blog.empty": "No blog post found for this URL.",
 
   // Status
   "status.available": "Available for new projects",
@@ -52,6 +69,7 @@ export const en: Record<string, string> = {
   "project.action": "action",
   "project.result": "result",
   "project.techStack": "tech stack",
+  "project.blog": "blog article",
   "project.clickToClose": "click outside to close",
 
   // Filter bar

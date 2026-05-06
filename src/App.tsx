@@ -15,7 +15,8 @@ import CVExportModal from "./components/CVExportModal";
 import ContactCard from "./components/ContactCard";
 import Footer from "./components/Footer";
 import ScrollToTop from "./components/ScrollToTop";
-import CompactViewToggle from "./components/CompactViewToggle";
+import BlogPage from "./components/BlogPage";
+import SettingsModal from "./components/SettingsModal";
 import useCompactView from "./hooks/useCompactView";
 import { useLanguage } from "./contexts/LanguageContext";
 import { portfolioDataEn } from "./data/portfolio.en";
@@ -27,10 +28,15 @@ import type {
   ViewMode,
 } from "./data/portfolio.types";
 import { ITEMS_PER_PAGE } from "./data/portfolio.en";
-import { FileText, Menu, X } from "lucide-react";
+import { Menu, Settings2, X } from "lucide-react";
+
+const INTRO_SEEN_KEY = "portfolio.welcomeSeen";
 
 function App() {
-  const [showIntro, setShowIntro] = useState(true);
+  const [pathname, setPathname] = useState(window.location.pathname);
+  const [showIntro, setShowIntro] = useState(() => {
+    return window.sessionStorage.getItem(INTRO_SEEN_KEY) !== "1";
+  });
   const [selectedTag, setSelectedTag] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [sortKey, setSortKey] = useState<SortKey>("sort_order");
@@ -39,6 +45,7 @@ function App() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [showCVExport, setShowCVExport] = useState(false);
+  const [showSettings, setShowSettings] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { compactView, toggleCompactView } = useCompactView();
@@ -51,6 +58,7 @@ function App() {
 
   const {
     projects,
+    blogPosts,
     techStack,
     stats,
     profile,
@@ -60,6 +68,12 @@ function App() {
     certificates,
     siteConfig,
   } = portfolioData;
+
+  useEffect(() => {
+    const onPopState = () => setPathname(window.location.pathname);
+    window.addEventListener("popstate", onPopState);
+    return () => window.removeEventListener("popstate", onPopState);
+  }, []);
 
   useEffect(() => {
     function onScroll() {
@@ -83,7 +97,7 @@ function App() {
   }, [projects]);
 
   const filteredAndSorted = useMemo(() => {
-    let result = projects.filter((p) => {
+    const result = projects.filter((p) => {
       const matchesTag = selectedTag === null || p.tag === selectedTag;
       if (!searchQuery) return matchesTag;
       const q = searchQuery.toLowerCase();
@@ -125,7 +139,7 @@ function App() {
     return filteredAndSorted.slice(start, start + ITEMS_PER_PAGE);
   }, [filteredAndSorted, currentPage]);
 
-  useMemo(() => {
+  useEffect(() => {
     setCurrentPage(1);
   }, [selectedTag, searchQuery]);
 
@@ -142,6 +156,7 @@ function App() {
 
   const navLabelByKey: Record<string, string> = {
     projects: t("nav.projects"),
+    blog: t("nav.blog"),
     stack: t("nav.stack"),
     contact: t("nav.contact"),
   };
@@ -149,13 +164,80 @@ function App() {
   const sectionProjectsTitle = t("section.projects");
   const sectionConnectTitle = t("section.connect");
 
+  const navigate = useCallback(
+    (nextPath: string) => {
+      if (nextPath === pathname) return;
+      window.history.pushState({}, "", nextPath);
+      setPathname(nextPath);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    },
+    [pathname],
+  );
+
+  const handleWelcomeComplete = useCallback(() => {
+    setShowIntro(false);
+    window.sessionStorage.setItem(INTRO_SEEN_KEY, "1");
+  }, []);
+
+  const handleNavigateHome = useCallback(() => {
+    setShowIntro(false);
+    window.sessionStorage.setItem(INTRO_SEEN_KEY, "1");
+    navigate("/");
+  }, [navigate]);
+
+  const handleOpenCVFromSettings = useCallback(() => {
+    setShowSettings(false);
+    setShowCVExport(true);
+  }, []);
+
+  const renderGlobalActions = (
+    <>
+      {showSettings && (
+        <SettingsModal
+          lang={lang}
+          onToggleLanguage={() => setLang(lang === "en" ? "vi" : "en")}
+          compactView={compactView}
+          onToggleCompact={toggleCompactView}
+          onExportCV={handleOpenCVFromSettings}
+          onClose={() => setShowSettings(false)}
+          t={t}
+        />
+      )}
+
+      {showCVExport && (
+        <CVExportModal
+          profile={profile}
+          projects={projects}
+          certificates={certificates}
+          techStack={techStack}
+          onClose={() => setShowCVExport(false)}
+        />
+      )}
+    </>
+  );
+
+  const isBlogRoute = pathname.startsWith("/blog");
+  if (isBlogRoute) {
+    return (
+      <div
+        className={`min-h-screen bg-terminal-bg relative app-scale-root ${compactView ? "compact-view" : ""}`}
+      >
+        <div className="app-scale-shell">
+          <BlogPage
+            posts={blogPosts}
+            onNavigateHome={handleNavigateHome}
+            onOpenSettings={() => setShowSettings(true)}
+          />
+        </div>
+        {renderGlobalActions}
+      </div>
+    );
+  }
+
   return (
     <>
       {showIntro && (
-        <WelcomeHero
-          lines={welcomeLines}
-          onComplete={() => setShowIntro(false)}
-        />
+        <WelcomeHero lines={welcomeLines} onComplete={handleWelcomeComplete} />
       )}
 
       <div
@@ -183,33 +265,31 @@ function App() {
 
                 {/* Desktop nav */}
                 <div className="hidden sm:flex items-center gap-4 text-[10px] text-terminal-muted uppercase tracking-wider">
-                  {siteConfig.navLinks.map((link) => (
-                    <a
-                      key={link.href}
-                      href={link.href}
-                      className="hover:text-terminal-accent transition-colors"
-                    >
-                      {navLabelByKey[link.label] ?? link.label}
-                    </a>
-                  ))}
+                  {siteConfig.navLinks.map((link) =>
+                    link.href.startsWith("/") ? (
+                      <button
+                        key={link.href}
+                        onClick={() => navigate(link.href)}
+                        className="hover:text-terminal-accent transition-colors"
+                      >
+                        {navLabelByKey[link.label] ?? link.label}
+                      </button>
+                    ) : (
+                      <a
+                        key={link.href}
+                        href={link.href}
+                        className="hover:text-terminal-accent transition-colors"
+                      >
+                        {navLabelByKey[link.label] ?? link.label}
+                      </a>
+                    ),
+                  )}
                   <button
-                    onClick={() => setLang(lang === "en" ? "vi" : "en")}
-                    className="px-2 py-1 border border-terminal-border/40 rounded-sm hover:border-terminal-accent/30 hover:text-terminal-accent transition-all duration-200"
-                    title={t("nav.language")}
+                    onClick={() => setShowSettings(true)}
+                    className="inline-flex items-center gap-1 hover:text-terminal-accent transition-colors"
                   >
-                    {lang === "en" ? "EN" : "VI"}
-                  </button>
-                  <CompactViewToggle
-                    compact={compactView}
-                    onToggle={toggleCompactView}
-                  />
-                  <button
-                    onClick={() => setShowCVExport(true)}
-                    className="flex items-center gap-1.5 px-2 py-1 border border-terminal-border/40 rounded-sm
-                             hover:border-terminal-accent/30 hover:text-terminal-accent transition-all duration-200"
-                  >
-                    <FileText size={10} />
-                    {t("nav.exportCv")}
+                    <Settings2 size={12} />
+                    {t("settings.open")}
                   </button>
                 </div>
 
@@ -225,36 +305,38 @@ function App() {
               {/* Mobile dropdown */}
               {mobileMenuOpen && (
                 <div className="sm:hidden pb-3 space-y-2 opacity-0 animate-fade-in">
-                  {siteConfig.navLinks.map((link) => (
-                    <a
-                      key={link.href}
-                      href={link.href}
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="block text-[10px] text-terminal-muted uppercase tracking-wider hover:text-terminal-accent transition-colors py-1"
-                    >
-                      {navLabelByKey[link.label] ?? link.label}
-                    </a>
-                  ))}
-                  <button
-                    onClick={() => setLang(lang === "en" ? "vi" : "en")}
-                    className="block text-[10px] text-terminal-muted uppercase tracking-wider hover:text-terminal-accent transition-colors py-1"
-                  >
-                    {t("nav.language")}: {lang === "en" ? "EN" : "VI"}
-                  </button>
-                  <CompactViewToggle
-                    compact={compactView}
-                    onToggle={toggleCompactView}
-                    mobile
-                  />
+                  {siteConfig.navLinks.map((link) =>
+                    link.href.startsWith("/") ? (
+                      <button
+                        key={link.href}
+                        onClick={() => {
+                          navigate(link.href);
+                          setMobileMenuOpen(false);
+                        }}
+                        className="block text-[10px] text-terminal-muted uppercase tracking-wider hover:text-terminal-accent transition-colors py-1"
+                      >
+                        {navLabelByKey[link.label] ?? link.label}
+                      </button>
+                    ) : (
+                      <a
+                        key={link.href}
+                        href={link.href}
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="block text-[10px] text-terminal-muted uppercase tracking-wider hover:text-terminal-accent transition-colors py-1"
+                      >
+                        {navLabelByKey[link.label] ?? link.label}
+                      </a>
+                    ),
+                  )}
                   <button
                     onClick={() => {
-                      setShowCVExport(true);
+                      setShowSettings(true);
                       setMobileMenuOpen(false);
                     }}
                     className="flex items-center gap-1.5 text-[10px] text-terminal-muted uppercase tracking-wider hover:text-terminal-accent transition-colors py-1"
                   >
-                    <FileText size={10} />
-                    {t("nav.exportCv")}
+                    <Settings2 size={10} />
+                    {t("settings.open")}
                   </button>
                 </div>
               )}
@@ -391,21 +473,12 @@ function App() {
             onClose={() => setSelectedProject(null)}
           />
 
-          {/* CV Export modal */}
-          {showCVExport && (
-            <CVExportModal
-              profile={profile}
-              projects={projects}
-              certificates={certificates}
-              techStack={techStack}
-              onClose={() => setShowCVExport(false)}
-            />
-          )}
-
           {/* Scroll to top */}
           <ScrollToTop />
         </div>
       </div>
+
+      {renderGlobalActions}
     </>
   );
 }

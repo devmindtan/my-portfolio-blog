@@ -195,7 +195,7 @@ export default function CVExportModal({
       <div className="absolute inset-0 bg-terminal-bg/80 backdrop-blur-sm" />
 
       <div
-        className="relative w-full sm:max-w-2xl max-h-[90vh] sm:max-h-[85vh] overflow-y-auto card-base rounded-t-sm sm:rounded-sm animate-slide-up"
+        className="relative w-full sm:max-w-3xl max-h-[90vh] sm:max-h-[85vh] overflow-y-auto card-base rounded-t-sm sm:rounded-sm animate-slide-up"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="terminal-header sticky top-0 bg-terminal-card z-10">
@@ -525,8 +525,7 @@ function CVContent({
   renderMode?: "preview" | "print";
 }) {
   if (template === "minimal") {
-    const minimalPadding =
-      renderMode === "preview" ? "14px 14px 14px 14px" : "0px";
+    const minimalPadding = renderMode === "preview" ? "24px " : "0px";
 
     return (
       <div

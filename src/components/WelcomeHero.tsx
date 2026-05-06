@@ -1,5 +1,5 @@
-import { useEffect, useState, useRef, useCallback } from 'react';
-import type { WelcomeLine } from '../data/portfolio';
+import { useEffect, useState, useRef, useCallback } from "react";
+import type { WelcomeLine } from "../data/portfolio";
 
 interface WelcomeHeroProps {
   lines: WelcomeLine[];
@@ -8,7 +8,7 @@ interface WelcomeHeroProps {
 
 export default function WelcomeHero({ lines, onComplete }: WelcomeHeroProps) {
   const [currentLine, setCurrentLine] = useState(0);
-  const [displayText, setDisplayText] = useState('');
+  const [displayText, setDisplayText] = useState("");
   const [isTyping, setIsTyping] = useState(true);
   const [allDone, setAllDone] = useState(false);
   const [fadingOut, setFadingOut] = useState(false);
@@ -18,7 +18,6 @@ export default function WelcomeHero({ lines, onComplete }: WelcomeHeroProps) {
     timerRef.current.forEach(clearTimeout);
     timerRef.current = [];
   }, []);
-
   useEffect(() => {
     clearTimers();
     if (currentLine >= lines.length) {
@@ -31,13 +30,14 @@ export default function WelcomeHero({ lines, onComplete }: WelcomeHeroProps) {
     const text = line.text;
     let charIndex = 0;
     setIsTyping(true);
-    setDisplayText('');
+    setDisplayText("");
 
     const typeChar = () => {
       if (charIndex < text.length) {
         setDisplayText(text.slice(0, charIndex + 1));
         charIndex++;
-        const delay = text[charIndex - 1] === ' ' ? 40 : 60 + Math.random() * 40;
+        const delay =
+          text[charIndex - 1] === " " ? 40 : 60 + Math.random() * 40;
         timerRef.current.push(setTimeout(typeChar, delay));
       } else {
         setIsTyping(false);
@@ -45,7 +45,7 @@ export default function WelcomeHero({ lines, onComplete }: WelcomeHeroProps) {
         timerRef.current.push(
           setTimeout(() => {
             setCurrentLine((prev) => prev + 1);
-          }, pause)
+          }, pause),
         );
       }
     };
@@ -63,16 +63,16 @@ export default function WelcomeHero({ lines, onComplete }: WelcomeHeroProps) {
   useEffect(() => {
     if (!allDone) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Enter' || e.key === ' ') handleEnter();
+      if (e.key === "Enter" || e.key === " ") handleEnter();
     };
-    window.addEventListener('keydown', onKey);
-    return () => window.removeEventListener('keydown', onKey);
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
   }, [allDone, handleEnter]);
 
   return (
     <div
       className={`fixed inset-0 z-50 flex items-center justify-center bg-terminal-bg transition-opacity duration-500 ${
-        fadingOut ? 'opacity-0' : 'opacity-100'
+        fadingOut ? "opacity-0" : "opacity-100"
       }`}
     >
       <div className="scanline-overlay" />
@@ -86,10 +86,10 @@ export default function WelcomeHero({ lines, onComplete }: WelcomeHeroProps) {
             return (
               <div
                 key={i}
-                className={`opacity-0 animate-fade-in ${line.className || 'text-terminal-text'}`}
+                className={`opacity-0 animate-fade-in ${line.className || "text-terminal-text"}`}
                 style={{
-                  fontSize: i === 2 ? '2.5rem' : i === 3 ? '1.25rem' : '1.1rem',
-                  lineHeight: i === 2 ? '1.2' : i === 3 ? '1.6' : '1.5',
+                  fontSize: i === 2 ? "2.5rem" : i === 3 ? "1.25rem" : "1.1rem",
+                  lineHeight: i === 2 ? "1.2" : i === 3 ? "1.6" : "1.5",
                 }}
               >
                 <span>{shownText}</span>
@@ -102,14 +102,19 @@ export default function WelcomeHero({ lines, onComplete }: WelcomeHeroProps) {
         </div>
 
         {allDone && (
-          <div className="opacity-0 animate-fade-in mt-10 sm:mt-14" style={{ animationDelay: '0.4s' }}>
+          <div
+            className="opacity-0 animate-fade-in mt-10 sm:mt-14"
+            style={{ animationDelay: "0.4s" }}
+          >
             <button
               onClick={handleEnter}
               className="group flex items-center gap-2 text-[10px] text-terminal-muted/60 uppercase tracking-[0.2em]
                          hover:text-terminal-accent transition-colors duration-300"
             >
-              <span className="w-5 h-5 flex items-center justify-center border border-terminal-border/50 rounded-sm
-                               group-hover:border-terminal-accent/40 transition-colors duration-300">
+              <span
+                className="w-5 h-5 flex items-center justify-center border border-terminal-border/50 rounded-sm
+                               group-hover:border-terminal-accent/40 transition-colors duration-300"
+              >
                 <span className="text-[9px]">&#9654;</span>
               </span>
               <span>press enter or click to continue</span>

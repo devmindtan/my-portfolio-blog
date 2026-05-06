@@ -251,7 +251,7 @@ export const profile: Profile = {
   linkedin: "linkedin.com/in/devmidtan",
   github: "github.com/devmindtan",
   summary:
-    "I build systems that handle real traffic at real scale. Production software that processes millions of transactions, serves millions of users, and stays up when things go wrong. My work sits at the intersection of distributed systems, real-time data pipelines, and platform engineering.",
+    "Final-year Software Engineering student with a strong focus on Distributed Systems and Platform Engineering. Experienced in architecting microservices with K3s, optimizing real-time data pipelines using YOLOv11 for traffic analysis, and developing decentralized protocols. Passionate about building resilient, automated infrastructure and solving complex backend challenges at scale.",
   experience: [
     {
       role: "Graduation thesis",

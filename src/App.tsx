@@ -15,6 +15,8 @@ import CVExportModal from "./components/CVExportModal";
 import ContactCard from "./components/ContactCard";
 import Footer from "./components/Footer";
 import ScrollToTop from "./components/ScrollToTop";
+import CompactViewToggle from "./components/CompactViewToggle";
+import useCompactView from "./hooks/useCompactView";
 import {
   projects,
   techStack,
@@ -42,6 +44,7 @@ function App() {
   const [showCVExport, setShowCVExport] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const { compactView, toggleCompactView } = useCompactView();
 
   useEffect(() => {
     function onScroll() {
@@ -131,227 +134,240 @@ function App() {
         />
       )}
 
-      <div className="min-h-screen bg-terminal-bg relative">
+      <div
+        className={`min-h-screen bg-terminal-bg relative app-scale-root ${compactView ? "compact-view" : ""}`}
+      >
         <div className="scanline-overlay" />
 
-        {/* Sticky Header */}
-        <header
-          className={`sticky top-0 z-40 transition-all duration-300 ${
-            scrolled
-              ? "bg-terminal-bg/90 backdrop-blur-md border-b border-terminal-border/30 shadow-lg shadow-terminal-bg/30"
-              : "bg-transparent"
-          }`}
-        >
-          <div className="max-w-6xl mx-auto px-4 sm:px-6">
-            <nav className="flex items-center justify-between h-12">
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-terminal-accent rounded-full animate-glow" />
-                <span className="text-xs text-terminal-text font-semibold tracking-wider uppercase">
-                  {siteConfig.brand}
-                </span>
-              </div>
+        <div className="app-scale-shell">
+          {/* Sticky Header */}
+          <header
+            className={`sticky top-0 z-40 transition-all duration-300 ${
+              scrolled
+                ? "bg-terminal-bg/90 backdrop-blur-md border-b border-terminal-border/30 shadow-lg shadow-terminal-bg/30"
+                : "bg-transparent"
+            }`}
+          >
+            <div className="max-w-6xl mx-auto px-4 sm:px-6">
+              <nav className="flex items-center justify-between h-12">
+                <div className="flex items-center gap-2">
+                  <div className="w-2 h-2 bg-terminal-accent rounded-full animate-glow" />
+                  <span className="text-xs text-terminal-text font-semibold tracking-wider uppercase">
+                    {siteConfig.brand}
+                  </span>
+                </div>
 
-              {/* Desktop nav */}
-              <div className="hidden sm:flex items-center gap-4 text-[10px] text-terminal-muted uppercase tracking-wider">
-                {siteConfig.navLinks.map((link) => (
-                  <a
-                    key={link.href}
-                    href={link.href}
-                    className="hover:text-terminal-accent transition-colors"
-                  >
-                    {link.label}
-                  </a>
-                ))}
-                <button
-                  onClick={() => setShowCVExport(true)}
-                  className="flex items-center gap-1.5 px-2 py-1 border border-terminal-border/40 rounded-sm
+                {/* Desktop nav */}
+                <div className="hidden sm:flex items-center gap-4 text-[10px] text-terminal-muted uppercase tracking-wider">
+                  {siteConfig.navLinks.map((link) => (
+                    <a
+                      key={link.href}
+                      href={link.href}
+                      className="hover:text-terminal-accent transition-colors"
+                    >
+                      {link.label}
+                    </a>
+                  ))}
+                  <CompactViewToggle
+                    compact={compactView}
+                    onToggle={toggleCompactView}
+                  />
+                  <button
+                    onClick={() => setShowCVExport(true)}
+                    className="flex items-center gap-1.5 px-2 py-1 border border-terminal-border/40 rounded-sm
                              hover:border-terminal-accent/30 hover:text-terminal-accent transition-all duration-200"
-                >
-                  <FileText size={10} />
-                  export cv
-                </button>
-              </div>
-
-              {/* Mobile menu button */}
-              <button
-                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className="sm:hidden p-1.5 text-terminal-muted hover:text-terminal-accent transition-colors"
-              >
-                {mobileMenuOpen ? <X size={16} /> : <Menu size={16} />}
-              </button>
-            </nav>
-
-            {/* Mobile dropdown */}
-            {mobileMenuOpen && (
-              <div className="sm:hidden pb-3 space-y-2 opacity-0 animate-fade-in">
-                {siteConfig.navLinks.map((link) => (
-                  <a
-                    key={link.href}
-                    href={link.href}
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="block text-[10px] text-terminal-muted uppercase tracking-wider hover:text-terminal-accent transition-colors py-1"
                   >
-                    {link.label}
-                  </a>
-                ))}
+                    <FileText size={10} />
+                    export cv
+                  </button>
+                </div>
+
+                {/* Mobile menu button */}
                 <button
-                  onClick={() => {
-                    setShowCVExport(true);
-                    setMobileMenuOpen(false);
-                  }}
-                  className="flex items-center gap-1.5 text-[10px] text-terminal-muted uppercase tracking-wider hover:text-terminal-accent transition-colors py-1"
+                  onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                  className="sm:hidden p-1.5 text-terminal-muted hover:text-terminal-accent transition-colors"
                 >
-                  <FileText size={10} />
-                  export cv
+                  {mobileMenuOpen ? <X size={16} /> : <Menu size={16} />}
                 </button>
-              </div>
-            )}
-          </div>
-        </header>
+              </nav>
 
-        <div className="max-w-6xl mx-auto px-4 py-6 sm:px-6 sm:py-10">
-          <div className="bento-grid">
-            {/* Terminal info hero */}
-            <TerminalHero lines={heroLines} />
+              {/* Mobile dropdown */}
+              {mobileMenuOpen && (
+                <div className="sm:hidden pb-3 space-y-2 opacity-0 animate-fade-in">
+                  {siteConfig.navLinks.map((link) => (
+                    <a
+                      key={link.href}
+                      href={link.href}
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="block text-[10px] text-terminal-muted uppercase tracking-wider hover:text-terminal-accent transition-colors py-1"
+                    >
+                      {link.label}
+                    </a>
+                  ))}
+                  <CompactViewToggle
+                    compact={compactView}
+                    onToggle={toggleCompactView}
+                    mobile
+                  />
+                  <button
+                    onClick={() => {
+                      setShowCVExport(true);
+                      setMobileMenuOpen(false);
+                    }}
+                    className="flex items-center gap-1.5 text-[10px] text-terminal-muted uppercase tracking-wider hover:text-terminal-accent transition-colors py-1"
+                  >
+                    <FileText size={10} />
+                    export cv
+                  </button>
+                </div>
+              )}
+            </div>
+          </header>
 
-            {/* Avatar + About */}
-            <AvatarCard profile={profile} />
-            <AboutCard profile={profile} />
+          <div className="max-w-6xl mx-auto px-4 py-6 sm:px-6 sm:py-10 web-justify">
+            <div className="bento-grid">
+              {/* Terminal info hero */}
+              <TerminalHero lines={heroLines} />
 
-            {/* Experience */}
-            <ExperienceCard
-              experience={profile.experience}
-              onProjectQuery={handleExperienceProjectQuery}
-            />
+              {/* Avatar + About */}
+              <AvatarCard profile={profile} />
+              <AboutCard profile={profile} />
 
-            {/* Stats + Philosophy (left col) + Tech stack (right col) */}
-            <div className="col-span-4 flex flex-col sm:flex-row gap-3 items-stretch">
-              <div className="flex flex-col gap-3 sm:flex-1 h-full">
-                <StatsCard stats={stats} />
-                <div className="flex-1 min-h-0">
-                  <PhilosophyCard principles={principles} />
+              {/* Experience */}
+              <ExperienceCard
+                experience={profile.experience}
+                onProjectQuery={handleExperienceProjectQuery}
+              />
+
+              {/* Stats + Philosophy (left col) + Tech stack (right col) */}
+              <div className="col-span-4 flex flex-col sm:flex-row gap-3 items-stretch">
+                <div className="flex flex-col gap-3 sm:flex-1 h-full">
+                  <StatsCard stats={stats} />
+                  <div className="flex-1 min-h-0">
+                    <PhilosophyCard principles={principles} />
+                  </div>
+                </div>
+                <div className="sm:flex-1">
+                  <TechStackCard techData={techStack} />
                 </div>
               </div>
-              <div className="sm:flex-1">
-                <TechStackCard techData={techStack} />
-              </div>
-            </div>
 
-            {/* Certificates */}
-            <CertificatesCard certificates={certificates} />
+              {/* Certificates */}
+              <CertificatesCard certificates={certificates} />
 
-            {/* Section divider */}
-            <div
-              id="projects"
-              className="col-span-4 flex items-center gap-2 sm:gap-3 py-4 opacity-0 animate-fade-in"
-              style={{ animationDelay: "0.5s" }}
-            >
-              <div className="h-px flex-1 bg-terminal-border/30" />
-              <span className="text-[10px] text-terminal-muted/50 uppercase tracking-[0.15em] sm:tracking-[0.3em]">
-                {siteConfig.sectionTitles.projects}
-              </span>
-              <div className="h-px flex-1 bg-terminal-border/30" />
-            </div>
-
-            {/* Filter bar */}
-            <ProjectFilter
-              tags={tags}
-              tagCounts={tagCounts}
-              selectedTag={selectedTag}
-              onTagSelect={setSelectedTag}
-              searchQuery={searchQuery}
-              onSearchChange={setSearchQuery}
-              sortKey={sortKey}
-              sortDir={sortDir}
-              onSortChange={handleSortChange}
-              viewMode={viewMode}
-              onViewChange={setViewMode}
-              currentPage={currentPage}
-              onPageChange={setCurrentPage}
-              resultCount={filteredAndSorted.length}
-              totalCount={projects.length}
-            />
-
-            {/* Projects */}
-            {paginatedProjects.length === 0 ? (
-              <div className="col-span-4 py-12 text-center space-y-2">
-                <span className="text-xs text-terminal-muted">
-                  No matching projects found.
+              {/* Section divider */}
+              <div
+                id="projects"
+                className="col-span-4 flex items-center gap-2 sm:gap-3 py-4 opacity-0 animate-fade-in"
+                style={{ animationDelay: "0.5s" }}
+              >
+                <div className="h-px flex-1 bg-terminal-border/30" />
+                <span className="text-[10px] text-terminal-muted/50 uppercase tracking-[0.15em] sm:tracking-[0.3em]">
+                  {siteConfig.sectionTitles.projects}
                 </span>
-                <button
-                  onClick={() => {
-                    setSelectedTag(null);
-                    setSearchQuery("");
-                  }}
-                  className="block mx-auto text-[10px] text-terminal-accent hover:underline"
-                >
-                  clear filters
-                </button>
+                <div className="h-px flex-1 bg-terminal-border/30" />
               </div>
-            ) : (
-              paginatedProjects.map((project, i) => (
-                <ProjectCard
-                  key={project.id}
-                  project={project}
-                  index={i}
-                  viewMode={viewMode}
-                  onClick={() => setSelectedProject(project)}
-                />
-              ))
-            )}
 
-            {/* Section divider */}
-            <div
-              id="contact"
-              className="col-span-4 flex items-center gap-2 sm:gap-3 py-4 opacity-0 animate-fade-in"
-              style={{ animationDelay: "0.8s" }}
-            >
-              <div className="h-px flex-1 bg-terminal-border/30" />
-              <span className="text-[10px] text-terminal-muted/50 uppercase tracking-[0.15em] sm:tracking-[0.3em]">
-                {siteConfig.sectionTitles.connect}
-              </span>
-              <div className="h-px flex-1 bg-terminal-border/30" />
-            </div>
+              {/* Filter bar */}
+              <ProjectFilter
+                tags={tags}
+                tagCounts={tagCounts}
+                selectedTag={selectedTag}
+                onTagSelect={setSelectedTag}
+                searchQuery={searchQuery}
+                onSearchChange={setSearchQuery}
+                sortKey={sortKey}
+                sortDir={sortDir}
+                onSortChange={handleSortChange}
+                viewMode={viewMode}
+                onViewChange={setViewMode}
+                currentPage={currentPage}
+                onPageChange={setCurrentPage}
+                resultCount={filteredAndSorted.length}
+                totalCount={projects.length}
+              />
 
-            {/* Contact + Status */}
-            <ContactCard config={siteConfig} />
-            <div className="col-span-4 sm:col-span-2 card-base">
-              <div className="p-4 sm:p-5 flex items-center gap-3">
-                <div className="w-2 h-2 bg-terminal-accent rounded-full animate-glow" />
-                <div>
-                  <span className="text-xs text-terminal-text/80">
-                    {siteConfig.status.text}
+              {/* Projects */}
+              {paginatedProjects.length === 0 ? (
+                <div className="col-span-4 py-12 text-center space-y-2">
+                  <span className="text-xs text-terminal-muted">
+                    No matching projects found.
                   </span>
-                  <div className="text-[10px] text-terminal-muted mt-0.5">
-                    {siteConfig.status.detail}
+                  <button
+                    onClick={() => {
+                      setSelectedTag(null);
+                      setSearchQuery("");
+                    }}
+                    className="block mx-auto text-[10px] text-terminal-accent hover:underline"
+                  >
+                    clear filters
+                  </button>
+                </div>
+              ) : (
+                paginatedProjects.map((project, i) => (
+                  <ProjectCard
+                    key={project.id}
+                    project={project}
+                    index={i}
+                    viewMode={viewMode}
+                    onClick={() => setSelectedProject(project)}
+                  />
+                ))
+              )}
+
+              {/* Section divider */}
+              <div
+                id="contact"
+                className="col-span-4 flex items-center gap-2 sm:gap-3 py-4 opacity-0 animate-fade-in"
+                style={{ animationDelay: "0.8s" }}
+              >
+                <div className="h-px flex-1 bg-terminal-border/30" />
+                <span className="text-[10px] text-terminal-muted/50 uppercase tracking-[0.15em] sm:tracking-[0.3em]">
+                  {siteConfig.sectionTitles.connect}
+                </span>
+                <div className="h-px flex-1 bg-terminal-border/30" />
+              </div>
+
+              {/* Contact + Status */}
+              <ContactCard config={siteConfig} />
+              <div className="col-span-4 sm:col-span-2 card-base">
+                <div className="p-4 sm:p-5 flex items-center gap-3">
+                  <div className="w-2 h-2 bg-terminal-accent rounded-full animate-glow" />
+                  <div>
+                    <span className="text-xs text-terminal-text/80">
+                      {siteConfig.status.text}
+                    </span>
+                    <div className="text-[10px] text-terminal-muted mt-0.5">
+                      {siteConfig.status.detail}
+                    </div>
                   </div>
                 </div>
               </div>
+
+              <Footer config={siteConfig} />
             </div>
-
-            <Footer config={siteConfig} />
           </div>
-        </div>
 
-        {/* Detail modal */}
-        <ProjectDetailModal
-          project={selectedProject}
-          onClose={() => setSelectedProject(null)}
-        />
-
-        {/* CV Export modal */}
-        {showCVExport && (
-          <CVExportModal
-            profile={profile}
-            projects={projects}
-            certificates={certificates}
-            techStack={techStack}
-            onClose={() => setShowCVExport(false)}
+          {/* Detail modal */}
+          <ProjectDetailModal
+            project={selectedProject}
+            onClose={() => setSelectedProject(null)}
           />
-        )}
 
-        {/* Scroll to top */}
-        <ScrollToTop />
+          {/* CV Export modal */}
+          {showCVExport && (
+            <CVExportModal
+              profile={profile}
+              projects={projects}
+              certificates={certificates}
+              techStack={techStack}
+              onClose={() => setShowCVExport(false)}
+            />
+          )}
+
+          {/* Scroll to top */}
+          <ScrollToTop />
+        </div>
       </div>
     </>
   );

@@ -3,6 +3,26 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --app-scale: 1.1;
+  }
+
+  .app-scale-root.compact-view {
+    --app-scale: 0.9;
+  }
+
+  .app-scale-shell {
+    zoom: var(--app-scale);
+  }
+
+  @supports not (zoom: 1) {
+    .app-scale-shell {
+      width: calc(100% / var(--app-scale));
+      transform: scale(var(--app-scale));
+      transform-origin: top left;
+    }
+  }
+
   * {
     font-family: "JetBrains Mono", "Fira Code", "SF Mono", Consolas, monospace;
   }
@@ -43,6 +63,27 @@
 }
 
 @layer components {
+  .web-justify .card-base {
+    text-align: justify;
+    text-justify: inter-word;
+  }
+
+  .web-justify .text-center {
+    text-align: center;
+  }
+
+  .web-justify .text-left {
+    text-align: justify;
+    text-justify: inter-word;
+  }
+
+  @media (min-width: 640px) {
+    .web-justify .sm\:text-left {
+      text-align: justify;
+      text-justify: inter-word;
+    }
+  }
+
   .card-base {
     @apply bg-terminal-card border border-terminal-border rounded-sm
            transition-all duration-300 ease-out

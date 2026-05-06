@@ -1,7 +1,7 @@
-import { useEffect, useState } from 'react';
-import { Terminal, ChevronDown } from 'lucide-react';
-import { heroLines } from '../data/portfolio';
-import type { HeroLine } from '../data/portfolio';
+import { useEffect, useState } from "react";
+import { Terminal, ChevronDown } from "lucide-react";
+import { heroLines } from "../data/portfolio";
+import type { HeroLine } from "../data/portfolio";
 
 interface TerminalHeroProps {
   lines?: HeroLine[];
@@ -16,7 +16,9 @@ export default function TerminalHero({ lines = heroLines }: TerminalHeroProps) {
     lines.forEach((_, i) => {
       timers.push(setTimeout(() => setVisibleLines(i + 1), (i + 1) * 800));
     });
-    timers.push(setTimeout(() => setShowCursor(false), lines.length * 800 + 600));
+    timers.push(
+      setTimeout(() => setShowCursor(false), lines.length * 800 + 600),
+    );
     return () => timers.forEach(clearTimeout);
   }, [lines]);
 
@@ -28,14 +30,18 @@ export default function TerminalHero({ lines = heroLines }: TerminalHeroProps) {
         <div className="terminal-dot bg-terminal-accent/80" />
         <span className="ml-2 flex items-center gap-1.5">
           <Terminal size={11} />
-          portfolio@dev:~
+          portfolio@devmindtan:~
         </span>
         <span className="ml-auto text-terminal-muted/50">zsh</span>
       </div>
 
       <div className="p-4 sm:p-6 space-y-4 min-h-[160px] sm:min-h-[220px]">
         {lines.slice(0, visibleLines).map((line, i) => (
-          <div key={i} className="opacity-0 animate-fade-in" style={{ animationDelay: `${i * 0.1}s` }}>
+          <div
+            key={i}
+            className="opacity-0 animate-fade-in"
+            style={{ animationDelay: `${i * 0.1}s` }}
+          >
             <div className="flex items-center gap-2 text-xs">
               <span className="text-terminal-accent font-semibold">❯</span>
               <span className="text-terminal-muted">{line.prompt}</span>
@@ -56,13 +62,19 @@ export default function TerminalHero({ lines = heroLines }: TerminalHeroProps) {
         )}
 
         {!showCursor && (
-          <div className="opacity-0 animate-fade-in pt-2" style={{ animationDelay: '0.2s' }}>
+          <div
+            className="opacity-0 animate-fade-in pt-2"
+            style={{ animationDelay: "0.2s" }}
+          >
             <div className="flex items-center gap-3">
               <div className="h-px flex-1 bg-terminal-border/40" />
               <span className="text-[10px] text-terminal-muted/50 uppercase tracking-[0.15em] sm:tracking-[0.25em]">
                 scroll to explore
               </span>
-              <ChevronDown size={12} className="text-terminal-muted/40 animate-bounce" />
+              <ChevronDown
+                size={12}
+                className="text-terminal-muted/40 animate-bounce"
+              />
               <div className="h-px flex-1 bg-terminal-border/40" />
             </div>
           </div>

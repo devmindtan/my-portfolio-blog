@@ -32,6 +32,16 @@ const DEFAULT_HEADINGS_VI: [string, string, string] = [
   "Kết quả và bài học",
 ];
 
+/**
+ * Thời gian đọc tùy chỉnh cho từng bài. Mặc định dùng DEFAULT_READ_TIME_VI.
+ */
+const DEFAULT_READ_TIME_VI = "Đọc trong 8 phút";
+const CUSTOM_READ_TIMES_VI: Record<string, string> = {
+  p01: "Đọc trong 12 phút",
+  p05: "Đọc trong 10 phút",
+  p11: "Đọc trong 11 phút",
+};
+
 export const createBlogPostsVi = (
   projects: Project[],
   blogPostsEn: BlogPost[],
@@ -50,7 +60,7 @@ export const createBlogPostsVi = (
       title: `${project.title} - Phân tích kỹ thuật`,
       excerpt: `Bài viết chi tiết về kiến trúc, quá trình triển khai và bài học từ dự án ${project.title}.`,
       publishedAt: project.created_at,
-      readTime: "8 phút",
+      readTime: CUSTOM_READ_TIMES_VI[project.id] ?? DEFAULT_READ_TIME_VI,
       tags: [project.tag, ...project.tech.slice(0, 2)],
       sections: [
         {

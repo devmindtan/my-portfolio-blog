@@ -48,6 +48,17 @@ const DEFAULT_HEADINGS: [string, string, string] = [
 ];
 
 /**
+ * Per-project read time overrides. Falls back to DEFAULT_READ_TIME.
+ * Adjust as you write or expand each article.
+ */
+const DEFAULT_READ_TIME = "8 min read";
+const CUSTOM_READ_TIMES: Record<string, string> = {
+  p01: "12 min read", // Payment Gateway Migration — saga + circuit breaker deep dive
+  p05: "10 min read", // CI/CD Pipeline Overhaul — TIA + canary walkthrough
+  p11: "11 min read", // Search Platform Rebuild — LTR + trie implementation
+};
+
+/**
  * Per-project custom sections appended after the auto-generated ones.
  * Add an entry here keyed by project id to enrich any specific blog post.
  */
@@ -122,7 +133,7 @@ export const createBlogPostsEn = (projects: Project[]): BlogPost[] =>
       title: `${project.title} - Technical Deep Dive`,
       excerpt: `Detailed breakdown of architecture decisions, delivery milestones, and production lessons from ${project.title}.`,
       publishedAt: project.created_at,
-      readTime: "8 min",
+      readTime: CUSTOM_READ_TIMES[project.id] ?? DEFAULT_READ_TIME,
       tags: [project.tag, ...project.tech.slice(0, 2)],
       sections: [
         {

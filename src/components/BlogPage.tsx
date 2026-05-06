@@ -195,7 +195,7 @@ function BlogPage({ posts, onNavigateHome, onOpenSettings }: BlogPageProps) {
                       </span>
                       <span className="inline-flex items-center gap-1">
                         <Clock3 size={11} />
-                        {featuredPost.readTime} read
+                        {featuredPost.readTime}
                       </span>
                     </div>
                     <h2 className="text-xl sm:text-2xl font-bold text-terminal-text group-hover:text-terminal-accent transition-colors leading-snug">
@@ -301,7 +301,7 @@ function BlogPage({ posts, onNavigateHome, onOpenSettings }: BlogPageProps) {
                       {post.publishedAt}
                       <span className="text-terminal-border">|</span>
                       <Clock3 size={10} />
-                      {post.readTime} read
+                      {post.readTime}
                     </div>
                     <h3 className="text-sm sm:text-base font-semibold text-terminal-text group-hover:text-terminal-accent transition-colors leading-snug flex-1">
                       {post.title}
@@ -372,7 +372,7 @@ function BlogPage({ posts, onNavigateHome, onOpenSettings }: BlogPageProps) {
                           {post.publishedAt}
                           <span className="text-terminal-border">|</span>
                           <Clock3 size={10} />
-                          {post.readTime} read
+                          {post.readTime}
                         </div>
                         <h3 className="text-base sm:text-lg font-semibold text-terminal-text group-hover:text-terminal-accent transition-colors leading-snug">
                           {post.title}

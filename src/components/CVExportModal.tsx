@@ -41,11 +41,26 @@ export default function CVExportModal({
   techStack,
   onClose,
 }: CVExportModalProps) {
+  const getAllActionIndexes = (project: Project) =>
+    project.actions.map((_, index) => index);
+
+  const getDefaultProjectIds = () =>
+    new Set(projects.slice(0, 10).map((p) => p.id));
+
+  const getDefaultProjectActionIndexes = () =>
+    Object.fromEntries(
+      projects
+        .slice(0, 10)
+        .map((project) => [project.id, getAllActionIndexes(project)]),
+    ) as Record<string, number[]>;
+
   const [selected, setSelected] = useState<TemplateKey>("minimal");
   const [showProjectPicker, setShowProjectPicker] = useState(false);
   const [selectedProjectIds, setSelectedProjectIds] = useState<Set<string>>(
-    () => new Set(projects.slice(0, 10).map((p) => p.id)),
+    () => getDefaultProjectIds(),
   );
+  const [selectedProjectActionIndexes, setSelectedProjectActionIndexes] =
+    useState<Record<string, number[]>>(() => getDefaultProjectActionIndexes());
   const [projectSearch, setProjectSearch] = useState("");
   const [projectTagFilter, setProjectTagFilter] = useState<string>("all");
   const contentRef = useRef<HTMLDivElement>(null);
@@ -105,19 +120,60 @@ export default function CVExportModal({
     return matchSearch && matchTag;
   });
 
-  const toggleProject = useCallback((id: string) => {
-    setSelectedProjectIds((prev) => {
-      const next = new Set(prev);
-      if (next.has(id)) {
-        next.delete(id);
-      } else if (next.size < 10) {
-        next.add(id);
-      }
-      return next;
-    });
-  }, []);
+  const toggleProject = useCallback(
+    (id: string) => {
+      setSelectedProjectIds((prev) => {
+        const next = new Set(prev);
+        if (next.has(id)) {
+          next.delete(id);
+        } else if (next.size < 10) {
+          next.add(id);
+        }
+        return next;
+      });
+      setSelectedProjectActionIndexes((prev) => {
+        const project = projects.find((item) => item.id === id);
+        if (!project) return prev;
 
-  const selectedProjects = projects.filter((p) => selectedProjectIds.has(p.id));
+        if (id in prev) {
+          const next = { ...prev };
+          delete next[id];
+          return next;
+        }
+
+        return {
+          ...prev,
+          [id]: getAllActionIndexes(project),
+        };
+      });
+    },
+    [projects],
+  );
+
+  const toggleProjectAction = useCallback(
+    (projectId: string, actionIndex: number) => {
+      setSelectedProjectActionIndexes((prev) => {
+        const current = prev[projectId] ?? [];
+        const exists = current.includes(actionIndex);
+        return {
+          ...prev,
+          [projectId]: exists
+            ? current.filter((index) => index !== actionIndex)
+            : [...current, actionIndex].sort((a, b) => a - b),
+        };
+      });
+    },
+    [],
+  );
+
+  const selectedProjects = projects
+    .filter((p) => selectedProjectIds.has(p.id))
+    .map((project) => ({
+      ...project,
+      actions: project.actions.filter((_, index) =>
+        (selectedProjectActionIndexes[project.id] ?? []).includes(index),
+      ),
+    }));
 
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
@@ -205,17 +261,21 @@ export default function CVExportModal({
               </span>
               <div className="flex items-center gap-3">
                 <button
-                  onClick={() =>
-                    setSelectedProjectIds(
-                      new Set(projects.slice(0, 10).map((p) => p.id)),
-                    )
-                  }
+                  onClick={() => {
+                    setSelectedProjectIds(getDefaultProjectIds());
+                    setSelectedProjectActionIndexes(
+                      getDefaultProjectActionIndexes(),
+                    );
+                  }}
                   className="text-[9px] text-terminal-muted hover:text-terminal-accent transition-colors"
                 >
                   all
                 </button>
                 <button
-                  onClick={() => setSelectedProjectIds(new Set())}
+                  onClick={() => {
+                    setSelectedProjectIds(new Set());
+                    setSelectedProjectActionIndexes({});
+                  }}
                   className="text-[9px] text-terminal-muted hover:text-terminal-error transition-colors"
                 >
                   clear
@@ -283,10 +343,12 @@ export default function CVExportModal({
                   {filteredProjects.map((proj) => {
                     const checked = selectedProjectIds.has(proj.id);
                     const atMax = selectedProjectIds.size >= 10 && !checked;
+                    const selectedActions =
+                      selectedProjectActionIndexes[proj.id] ?? [];
                     return (
-                      <label
+                      <div
                         key={proj.id}
-                        className={`flex items-center gap-2 px-3 py-2 cursor-pointer transition-colors border-b border-terminal-border/20 last:border-0 ${
+                        className={`border-b border-terminal-border/20 last:border-0 ${
                           checked
                             ? "bg-terminal-accent/5"
                             : atMax
@@ -294,37 +356,78 @@ export default function CVExportModal({
                               : "hover:bg-terminal-surface/30"
                         }`}
                       >
-                        <input
-                          type="checkbox"
-                          className="sr-only"
-                          checked={checked}
-                          disabled={atMax}
-                          onChange={() => toggleProject(proj.id)}
-                        />
-                        <div
-                          className={`w-3.5 h-3.5 border rounded-[2px] flex items-center justify-center flex-shrink-0 transition-colors ${
-                            checked
-                              ? "border-terminal-accent bg-terminal-accent/20"
-                              : "border-terminal-border/50"
-                          }`}
-                        >
-                          {checked && (
-                            <Check size={8} className="text-terminal-accent" />
-                          )}
-                        </div>
-                        <span
-                          className={`text-[10px] flex-1 truncate ${
-                            checked
-                              ? "text-terminal-text"
-                              : "text-terminal-muted"
-                          }`}
-                        >
-                          {proj.title}
-                        </span>
-                        <span className="text-[9px] text-terminal-muted/50 flex-shrink-0 ml-1">
-                          {proj.tag}
-                        </span>
-                      </label>
+                        <label className="flex items-center gap-2 px-3 py-2 cursor-pointer transition-colors">
+                          <input
+                            type="checkbox"
+                            className="sr-only"
+                            checked={checked}
+                            disabled={atMax}
+                            onChange={() => toggleProject(proj.id)}
+                          />
+                          <div
+                            className={`w-3.5 h-3.5 border rounded-[2px] flex items-center justify-center flex-shrink-0 transition-colors ${
+                              checked
+                                ? "border-terminal-accent bg-terminal-accent/20"
+                                : "border-terminal-border/50"
+                            }`}
+                          >
+                            {checked && (
+                              <Check
+                                size={8}
+                                className="text-terminal-accent"
+                              />
+                            )}
+                          </div>
+                          <span
+                            className={`text-[10px] flex-1 truncate ${
+                              checked
+                                ? "text-terminal-text"
+                                : "text-terminal-muted"
+                            }`}
+                          >
+                            {proj.title}
+                          </span>
+                          <span className="text-[9px] text-terminal-muted/50 flex-shrink-0 ml-1">
+                            {proj.tag}
+                          </span>
+                        </label>
+
+                        {checked && proj.actions.length > 0 && (
+                          <div className="px-3 pb-2 pt-0.5 space-y-1.5">
+                            <div className="text-[8px] uppercase tracking-wider text-terminal-info/60">
+                              selected actions ({selectedActions.length}/
+                              {proj.actions.length})
+                            </div>
+                            <div className="space-y-1">
+                              {proj.actions.map((action, actionIndex) => {
+                                const actionChecked =
+                                  selectedActions.includes(actionIndex);
+                                return (
+                                  <label
+                                    key={`${proj.id}-${actionIndex}`}
+                                    className="flex items-start gap-2 cursor-pointer"
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      className="mt-[2px]"
+                                      checked={actionChecked}
+                                      onChange={() =>
+                                        toggleProjectAction(
+                                          proj.id,
+                                          actionIndex,
+                                        )
+                                      }
+                                    />
+                                    <span className="text-[9px] leading-4 text-terminal-muted">
+                                      {action}
+                                    </span>
+                                  </label>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+                      </div>
                     );
                   })}
                 </div>
@@ -500,12 +603,23 @@ function CVContent({
               >
                 <div style={{ fontWeight: "bold", fontSize: "14px", flex: 1 }}>
                   {exp.role}
-                  {exp.company && (
+                  {exp.organization && (
                     <span style={{ fontWeight: "normal" }}>
                       {" "}
-                      — {exp.company}
+                      — {exp.organization}
                     </span>
                   )}
+                  <span
+                    style={{
+                      fontWeight: "normal",
+                      fontSize: "12px",
+                      textTransform: "uppercase",
+                      color: "#777",
+                      marginLeft: "8px",
+                    }}
+                  >
+                    [{exp.type}]
+                  </span>
                 </div>
                 <div
                   style={{
@@ -589,6 +703,30 @@ function CVContent({
                 >
                   <strong>Problem:</strong> {proj.problem}
                 </p>
+
+                {proj.actions.length > 0 && (
+                  <div style={{ margin: "5px 0" }}>
+                    <div style={{ fontSize: "13px", fontWeight: "bold" }}>
+                      Actions:
+                    </div>
+                    <ul
+                      style={{
+                        margin: "4px 0 0 18px",
+                        padding: 0,
+                        fontSize: "13px",
+                        lineHeight: "1.5",
+                        listStyleType: "disc",
+                        listStylePosition: "outside",
+                      }}
+                    >
+                      {proj.actions.map((action, actionIndex) => (
+                        <li key={`${proj.id}-minimal-action-${actionIndex}`}>
+                          {action}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
                 {proj.results && proj.results.length > 0 && (
                   <p
                     style={{
@@ -814,12 +952,23 @@ function CVContent({
                     style={{ fontWeight: "bold", fontSize: "14px", flex: 1 }}
                   >
                     {exp.role}
-                    {exp.company && (
+                    {exp.organization && (
                       <span style={{ fontWeight: "normal" }}>
                         {" "}
-                        — {exp.company}
+                        — {exp.organization}
                       </span>
                     )}
+                    <span
+                      style={{
+                        fontWeight: "normal",
+                        fontSize: "12px",
+                        textTransform: "uppercase",
+                        color: "#777",
+                        marginLeft: "8px",
+                      }}
+                    >
+                      [{exp.type}]
+                    </span>
                   </div>
                   <div
                     style={{
@@ -865,8 +1014,20 @@ function CVContent({
                     <div
                       style={{ fontWeight: "bold", fontSize: "14px", flex: 1 }}
                     >
-                      {proj.title}
+                      {proj.title}{" "}
+                      <span
+                        style={{
+                          fontSize: "12px",
+                          color: "#0e6e64",
+                          fontWeight: "bold",
+                          marginBottom: "2px",
+                          textTransform: "uppercase",
+                        }}
+                      >
+                        - {proj.tag}
+                      </span>
                     </div>
+
                     <div
                       style={{
                         fontSize: "12px",
@@ -878,17 +1039,7 @@ function CVContent({
                       {proj.created_at}
                     </div>
                   </div>
-                  <div
-                    style={{
-                      fontSize: "12px",
-                      color: "#0e6e64",
-                      fontWeight: "bold",
-                      marginBottom: "2px",
-                      textTransform: "uppercase",
-                    }}
-                  >
-                    {proj.tag}
-                  </div>
+
                   <p
                     style={{
                       margin: "2px 0",
@@ -898,9 +1049,40 @@ function CVContent({
                   >
                     <strong>Problem:</strong> {proj.problem}
                   </p>
+                  {proj.actions.length > 0 && (
+                    <div style={{ margin: "4px 0" }}>
+                      <div
+                        style={{
+                          fontSize: "13px",
+                          fontWeight: "bold",
+                          marginBottom: "2px",
+                        }}
+                      >
+                        Actions:
+                      </div>
+                      <ul
+                        style={{
+                          margin: "0 0 0 18px",
+                          padding: 0,
+                          fontSize: "13px",
+                          lineHeight: "1.45",
+                          listStyleType: "disc",
+                          listStylePosition: "outside",
+                        }}
+                      >
+                        {proj.actions.map((action, actionIndex) => (
+                          <li key={`${proj.id}-modern-action-${actionIndex}`}>
+                            {action}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
                   {proj.results && proj.results.length > 0 && (
                     <p
                       style={{
+                        listStyleType: "disc",
+                        listStylePosition: "outside",
                         margin: "2px 0",
                         fontSize: "13px",
                         lineHeight: "1.5",
@@ -914,6 +1096,7 @@ function CVContent({
                         .join(" • ")}
                     </p>
                   )}
+
                   <p
                     style={{
                       margin: "2px 0 0 0",
@@ -1017,12 +1200,23 @@ function CVContent({
               >
                 <div style={{ fontWeight: "bold", fontSize: "14px", flex: 1 }}>
                   {exp.role}
-                  {exp.company && (
+                  {exp.organization && (
                     <span style={{ fontWeight: "normal" }}>
                       {" "}
-                      — {exp.company}
+                      — {exp.organization}
                     </span>
                   )}
+                  <span
+                    style={{
+                      fontWeight: "normal",
+                      fontSize: "12px",
+                      textTransform: "uppercase",
+                      color: "#777",
+                      marginLeft: "8px",
+                    }}
+                  >
+                    [{exp.type}]
+                  </span>
                 </div>
                 <div
                   style={{
@@ -1102,6 +1296,33 @@ function CVContent({
                 >
                   <strong>Problem:</strong> {proj.problem}
                 </p>
+                {proj.actions.length > 0 && (
+                  <div style={{ margin: "4px 0" }}>
+                    <div
+                      style={{
+                        fontSize: "13px",
+                        fontWeight: "bold",
+                        marginBottom: "2px",
+                      }}
+                    >
+                      Actions:
+                    </div>
+                    <ul
+                      style={{
+                        margin: "0 0 0 18px",
+                        padding: 0,
+                        fontSize: "13px",
+                        lineHeight: "1.45",
+                      }}
+                    >
+                      {proj.actions.map((action, actionIndex) => (
+                        <li key={`${proj.id}-executive-action-${actionIndex}`}>
+                          {action}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
                 {proj.results && proj.results.length > 0 && (
                   <p
                     style={{
@@ -1118,6 +1339,7 @@ function CVContent({
                       .join(" • ")}
                   </p>
                 )}
+
                 <p
                   style={{
                     margin: "2px 0 0 0",

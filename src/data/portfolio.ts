@@ -124,6 +124,21 @@ export interface Certificate {
   imageUrl?: string;
 }
 
+export type ExperienceEntryType = "company" | "project";
+
+export interface ExperienceEntry {
+  role: string;
+  organization: string;
+  type: ExperienceEntryType;
+  period: string;
+  description: string;
+  links?: {
+    label: string;
+    href: string;
+    projectName?: string;
+  }[];
+}
+
 export const certificates: Certificate[] = [
   {
     name: "Olympic PMNM Contest 2025",
@@ -216,17 +231,7 @@ export interface Profile {
   linkedin: string;
   github: string;
   summary: string;
-  experience: {
-    role: string;
-    company: string;
-    period: string;
-    description: string;
-    links?: {
-      label: string;
-      href: string;
-      projectName?: string;
-    }[];
-  }[];
+  experience: ExperienceEntry[];
   education: {
     degree: string;
     school: string;
@@ -250,7 +255,8 @@ export const profile: Profile = {
   experience: [
     {
       role: "Graduation thesis",
-      company: "",
+      organization: "Van Lang University",
+      type: "project",
       period: "2/2026 - 6/2026",
       description:
         "Develop a project to monitor and predict traffic density using a microservice system.",
@@ -266,9 +272,24 @@ export const profile: Profile = {
       ],
     },
     {
-      role: "Full-Stack Developer",
-      company: "DataFlow Inc",
-      period: "2018 - 2021",
+      role: "Verzik",
+      organization: "VIETFUTURE",
+      type: "project",
+      period: "2/2026 - 8/2026",
+      description:
+        "Built real-time analytics platforms and streaming data pipelines. Reduced data lag from 24h to under 30s using Flink and Kafka.",
+      links: [
+        {
+          label: "website",
+          href: "https://verzik-app.vercel.app/",
+        },
+      ],
+    },
+    {
+      role: "Verzik",
+      organization: "VIETFUTURE",
+      type: "company",
+      period: "2/2026",
       description:
         "Built real-time analytics platforms and streaming data pipelines. Reduced data lag from 24h to under 30s using Flink and Kafka.",
       links: [

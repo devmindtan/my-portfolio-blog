@@ -1,6 +1,6 @@
 import { Briefcase } from "lucide-react";
 import { useMemo, useState } from "react";
-import type { Profile } from "../data/portfolio";
+import type { ExperienceEntry, Profile } from "../data/portfolio";
 
 interface ExperienceCardProps {
   experience: Profile["experience"];
@@ -8,7 +8,7 @@ interface ExperienceCardProps {
 }
 
 type SortMode = "newest" | "oldest";
-type ExperienceType = "all" | "company" | "project";
+type ExperienceFilter = "all" | ExperienceEntry["type"];
 
 function parsePeriodPoint(raw: string): number {
   const text = raw.trim().toLowerCase();
@@ -46,12 +46,11 @@ export default function ExperienceCard({
   onProjectQuery,
 }: ExperienceCardProps) {
   const [sortMode, setSortMode] = useState<SortMode>("newest");
-  const [expType, setExpType] = useState<ExperienceType>("all");
+  const [expType, setExpType] = useState<ExperienceFilter>("all");
 
   const filteredAndSorted = useMemo(() => {
     const filtered = experience.filter((item) => {
-      const type: ExperienceType = item.company.trim() ? "company" : "project";
-      return expType === "all" || expType === type;
+      return expType === "all" || expType === item.type;
     });
 
     const sorted = [...filtered].sort((a, b) => {
@@ -129,10 +128,10 @@ export default function ExperienceCard({
               <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5">
                 <div className="text-[11px] text-terminal-text/85 font-semibold leading-snug">
                   {item.role}
-                  {item.company ? (
+                  {item.organization ? (
                     <span className="text-terminal-muted/70 font-normal">
                       {" "}
-                      at {item.company}
+                      at {item.organization}
                     </span>
                   ) : null}
                 </div>
@@ -143,12 +142,12 @@ export default function ExperienceCard({
               <div className="mt-1">
                 <span
                   className={`text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded border ${
-                    item.company.trim()
+                    item.type === "company"
                       ? "border-terminal-info/40 text-terminal-info/70"
                       : "border-terminal-accent/40 text-terminal-accent/70"
                   }`}
                 >
-                  {item.company.trim() ? "company" : "project"}
+                  {item.type}
                 </span>
               </div>
               <p className="text-[10px] sm:text-[11px] text-terminal-text/65 mt-1.5 leading-relaxed">

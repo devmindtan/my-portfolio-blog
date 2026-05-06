@@ -231,6 +231,7 @@ export interface Profile {
   linkedin: string;
   github: string;
   summary: string;
+  detail: string;
   experience: ExperienceEntry[];
   education: {
     degree: string;
@@ -252,6 +253,8 @@ export const profile: Profile = {
   github: "github.com/devmindtan",
   summary:
     "Final-year Software Engineering student with a strong focus on Distributed Systems and Platform Engineering. Experienced in architecting microservices with K3s, optimizing real-time data pipelines using YOLOv11 for traffic analysis, and developing decentralized protocols. Passionate about building resilient, automated infrastructure and solving complex backend challenges at scale.",
+  detail:
+    "My technical foundation is built on a passion for emerging technologies, from decentralized protocols to Computer Vision. Through my graduation project, DatapolisX, and the Verzik protocol, I have gained hands-on experience in solving the 'hard' problems: gas optimization in Solidity, high-concurrency data streaming, and predictive modeling using Random Forest Regressors. I thrive in terminal-centric workflows where I can automate every part of the CI/CD pipeline, allowing me to focus on architecting secure and efficient decentralized solutions.",
   experience: [
     {
       role: "Graduation thesis",

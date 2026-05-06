@@ -1,5 +1,6 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import { useReactToPrint } from "react-to-print";
+import { useLanguage } from "../contexts/LanguageContext";
 import {
   X,
   FileText,
@@ -16,7 +17,7 @@ import type {
   Project,
   Certificate,
   TechItem,
-} from "../data/portfolio";
+} from "../data/portfolio.types";
 
 interface CVExportModalProps {
   profile: Profile;
@@ -28,12 +29,6 @@ interface CVExportModalProps {
 
 type TemplateKey = "minimal" | "modern" | "executive";
 
-const templates: { key: TemplateKey; label: string; desc: string }[] = [
-  { key: "minimal", label: "Minimal", desc: "Clean, single-column" },
-  { key: "modern", label: "Modern", desc: "Sidebar + content" },
-  { key: "executive", label: "Executive", desc: "Navy header band" },
-];
-
 export default function CVExportModal({
   profile,
   projects,
@@ -41,6 +36,26 @@ export default function CVExportModal({
   techStack,
   onClose,
 }: CVExportModalProps) {
+  const { t } = useLanguage();
+
+  const templates: { key: TemplateKey; label: string; desc: string }[] = [
+    {
+      key: "minimal",
+      label: t("cvExport.tplMinimalLabel"),
+      desc: t("cvExport.tplMinimalDesc"),
+    },
+    {
+      key: "modern",
+      label: t("cvExport.tplModernLabel"),
+      desc: t("cvExport.tplModernDesc"),
+    },
+    {
+      key: "executive",
+      label: t("cvExport.tplExecutiveLabel"),
+      desc: t("cvExport.tplExecutiveDesc"),
+    },
+  ];
+
   const getAllActionIndexes = (project: Project) =>
     project.actions.map((_, index) => index);
 
@@ -195,7 +210,7 @@ export default function CVExportModal({
         <Search size={9} className="text-terminal-muted flex-shrink-0" />
         <input
           type="text"
-          placeholder="search title or tag…"
+          placeholder={t("cvExport.searchPlaceholder")}
           value={projectSearch}
           onChange={(e) => setProjectSearch(e.target.value)}
           className="flex-1 bg-transparent text-[10px] text-terminal-text placeholder:text-terminal-muted/50 outline-none"
@@ -220,7 +235,7 @@ export default function CVExportModal({
                 : "border-terminal-border/30 text-terminal-muted hover:text-terminal-text"
             }`}
           >
-            {tag}
+            {tag === "all" ? t("cvExport.searchTagAll") : tag}
           </button>
         ))}
       </div>
@@ -232,7 +247,7 @@ export default function CVExportModal({
     <div className="overflow-y-auto max-h-44 sm:max-h-full sm:flex-1">
       {filteredProjects.length === 0 && (
         <div className="px-3 py-3 text-[10px] text-terminal-muted text-center">
-          no results
+          {t("cvExport.noResults")}
         </div>
       )}
       {filteredProjects.map((proj) => {
@@ -317,7 +332,7 @@ export default function CVExportModal({
             {checked && isFocused && proj.actions.length > 0 && (
               <div className="sm:hidden px-3 pb-2 pt-0.5 space-y-1.5">
                 <div className="text-[8px] uppercase tracking-wider text-terminal-info/60">
-                  selected actions (
+                  {t("cvExport.selectedActions")} (
                   {(selectedProjectActionIndexes[proj.id] ?? []).length}/
                   {proj.actions.length})
                 </div>
@@ -387,26 +402,26 @@ export default function CVExportModal({
           <div>
             <span className="section-label text-terminal-info/70 flex items-center gap-1.5">
               <Palette size={10} />
-              select template
+              {t("cvExport.selectTemplate")}
             </span>
             <div className="grid grid-cols-3 gap-2 mt-2">
-              {templates.map((t) => (
+              {templates.map((tpl) => (
                 <button
-                  key={t.key}
-                  onClick={() => setSelected(t.key)}
+                  key={tpl.key}
+                  onClick={() => setSelected(tpl.key)}
                   className={`p-3 border rounded-sm text-left transition-all ${
-                    selected === t.key
+                    selected === tpl.key
                       ? "border-terminal-accent/40 bg-terminal-accent/5"
                       : "border-terminal-border/40"
                   }`}
                 >
                   <span
-                    className={`text-xs font-semibold block ${selected === t.key ? "text-terminal-accent" : "text-terminal-text"}`}
+                    className={`text-xs font-semibold block ${selected === tpl.key ? "text-terminal-accent" : "text-terminal-text"}`}
                   >
-                    {t.label}
+                    {tpl.label}
                   </span>
                   <span className="text-[9px] text-terminal-muted mt-0.5">
-                    {t.desc}
+                    {tpl.desc}
                   </span>
                 </button>
               ))}
@@ -418,7 +433,7 @@ export default function CVExportModal({
             {/* Picker header */}
             <div className="flex items-center justify-between">
               <span className="section-label text-terminal-info/70">
-                projects&nbsp;
+                {t("cvExport.projects")}&nbsp;
                 <span
                   className={`font-mono ${
                     selectedProjectIds.size >= 10
@@ -439,7 +454,7 @@ export default function CVExportModal({
                   }}
                   className="text-[9px] text-terminal-muted hover:text-terminal-accent transition-colors"
                 >
-                  all
+                  {t("cvExport.selectAll")}
                 </button>
                 <button
                   onClick={() => {
@@ -449,7 +464,7 @@ export default function CVExportModal({
                   }}
                   className="text-[9px] text-terminal-muted hover:text-terminal-error transition-colors"
                 >
-                  clear
+                  {t("cvExport.clear")}
                 </button>
                 <button
                   onClick={() => setShowProjectPicker((v) => !v)}
@@ -486,7 +501,7 @@ export default function CVExportModal({
                               {focusedProject.title}
                             </div>
                             <div className="text-[8px] uppercase tracking-wider text-terminal-info/60 mt-0.5">
-                              actions (
+                              {t("cvExport.actionsOf")} (
                               {
                                 (
                                   selectedProjectActionIndexes[
@@ -509,7 +524,7 @@ export default function CVExportModal({
                         <div className="overflow-y-auto flex-1 p-2 space-y-1">
                           {focusedProject.actions.length === 0 ? (
                             <div className="text-[9px] text-terminal-muted text-center py-4">
-                              no actions
+                              {t("cvExport.noActions")}
                             </div>
                           ) : (
                             focusedProject.actions.map(
@@ -578,7 +593,7 @@ export default function CVExportModal({
                             }
                             className="text-[8px] text-terminal-muted hover:text-terminal-accent transition-colors"
                           >
-                            all
+                            {t("cvExport.allActions")}
                           </button>
                           <button
                             onClick={() =>
@@ -589,7 +604,7 @@ export default function CVExportModal({
                             }
                             className="text-[8px] text-terminal-muted hover:text-terminal-error transition-colors"
                           >
-                            none
+                            {t("cvExport.noneActions")}
                           </button>
                         </div>
                       </div>
@@ -597,12 +612,12 @@ export default function CVExportModal({
                       /* Empty state */
                       <div className="flex flex-col items-center justify-center h-full text-center px-4 py-6 gap-1.5">
                         <div className="text-terminal-muted/40 text-[10px] uppercase tracking-wider">
-                          actions panel
+                          {t("cvExport.actionsPanel")}
                         </div>
                         <div className="text-terminal-muted/30 text-[9px]">
                           {selectedProjectIds.size === 0
-                            ? "select a project to configure its actions"
-                            : "click a selected project title to edit its actions"}
+                            ? t("cvExport.selectProjectHint")
+                            : t("cvExport.clickProjectHint")}
                         </div>
                       </div>
                     )}
@@ -621,7 +636,7 @@ export default function CVExportModal({
           {/* Live preview */}
           <div className="card-base p-4 space-y-2">
             <div className="flex items-center justify-between text-[10px] text-terminal-muted">
-              <span>LIVE PREVIEW</span>
+              <span>{t("cvExport.livePreview")}</span>
               <span className="text-terminal-accent/50">{selected}.pdf</span>
             </div>
             <div
@@ -676,7 +691,7 @@ export default function CVExportModal({
                          border border-terminal-border/50 text-terminal-muted rounded-sm hover:text-terminal-accent transition-colors"
             >
               <Eye size={12} />
-              preview
+              {t("cvExport.preview")}
             </button>
             <button
               onClick={handleDownloadPDF}
@@ -684,7 +699,7 @@ export default function CVExportModal({
                          bg-terminal-accent/10 border border-terminal-accent/30 text-terminal-accent rounded-sm hover:bg-terminal-accent/20 transition-colors"
             >
               <Download size={12} />
-              download pdf
+              {t("cvExport.download")}
             </button>
           </div>
         </div>
@@ -710,6 +725,7 @@ function CVContent({
   techStack?: TechItem[];
   renderMode?: "preview" | "print";
 }) {
+  const { t } = useLanguage();
   if (template === "minimal") {
     const minimalPadding = renderMode === "preview" ? "24px " : "0px";
     return (
@@ -763,12 +779,12 @@ function CVContent({
             borderTop: "2px solid #ddd",
           }}
         />
-        <Section title="SUMMARY">
+        <Section title={t("cv.summary")}>
           <p style={{ margin: "0", fontSize: "13px", lineHeight: "1.7" }}>
             {profile.summary}
           </p>
         </Section>
-        <Section title="EXPERIENCE">
+        <Section title={t("cv.experience")}>
           {profile.experience.map((exp, i) => (
             <div key={i} data-cv-item="true" style={{ marginBottom: "14px" }}>
               <div
@@ -825,12 +841,12 @@ function CVContent({
           ))}
         </Section>
         {techStack && techStack.length > 0 && (
-          <Section title="SKILLS">
+          <Section title={t("cv.skills")}>
             <SkillsGrid techStack={techStack} />
           </Section>
         )}
         {profile.education && profile.education.length > 0 && (
-          <Section title="EDUCATION">
+          <Section title={t("cv.education")}>
             {profile.education.map((edu, i) => (
               <div key={i} style={{ marginBottom: "8px", fontSize: "12px" }}>
                 <strong>{edu.degree}</strong> — {edu.school} ({edu.year})
@@ -839,7 +855,7 @@ function CVContent({
           </Section>
         )}
         {projects.length > 0 && (
-          <Section title="PROJECTS">
+          <Section title={t("cv.projects")}>
             {projects.map((proj, i) => (
               <div key={i} data-cv-item="true" style={{ marginBottom: "14px" }}>
                 <div
@@ -873,12 +889,12 @@ function CVContent({
                     lineHeight: "1.6",
                   }}
                 >
-                  <strong>Problem:</strong> {proj.problem}
+                  <strong>{t("cv.problem")}</strong> {proj.problem}
                 </p>
                 {proj.actions.length > 0 && (
                   <div style={{ margin: "5px 0" }}>
                     <div style={{ fontSize: "13px", fontWeight: "bold" }}>
-                      Actions:
+                      {t("cv.actions")}
                     </div>
                     <ul
                       style={{
@@ -906,21 +922,21 @@ function CVContent({
                       lineHeight: "1.6",
                     }}
                   >
-                    <strong>Results:</strong>{" "}
+                    <strong>{t("cv.results")}</strong>{" "}
                     {proj.results
                       .map((r) => `${r.value} ${r.label}`)
                       .join(" • ")}
                   </p>
                 )}
                 <p style={{ margin: "3px 0", fontSize: "12px", color: "#666" }}>
-                  <strong>Tech:</strong> {proj.tech.join(", ")}
+                  <strong>{t("cv.tech")}</strong> {proj.tech.join(", ")}
                 </p>
               </div>
             ))}
           </Section>
         )}
         {certificates.length > 0 && (
-          <Section title="CERTIFICATIONS">
+          <Section title={t("cv.certifications")}>
             {certificates.map((cert, i) => (
               <div key={i} data-cv-item="true" style={{ marginBottom: "8px" }}>
                 <div style={{ fontWeight: "bold", fontSize: "12px" }}>
@@ -1019,7 +1035,7 @@ function CVContent({
           >
             {profile.title}
           </p>
-          <SidebarSection title="CONTACT">
+          <SidebarSection title={t("cv.contact")}>
             <div style={{ fontSize: "9.5px", lineHeight: "1.65" }}>
               {profile.email && (
                 <div style={{ wordBreak: "break-all" }}>{profile.email}</div>
@@ -1037,7 +1053,7 @@ function CVContent({
             </div>
           </SidebarSection>
           {profile.education && profile.education.length > 0 && (
-            <SidebarSection title="EDUCATION">
+            <SidebarSection title={t("cv.education")}>
               {profile.education.map((edu, i) => (
                 <div key={i} style={{ marginBottom: "5px", fontSize: "9.5px" }}>
                   <div
@@ -1057,7 +1073,7 @@ function CVContent({
             </SidebarSection>
           )}
           {certificates.length > 0 && (
-            <SidebarSection title="CERTIFICATIONS">
+            <SidebarSection title={t("cv.certifications")}>
               {certificates.map((cert, i) => (
                 <div key={i} style={{ marginBottom: "6px", fontSize: "9.5px" }}>
                   <div
@@ -1092,12 +1108,12 @@ function CVContent({
             flexDirection: "column",
           }}
         >
-          <Section title="SUMMARY">
+          <Section title={t("cv.summary")}>
             <p style={{ margin: "0", fontSize: "13px", lineHeight: "1.6" }}>
               {profile.summary}
             </p>
           </Section>
-          <Section title="EXPERIENCE">
+          <Section title={t("cv.experience")}>
             {profile.experience.map((exp, i) => (
               <div key={i} data-cv-item="true" style={{ marginBottom: "12px" }}>
                 <div
@@ -1155,7 +1171,7 @@ function CVContent({
             ))}
           </Section>
           {projects.length > 0 && (
-            <Section title="PROJECTS">
+            <Section title={t("cv.projects")}>
               {projects.map((proj, i) => (
                 <div
                   key={i}
@@ -1203,7 +1219,7 @@ function CVContent({
                       lineHeight: "1.5",
                     }}
                   >
-                    <strong>Problem:</strong> {proj.problem}
+                    <strong>{t("cv.problem")}</strong> {proj.problem}
                   </p>
                   {proj.actions.length > 0 && (
                     <div style={{ margin: "4px 0" }}>
@@ -1214,7 +1230,7 @@ function CVContent({
                           marginBottom: "2px",
                         }}
                       >
-                        Actions:
+                        {t("cv.actions")}
                       </div>
                       <ul
                         style={{
@@ -1244,7 +1260,7 @@ function CVContent({
                         fontWeight: "bold",
                       }}
                     >
-                      Results:{" "}
+                      {t("cv.results")}{" "}
                       {proj.results
                         .map((r) => `${r.value} ${r.label}`)
                         .join(" • ")}
@@ -1257,7 +1273,7 @@ function CVContent({
                       color: "#888",
                     }}
                   >
-                    Tech: {proj.tech.slice(0, 5).join(", ")}
+                    {t("cv.tech")} {proj.tech.slice(0, 5).join(", ")}
                   </p>
                 </div>
               ))}
@@ -1317,12 +1333,12 @@ function CVContent({
         </div>
       </div>
       <div style={{ padding: "0 24px" }}>
-        <Section title="SUMMARY">
+        <Section title={t("cv.summary")}>
           <p style={{ margin: "0", fontSize: "13px", lineHeight: "1.6" }}>
             {profile.summary}
           </p>
         </Section>
-        <Section title="EXPERIENCE">
+        <Section title={t("cv.experience")}>
           {profile.experience.map((exp, i) => (
             <div key={i} data-cv-item="true" style={{ marginBottom: "12px" }}>
               <div
@@ -1378,12 +1394,12 @@ function CVContent({
           ))}
         </Section>
         {techStack && techStack.length > 0 && (
-          <Section title="SKILLS">
+          <Section title={t("cv.skills")}>
             <SkillsGrid techStack={techStack} />
           </Section>
         )}
         {profile.education && profile.education.length > 0 && (
-          <Section title="EDUCATION">
+          <Section title={t("cv.education")}>
             {profile.education.map((edu, i) => (
               <div key={i} style={{ marginBottom: "6px", fontSize: "12px" }}>
                 <strong>{edu.degree}</strong> — {edu.school} ({edu.year})
@@ -1392,7 +1408,7 @@ function CVContent({
           </Section>
         )}
         {projects.length > 0 && (
-          <Section title="PROJECTS">
+          <Section title={t("cv.projects")}>
             {projects.map((proj, i) => (
               <div key={i} data-cv-item="true" style={{ marginBottom: "12px" }}>
                 <div
@@ -1426,7 +1442,7 @@ function CVContent({
                     lineHeight: "1.5",
                   }}
                 >
-                  <strong>Problem:</strong> {proj.problem}
+                  <strong>{t("cv.problem")}</strong> {proj.problem}
                 </p>
                 {proj.actions.length > 0 && (
                   <div style={{ margin: "4px 0" }}>
@@ -1437,7 +1453,7 @@ function CVContent({
                         marginBottom: "2px",
                       }}
                     >
-                      Actions:
+                      {t("cv.actions")}
                     </div>
                     <ul
                       style={{
@@ -1465,7 +1481,7 @@ function CVContent({
                       fontWeight: "bold",
                     }}
                   >
-                    Results:{" "}
+                    {t("cv.results")}{" "}
                     {proj.results
                       .map((r) => `${r.value} ${r.label}`)
                       .join(" • ")}
@@ -1478,14 +1494,14 @@ function CVContent({
                     color: "#888",
                   }}
                 >
-                  Tech: {proj.tech.join(", ")}
+                  {t("cv.tech")} {proj.tech.join(", ")}
                 </p>
               </div>
             ))}
           </Section>
         )}
         {certificates.length > 0 && (
-          <Section title="CERTIFICATIONS">
+          <Section title={t("cv.certifications")}>
             {certificates.map((cert, i) => (
               <div
                 key={i}

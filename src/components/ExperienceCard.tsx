@@ -1,6 +1,7 @@
 import { Briefcase } from "lucide-react";
 import { useMemo, useState } from "react";
-import type { ExperienceEntry, Profile } from "../data/portfolio";
+import { useLanguage } from "../contexts/LanguageContext";
+import type { ExperienceEntry, Profile } from "../data/portfolio.types";
 
 interface ExperienceCardProps {
   experience: Profile["experience"];
@@ -47,6 +48,7 @@ export default function ExperienceCard({
 }: ExperienceCardProps) {
   const [sortMode, setSortMode] = useState<SortMode>("newest");
   const [expType, setExpType] = useState<ExperienceFilter>("all");
+  const { t } = useLanguage();
 
   const filteredAndSorted = useMemo(() => {
     const filtered = experience.filter((item) => {
@@ -77,9 +79,9 @@ export default function ExperienceCard({
           <div className="inline-flex items-center gap-1 rounded-sm border border-terminal-border/40 p-1">
             {(
               [
-                { key: "all", label: "all" },
-                { key: "company", label: "company" },
-                { key: "project", label: "project" },
+                { key: "all", label: t("exp.filterAll") },
+                { key: "company", label: t("exp.filterCompany") },
+                { key: "project", label: t("exp.filterProject") },
               ] as const
             ).map((item) => (
               <button
@@ -97,7 +99,7 @@ export default function ExperienceCard({
           </div>
 
           <label className="sm:ml-auto inline-flex items-center gap-2 text-[10px] text-terminal-muted uppercase tracking-wide">
-            sort
+            {t("exp.sort")}
             <select
               value={sortMode}
               onChange={(e) => setSortMode(e.target.value as SortMode)}
@@ -107,88 +109,92 @@ export default function ExperienceCard({
                 value="newest"
                 className="bg-terminal-bg text-terminal-text"
               >
-                newest first
+                {t("exp.newestFirst")}
               </option>
               <option
                 value="oldest"
                 className="bg-terminal-bg text-terminal-text"
               >
-                oldest first
+                {t("exp.oldestFirst")}
               </option>
             </select>
           </label>
         </div>
 
         <div className="max-h-[360px] overflow-y-auto pr-1 space-y-3 sm:space-y-4">
-          {filteredAndSorted.map((item, i) => (
-            <div
-              key={`${item.role}-${item.period}-${i}`}
-              className="border border-terminal-border/35 rounded-sm bg-terminal-highlight/15 p-3 sm:p-3.5"
-            >
-              <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5">
-                <div className="text-[11px] text-terminal-text/85 font-semibold leading-snug">
-                  {item.role}
-                  {item.organization ? (
-                    <span className="text-terminal-muted/70 font-normal">
-                      {" "}
-                      at {item.organization}
-                    </span>
-                  ) : null}
+          {filteredAndSorted.map((item, i) => {
+            return (
+              <div
+                key={`${item.role}-${item.period}-${i}`}
+                className="border border-terminal-border/35 rounded-sm bg-terminal-highlight/15 p-3 sm:p-3.5"
+              >
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1.5">
+                  <div className="text-[11px] text-terminal-text/85 font-semibold leading-snug">
+                    {item.role}
+                    {item.organization ? (
+                      <span className="text-terminal-muted/70 font-normal">
+                        {" "}
+                        {t("exp.at")} {item.organization}
+                      </span>
+                    ) : null}
+                  </div>
+                  <span className="text-[10px] text-terminal-accent/70 font-mono">
+                    {item.period}
+                  </span>
                 </div>
-                <span className="text-[10px] text-terminal-accent/70 font-mono">
-                  {item.period}
-                </span>
-              </div>
-              <div className="mt-1">
-                <span
-                  className={`text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded border ${
-                    item.type === "company"
-                      ? "border-terminal-info/40 text-terminal-info/70"
-                      : "border-terminal-accent/40 text-terminal-accent/70"
-                  }`}
-                >
-                  {item.type}
-                </span>
-              </div>
-              <p className="text-[10px] sm:text-[11px] text-terminal-text/65 mt-1.5 leading-relaxed">
-                {item.description}
-              </p>
-
-              {item.links && item.links.length > 0 ? (
-                <div className="mt-2 flex flex-wrap gap-1.5">
-                  {item.links.map((link) => (
-                    <a
-                      key={`${item.role}-${link.href}`}
-                      href={link.href}
-                      target={link.projectName ? undefined : "_blank"}
-                      rel={link.projectName ? undefined : "noopener noreferrer"}
-                      onClick={(e) => {
-                        if (!link.projectName) return;
-
-                        e.preventDefault();
-
-                        const projectSection =
-                          document.getElementById("projects");
-                        if (projectSection) {
-                          projectSection.scrollIntoView({
-                            behavior: "smooth",
-                            block: "start",
-                          });
-                        }
-
-                        if (link.projectName && onProjectQuery) {
-                          onProjectQuery(link.projectName);
-                        }
-                      }}
-                      className="text-[10px] px-2 py-1 rounded-sm border border-terminal-border/40 text-terminal-muted hover:text-terminal-accent hover:border-terminal-accent/40 transition-colors"
-                    >
-                      {link.label}
-                    </a>
-                  ))}
+                <div className="mt-1">
+                  <span
+                    className={`text-[9px] uppercase tracking-wider px-1.5 py-0.5 rounded border ${
+                      item.type === "company"
+                        ? "border-terminal-info/40 text-terminal-info/70"
+                        : "border-terminal-accent/40 text-terminal-accent/70"
+                    }`}
+                  >
+                    {item.type}
+                  </span>
                 </div>
-              ) : null}
-            </div>
-          ))}
+                <p className="text-[10px] sm:text-[11px] text-terminal-text/65 mt-1.5 leading-relaxed">
+                  {item.description}
+                </p>
+
+                {item.links && item.links.length > 0 ? (
+                  <div className="mt-2 flex flex-wrap gap-1.5">
+                    {item.links.map((link) => (
+                      <a
+                        key={`${item.role}-${link.href}`}
+                        href={link.href}
+                        target={link.projectName ? undefined : "_blank"}
+                        rel={
+                          link.projectName ? undefined : "noopener noreferrer"
+                        }
+                        onClick={(e) => {
+                          if (!link.projectName) return;
+
+                          e.preventDefault();
+
+                          const projectSection =
+                            document.getElementById("projects");
+                          if (projectSection) {
+                            projectSection.scrollIntoView({
+                              behavior: "smooth",
+                              block: "start",
+                            });
+                          }
+
+                          if (link.projectName && onProjectQuery) {
+                            onProjectQuery(link.projectName);
+                          }
+                        }}
+                        className="text-[10px] px-2 py-1 rounded-sm border border-terminal-border/40 text-terminal-muted hover:text-terminal-accent hover:border-terminal-accent/40 transition-colors"
+                      >
+                        {link.label}
+                      </a>
+                    ))}
+                  </div>
+                ) : null}
+              </div>
+            );
+          })}
         </div>
       </div>
     </div>

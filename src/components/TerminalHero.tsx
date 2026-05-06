@@ -1,13 +1,15 @@
 import { useEffect, useState } from "react";
 import { Terminal, ChevronDown } from "lucide-react";
-import { heroLines } from "../data/portfolio";
-import type { HeroLine } from "../data/portfolio";
+import { heroLines } from "../data/portfolio.en";
+import { useLanguage } from "../contexts/LanguageContext";
+import type { HeroLine } from "../data/portfolio.types";
 
 interface TerminalHeroProps {
   lines?: HeroLine[];
 }
 
 export default function TerminalHero({ lines = heroLines }: TerminalHeroProps) {
+  const { t } = useLanguage();
   const [visibleLines, setVisibleLines] = useState(0);
   const [showCursor, setShowCursor] = useState(true);
 
@@ -69,7 +71,7 @@ export default function TerminalHero({ lines = heroLines }: TerminalHeroProps) {
             <div className="flex items-center gap-3">
               <div className="h-px flex-1 bg-terminal-border/40" />
               <span className="text-[10px] text-terminal-muted/50 uppercase tracking-[0.15em] sm:tracking-[0.25em]">
-                scroll to explore
+                {t("hero.scrollToExplore")}
               </span>
               <ChevronDown
                 size={12}

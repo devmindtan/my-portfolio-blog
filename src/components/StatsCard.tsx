@@ -1,16 +1,18 @@
 import { Activity } from "lucide-react";
-import type { Stat } from "../data/portfolio";
+import { useLanguage } from "../contexts/LanguageContext";
+import type { Stat } from "../data/portfolio.types";
 
 interface StatsCardProps {
   stats: Stat[];
 }
 
 export default function StatsCard({ stats }: StatsCardProps) {
+  const { t } = useLanguage();
   return (
     <div className="col-span-4 sm:col-span-2 card-base card-glow">
       <div className="terminal-header">
         <Activity size={11} />
-        <span>metrics</span>
+        <span>{t("stats.title")}</span>
       </div>
       <div className="p-4 sm:p-5 grid grid-cols-2 sm:grid-cols-2 gap-3">
         {stats.map((stat, i) => (

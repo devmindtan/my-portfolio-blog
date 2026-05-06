@@ -1,5 +1,5 @@
 import { BookOpen } from "lucide-react";
-import type { Principle } from "../data/portfolio";
+import type { Principle } from "../data/portfolio.types";
 
 interface PhilosophyCardProps {
   principles: Principle[];

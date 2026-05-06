@@ -1,6 +1,7 @@
 import { Award, ExternalLink } from "lucide-react";
 import { useEffect, useRef, useState } from "react";
-import type { Certificate } from "../data/portfolio";
+import { useLanguage } from "../contexts/LanguageContext";
+import type { Certificate } from "../data/portfolio.types";
 
 let pdfWorkerConfigured = false;
 
@@ -11,6 +12,7 @@ interface CertificatesCardProps {
 export default function CertificatesCard({
   certificates,
 }: CertificatesCardProps) {
+  const { t } = useLanguage();
   const outerRef = useRef<HTMLDivElement>(null);
   const trackRef = useRef<HTMLDivElement>(null);
   const posRef = useRef(0);
@@ -127,7 +129,7 @@ export default function CertificatesCard({
         <Award size={11} />
         <span>certs.json</span>
         <span className="ml-auto text-[9px] text-green-400/60">
-          ● auto-scroll · drag to seek
+          ● {t("cert.scrollHint")}
         </span>
       </div>
 
@@ -162,6 +164,7 @@ export default function CertificatesCard({
 }
 
 function CertCard({ cert }: { cert: Certificate }) {
+  const { t } = useLanguage();
   const isPdf = cert.imageUrl?.toLowerCase().endsWith(".pdf");
   const cardClassName =
     "flex-shrink-0 w-32 sm:w-40 rounded border border-terminal-border/40 bg-terminal-highlight/20 hover:border-terminal-accent/60 transition-all duration-200 overflow-hidden group cursor-pointer";
@@ -188,7 +191,7 @@ function CertCard({ cert }: { cert: Certificate }) {
         </div>
         <div className="absolute bottom-1.5 left-1.5">
           <span className="text-[8px] font-mono px-1 py-0.5 rounded bg-terminal-bg/80 border border-green-500/30 text-green-400/70">
-            ✓ verified
+            {t("cert.verified")}
           </span>
         </div>
       </div>

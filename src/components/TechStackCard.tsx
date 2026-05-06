@@ -1,6 +1,6 @@
 import { Cpu } from "lucide-react";
-import type { TechItem } from "../data/portfolio";
-import { categoryLabels, categoryOrder } from "../data/portfolio";
+import type { TechItem } from "../data/portfolio.types";
+import { categoryLabels, categoryOrder } from "../data/portfolio.en";
 
 interface TechStackCardProps {
   techData: TechItem[];

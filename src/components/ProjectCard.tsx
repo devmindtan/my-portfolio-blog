@@ -1,6 +1,7 @@
-import { useState } from 'react';
-import type { Project, ViewMode } from '../data/portfolio';
-import { ChevronRight, FolderGit2 } from 'lucide-react';
+import { useState } from "react";
+import { useLanguage } from "../contexts/LanguageContext";
+import type { Project, ViewMode } from "../data/portfolio.types";
+import { ChevronRight, FolderGit2 } from "lucide-react";
 
 interface ProjectCardProps {
   project: Project;
@@ -9,10 +10,16 @@ interface ProjectCardProps {
   onClick: () => void;
 }
 
-export default function ProjectCard({ project, index, viewMode, onClick }: ProjectCardProps) {
+export default function ProjectCard({
+  project,
+  index,
+  viewMode,
+  onClick,
+}: ProjectCardProps) {
   const [isHovered, setIsHovered] = useState(false);
+  const { t } = useLanguage();
 
-  if (viewMode === 'list') {
+  if (viewMode === "list") {
     return (
       <button
         onClick={onClick}
@@ -24,16 +31,23 @@ export default function ProjectCard({ project, index, viewMode, onClick }: Proje
       >
         <div className="flex items-center gap-2 text-terminal-muted text-xs flex-shrink-0">
           <FolderGit2 size={11} />
-          <span className="text-[10px] uppercase tracking-wider">{project.tag}</span>
+          <span className="text-[10px] uppercase tracking-wider">
+            {project.tag}
+          </span>
         </div>
 
         <div className="flex-1 min-w-0">
-          <h3 className="text-xs font-semibold text-terminal-text truncate">{project.title}</h3>
+          <h3 className="text-xs font-semibold text-terminal-text truncate">
+            {project.title}
+          </h3>
         </div>
 
         <div className="hidden md:flex items-center gap-2 flex-shrink-0">
           {project.tech.slice(0, 4).map((t) => (
-            <span key={t} className="px-1.5 py-0.5 text-[9px] bg-terminal-highlight border border-terminal-border/30 text-terminal-muted rounded-sm">
+            <span
+              key={t}
+              className="px-1.5 py-0.5 text-[9px] bg-terminal-highlight border border-terminal-border/30 text-terminal-muted rounded-sm"
+            >
               {t}
             </span>
           ))}
@@ -42,8 +56,12 @@ export default function ProjectCard({ project, index, viewMode, onClick }: Proje
         <div className="flex items-center gap-3 flex-shrink-0">
           {project.results.slice(0, 2).map((r, i) => (
             <div key={i} className="text-center">
-              <span className="mono-value text-xs text-terminal-accent">{r.value}</span>
-              <span className="text-[9px] text-terminal-muted ml-1">{r.label}</span>
+              <span className="mono-value text-xs text-terminal-accent">
+                {r.value}
+              </span>
+              <span className="text-[9px] text-terminal-muted ml-1">
+                {r.label}
+              </span>
             </div>
           ))}
         </div>
@@ -51,7 +69,7 @@ export default function ProjectCard({ project, index, viewMode, onClick }: Proje
         <ChevronRight
           size={14}
           className={`text-terminal-muted transition-all duration-300 flex-shrink-0 hidden sm:block ${
-            isHovered ? 'text-terminal-accent translate-x-0.5' : ''
+            isHovered ? "text-terminal-accent translate-x-0.5" : ""
           }`}
         />
       </button>
@@ -76,8 +94,8 @@ export default function ProjectCard({ project, index, viewMode, onClick }: Proje
           {project.tag}
         </span>
         <span className="ml-auto text-terminal-muted/50 hidden sm:inline">
-          {project.tech.slice(0, 3).join(' · ')}
-          {project.tech.length > 3 && ' · ...'}
+          {project.tech.slice(0, 3).join(" · ")}
+          {project.tech.length > 3 && " · ..."}
         </span>
       </div>
 
@@ -90,14 +108,16 @@ export default function ProjectCard({ project, index, viewMode, onClick }: Proje
           <ChevronRight
             size={14}
             className={`text-terminal-muted transition-all duration-300 flex-shrink-0 mt-0.5 ${
-              isHovered ? 'text-terminal-accent translate-x-0.5' : ''
+              isHovered ? "text-terminal-accent translate-x-0.5" : ""
             }`}
           />
         </div>
 
         {/* Problem */}
         <div>
-          <span className="section-label text-terminal-error/70">problem</span>
+          <span className="section-label text-terminal-error/70">
+            {t("project.problem")}
+          </span>
           <p className="text-xs text-terminal-text/80 mt-1 leading-relaxed line-clamp-2">
             {project.problem}
           </p>
@@ -105,11 +125,18 @@ export default function ProjectCard({ project, index, viewMode, onClick }: Proje
 
         {/* Actions */}
         <div>
-          <span className="section-label text-terminal-info/70">action</span>
+          <span className="section-label text-terminal-info/70">
+            {t("project.action")}
+          </span>
           <ul className="mt-1.5 space-y-1">
             {project.actions.map((action, i) => (
-              <li key={i} className="text-xs text-terminal-text/70 flex items-start gap-2">
-                <span className="text-terminal-accent/60 mt-0.5 flex-shrink-0">{'>'}</span>
+              <li
+                key={i}
+                className="text-xs text-terminal-text/70 flex items-start gap-2"
+              >
+                <span className="text-terminal-accent/60 mt-0.5 flex-shrink-0">
+                  {">"}
+                </span>
                 <span className="line-clamp-1">{action}</span>
               </li>
             ))}
@@ -118,14 +145,18 @@ export default function ProjectCard({ project, index, viewMode, onClick }: Proje
 
         {/* Results */}
         <div>
-          <span className="section-label text-terminal-accent/70">result</span>
+          <span className="section-label text-terminal-accent/70">
+            {t("project.result")}
+          </span>
           <div className="flex flex-wrap gap-3 sm:gap-4 mt-1.5">
             {project.results.map((result, i) => (
               <div key={i} className="flex flex-col">
                 <span className="mono-value text-sm text-terminal-accent text-shadow-glow">
                   {result.value}
                 </span>
-                <span className="text-[10px] text-terminal-muted">{result.label}</span>
+                <span className="text-[10px] text-terminal-muted">
+                  {result.label}
+                </span>
               </div>
             ))}
           </div>

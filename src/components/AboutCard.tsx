@@ -9,8 +9,7 @@ import {
   Globe,
   type LucideIcon,
 } from "lucide-react";
-import type { Profile } from "../data/portfolio";
-
+import type { Profile } from "../data/portfolio.types";
 interface AboutCardProps {
   profile: Profile;
 }

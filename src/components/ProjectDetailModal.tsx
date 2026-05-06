@@ -1,32 +1,43 @@
-import { useEffect, useCallback } from 'react';
-import type { Project } from '../data/portfolio';
-import { X, FolderGit2, ExternalLink } from 'lucide-react';
+import { useEffect, useCallback } from "react";
+import { useLanguage } from "../contexts/LanguageContext";
+import type { Project } from "../data/portfolio.types";
+import { X, FolderGit2, ExternalLink } from "lucide-react";
 
 interface ProjectDetailModalProps {
   project: Project | null;
   onClose: () => void;
 }
 
-export default function ProjectDetailModal({ project, onClose }: ProjectDetailModalProps) {
-  const handleKeyDown = useCallback((e: KeyboardEvent) => {
-    if (e.key === 'Escape') onClose();
-  }, [onClose]);
+export default function ProjectDetailModal({
+  project,
+  onClose,
+}: ProjectDetailModalProps) {
+  const { t } = useLanguage();
+  const handleKeyDown = useCallback(
+    (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    },
+    [onClose],
+  );
 
   useEffect(() => {
     if (project) {
-      document.addEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = 'hidden';
+      document.addEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "hidden";
     }
     return () => {
-      document.removeEventListener('keydown', handleKeyDown);
-      document.body.style.overflow = '';
+      document.removeEventListener("keydown", handleKeyDown);
+      document.body.style.overflow = "";
     };
   }, [project, handleKeyDown]);
 
   if (!project) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4" onClick={onClose}>
+    <div
+      className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4"
+      onClick={onClose}
+    >
       {/* Backdrop */}
       <div className="absolute inset-0 bg-terminal-bg/80 backdrop-blur-sm" />
 
@@ -67,7 +78,9 @@ export default function ProjectDetailModal({ project, onClose }: ProjectDetailMo
 
           {/* Problem */}
           <div>
-            <span className="section-label text-terminal-error/70">problem</span>
+            <span className="text-[12px] section-label text-terminal-error/70">
+              {t("project.problem")}
+            </span>
             <p className="text-xs text-terminal-text/80 mt-1.5 leading-relaxed">
               {project.problem}
             </p>
@@ -75,11 +88,18 @@ export default function ProjectDetailModal({ project, onClose }: ProjectDetailMo
 
           {/* Actions */}
           <div>
-            <span className="section-label text-terminal-info/70">action</span>
+            <span className="text-[12px] section-label text-terminal-info/70">
+              {t("project.action")}
+            </span>
             <ul className="mt-1.5 space-y-1.5">
               {project.actions.map((action, i) => (
-                <li key={i} className="text-xs text-terminal-text/70 flex items-start gap-2">
-                  <span className="text-terminal-accent/60 mt-0.5 flex-shrink-0">{'>'}</span>
+                <li
+                  key={i}
+                  className="text-xs text-terminal-text/70 flex items-start gap-2"
+                >
+                  <span className="text-terminal-accent/60 mt-0.5 flex-shrink-0">
+                    {">"}
+                  </span>
                   <span>{action}</span>
                 </li>
               ))}
@@ -88,14 +108,21 @@ export default function ProjectDetailModal({ project, onClose }: ProjectDetailMo
 
           {/* Results */}
           <div>
-            <span className="section-label text-terminal-accent/70">result</span>
+            <span className="text-[12px] section-label text-terminal-accent/70">
+              {t("project.result")}
+            </span>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mt-2">
               {project.results.map((result, i) => (
-                <div key={i} className="p-3 bg-terminal-highlight border border-terminal-border/30 rounded-sm">
+                <div
+                  key={i}
+                  className="p-3 bg-terminal-highlight border border-terminal-border/30 rounded-sm"
+                >
                   <span className="mono-value text-lg text-terminal-accent text-shadow-glow block">
                     {result.value}
                   </span>
-                  <span className="text-[10px] text-terminal-muted uppercase tracking-wider">{result.label}</span>
+                  <span className="text-[10px] text-terminal-muted uppercase tracking-wider">
+                    {result.label}
+                  </span>
                 </div>
               ))}
             </div>
@@ -103,7 +130,9 @@ export default function ProjectDetailModal({ project, onClose }: ProjectDetailMo
 
           {/* Tech Stack */}
           <div>
-            <span className="section-label text-terminal-info/70">tech stack</span>
+            <span className="text-[12px] section-label text-terminal-info/70">
+              {t("project.techStack")}
+            </span>
             <div className="flex flex-wrap gap-1.5 mt-1.5">
               {project.tech.map((t) => (
                 <span
@@ -120,7 +149,9 @@ export default function ProjectDetailModal({ project, onClose }: ProjectDetailMo
           {/* Insight */}
           <div className="pt-4 border-t border-terminal-border/30">
             <p className="text-xs text-terminal-muted/80 italic leading-relaxed">
-              <span className="text-terminal-warning/60 not-italic mr-1">//</span>
+              <span className="text-terminal-warning/60 not-italic mr-1">
+                //
+              </span>
               {project.insight}
             </p>
           </div>
@@ -130,7 +161,7 @@ export default function ProjectDetailModal({ project, onClose }: ProjectDetailMo
             <span>id: {project.id.slice(0, 8)}</span>
             <span className="flex items-center gap-1">
               <ExternalLink size={9} />
-              click outside to close
+              {t("project.clickToClose")}
             </span>
           </div>
         </div>

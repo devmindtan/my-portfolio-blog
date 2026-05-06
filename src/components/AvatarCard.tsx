@@ -1,10 +1,12 @@
-import type { Profile } from "../data/portfolio";
+import { useLanguage } from "../contexts/LanguageContext";
+import type { Profile } from "../data/portfolio.types";
 
 interface AvatarCardProps {
   profile: Profile;
 }
 
 export default function AvatarCard({ profile }: AvatarCardProps) {
+  const { t } = useLanguage();
   return (
     <div className="col-span-4 card-base card-glow overflow-hidden">
       <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 p-4 sm:p-5">
@@ -38,7 +40,7 @@ export default function AvatarCard({ profile }: AvatarCardProps) {
             <span className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-terminal-accent/5 border border-terminal-accent/20 rounded-sm self-center sm:self-auto">
               <span className="w-1.5 h-1.5 bg-terminal-accent rounded-full animate-glow" />
               <span className="text-[9px] text-terminal-accent uppercase tracking-wider">
-                open to work
+                {t("avatar.openToWork")}
               </span>
             </span>
           </div>

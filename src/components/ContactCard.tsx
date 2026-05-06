@@ -1,5 +1,5 @@
 import { Mail, Github, Linkedin, ArrowUpRight, Facebook } from "lucide-react";
-import type { SiteConfig } from "../data/portfolio";
+import type { SiteConfig } from "../data/portfolio.types";
 
 interface ContactCardProps {
   config: SiteConfig;

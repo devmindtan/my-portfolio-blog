@@ -17,19 +17,16 @@ import Footer from "./components/Footer";
 import ScrollToTop from "./components/ScrollToTop";
 import CompactViewToggle from "./components/CompactViewToggle";
 import useCompactView from "./hooks/useCompactView";
-import {
-  projects,
-  techStack,
-  stats,
-  profile,
-  heroLines,
-  welcomeLines,
-  principles,
-  certificates,
-  siteConfig,
-} from "./data/portfolio";
-import type { Project, SortKey, SortDir, ViewMode } from "./data/portfolio";
-import { ITEMS_PER_PAGE } from "./data/portfolio";
+import { useLanguage } from "./contexts/LanguageContext";
+import { portfolioDataEn } from "./data/portfolio.en";
+import { portfolioDataVi } from "./data/portfolio.vi";
+import type {
+  Project,
+  SortKey,
+  SortDir,
+  ViewMode,
+} from "./data/portfolio.types";
+import { ITEMS_PER_PAGE } from "./data/portfolio.en";
 import { FileText, Menu, X } from "lucide-react";
 
 function App() {
@@ -45,6 +42,24 @@ function App() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { compactView, toggleCompactView } = useCompactView();
+  const { lang, setLang, t } = useLanguage();
+
+  const portfolioData = useMemo(
+    () => (lang === "vi" ? portfolioDataVi : portfolioDataEn),
+    [lang],
+  );
+
+  const {
+    projects,
+    techStack,
+    stats,
+    profile,
+    heroLines,
+    welcomeLines,
+    principles,
+    certificates,
+    siteConfig,
+  } = portfolioData;
 
   useEffect(() => {
     function onScroll() {
@@ -56,7 +71,7 @@ function App() {
 
   const tags = useMemo(
     () => [...new Set(projects.map((p) => p.tag))].sort(),
-    [],
+    [projects],
   );
 
   const tagCounts = useMemo(() => {
@@ -65,7 +80,7 @@ function App() {
       counts[p.tag] = (counts[p.tag] || 0) + 1;
     });
     return counts;
-  }, []);
+  }, [projects]);
 
   const filteredAndSorted = useMemo(() => {
     let result = projects.filter((p) => {
@@ -103,7 +118,7 @@ function App() {
     });
 
     return result;
-  }, [selectedTag, searchQuery, sortKey, sortDir]);
+  }, [projects, selectedTag, searchQuery, sortKey, sortDir]);
 
   const paginatedProjects = useMemo(() => {
     const start = (currentPage - 1) * ITEMS_PER_PAGE;
@@ -124,6 +139,15 @@ function App() {
     setSearchQuery(projectName);
     setCurrentPage(1);
   }, []);
+
+  const navLabelByKey: Record<string, string> = {
+    projects: t("nav.projects"),
+    stack: t("nav.stack"),
+    contact: t("nav.contact"),
+  };
+
+  const sectionProjectsTitle = t("section.projects");
+  const sectionConnectTitle = t("section.connect");
 
   return (
     <>
@@ -165,9 +189,16 @@ function App() {
                       href={link.href}
                       className="hover:text-terminal-accent transition-colors"
                     >
-                      {link.label}
+                      {navLabelByKey[link.label] ?? link.label}
                     </a>
                   ))}
+                  <button
+                    onClick={() => setLang(lang === "en" ? "vi" : "en")}
+                    className="px-2 py-1 border border-terminal-border/40 rounded-sm hover:border-terminal-accent/30 hover:text-terminal-accent transition-all duration-200"
+                    title={t("nav.language")}
+                  >
+                    {lang === "en" ? "EN" : "VI"}
+                  </button>
                   <CompactViewToggle
                     compact={compactView}
                     onToggle={toggleCompactView}
@@ -178,7 +209,7 @@ function App() {
                              hover:border-terminal-accent/30 hover:text-terminal-accent transition-all duration-200"
                   >
                     <FileText size={10} />
-                    export cv
+                    {t("nav.exportCv")}
                   </button>
                 </div>
 
@@ -201,9 +232,15 @@ function App() {
                       onClick={() => setMobileMenuOpen(false)}
                       className="block text-[10px] text-terminal-muted uppercase tracking-wider hover:text-terminal-accent transition-colors py-1"
                     >
-                      {link.label}
+                      {navLabelByKey[link.label] ?? link.label}
                     </a>
                   ))}
+                  <button
+                    onClick={() => setLang(lang === "en" ? "vi" : "en")}
+                    className="block text-[10px] text-terminal-muted uppercase tracking-wider hover:text-terminal-accent transition-colors py-1"
+                  >
+                    {t("nav.language")}: {lang === "en" ? "EN" : "VI"}
+                  </button>
                   <CompactViewToggle
                     compact={compactView}
                     onToggle={toggleCompactView}
@@ -217,7 +254,7 @@ function App() {
                     className="flex items-center gap-1.5 text-[10px] text-terminal-muted uppercase tracking-wider hover:text-terminal-accent transition-colors py-1"
                   >
                     <FileText size={10} />
-                    export cv
+                    {t("nav.exportCv")}
                   </button>
                 </div>
               )}
@@ -263,7 +300,7 @@ function App() {
               >
                 <div className="h-px flex-1 bg-terminal-border/30" />
                 <span className="text-[10px] text-terminal-muted/50 uppercase tracking-[0.15em] sm:tracking-[0.3em]">
-                  {siteConfig.sectionTitles.projects}
+                  {sectionProjectsTitle || siteConfig.sectionTitles.projects}
                 </span>
                 <div className="h-px flex-1 bg-terminal-border/30" />
               </div>
@@ -291,7 +328,7 @@ function App() {
               {paginatedProjects.length === 0 ? (
                 <div className="col-span-4 py-12 text-center space-y-2">
                   <span className="text-xs text-terminal-muted">
-                    No matching projects found.
+                    {t("empty.projects")}
                   </span>
                   <button
                     onClick={() => {
@@ -300,7 +337,7 @@ function App() {
                     }}
                     className="block mx-auto text-[10px] text-terminal-accent hover:underline"
                   >
-                    clear filters
+                    {t("action.clearFilters")}
                   </button>
                 </div>
               ) : (
@@ -323,7 +360,7 @@ function App() {
               >
                 <div className="h-px flex-1 bg-terminal-border/30" />
                 <span className="text-[10px] text-terminal-muted/50 uppercase tracking-[0.15em] sm:tracking-[0.3em]">
-                  {siteConfig.sectionTitles.connect}
+                  {sectionConnectTitle || siteConfig.sectionTitles.connect}
                 </span>
                 <div className="h-px flex-1 bg-terminal-border/30" />
               </div>
@@ -335,10 +372,10 @@ function App() {
                   <div className="w-2 h-2 bg-terminal-accent rounded-full animate-glow" />
                   <div>
                     <span className="text-xs text-terminal-text/80">
-                      {siteConfig.status.text}
+                      {t("status.available") || siteConfig.status.text}
                     </span>
                     <div className="text-[10px] text-terminal-muted mt-0.5">
-                      {siteConfig.status.detail}
+                      {t("status.response") || siteConfig.status.detail}
                     </div>
                   </div>
                 </div>

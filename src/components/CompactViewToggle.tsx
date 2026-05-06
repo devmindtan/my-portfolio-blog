@@ -1,4 +1,5 @@
 import { Maximize2, Minimize2 } from "lucide-react";
+import { useLanguage } from "../contexts/LanguageContext";
 
 interface CompactViewToggleProps {
   compact: boolean;
@@ -11,8 +12,9 @@ export default function CompactViewToggle({
   onToggle,
   mobile = false,
 }: CompactViewToggleProps) {
+  const { t } = useLanguage();
   const Icon = compact ? Maximize2 : Minimize2;
-  const label = compact ? "Expand" : "Compact";
+  const label = compact ? t("compact.expand") : t("compact.compact");
 
   if (mobile) {
     return (
@@ -24,7 +26,7 @@ export default function CompactViewToggle({
             : "text-terminal-muted hover:text-terminal-accent"
         }`}
         aria-pressed={compact}
-        title={compact ? "Expand View" : "Compact View"}
+        title={compact ? t("compact.expandTitle") : t("compact.compactTitle")}
       >
         <span
           className="mt-[1px] transition-transform duration-300 ease-in-out"
@@ -50,11 +52,7 @@ export default function CompactViewToggle({
           : "border-terminal-border/40 text-terminal-muted hover:border-terminal-accent/40 hover:text-terminal-accent hover:bg-terminal-accent/5"
       }`}
       aria-pressed={compact}
-      title={
-        compact
-          ? "Expand View: Restore normal spacing"
-          : "Compact View: Use smaller fonts and tighter spacing"
-      }
+      title={compact ? t("compact.expandTitle") : t("compact.compactTitle")}
     >
       {/* Animated icon swap */}
       <span className="relative w-[11px] h-[11px] mt-[2px] flex-shrink-0">

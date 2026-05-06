@@ -1,5 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from "react";
-import type { WelcomeLine } from "../data/portfolio";
+import { useLanguage } from "../contexts/LanguageContext";
+import type { WelcomeLine } from "../data/portfolio.types";
 
 interface WelcomeHeroProps {
   lines: WelcomeLine[];
@@ -7,6 +8,7 @@ interface WelcomeHeroProps {
 }
 
 export default function WelcomeHero({ lines, onComplete }: WelcomeHeroProps) {
+  const { t } = useLanguage();
   const [currentLine, setCurrentLine] = useState(0);
   const [displayText, setDisplayText] = useState("");
   const [isTyping, setIsTyping] = useState(true);
@@ -117,7 +119,7 @@ export default function WelcomeHero({ lines, onComplete }: WelcomeHeroProps) {
               >
                 <span className="text-[9px]">&#9654;</span>
               </span>
-              <span>press enter or click to continue</span>
+              <span>{t("welcome.pressEnter")}</span>
             </button>
           </div>
         )}

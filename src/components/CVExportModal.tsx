@@ -81,7 +81,7 @@ export default function CVExportModal({
     ) as Record<string, number[]>;
 
   const [selected, setSelected] = useState<TemplateKey>("minimal");
-  const [showProjectPicker, setShowProjectPicker] = useState(true);
+  const [showProjectPicker, setShowProjectPicker] = useState(false);
   const projectIdSelection = useSelectableSet<string>({
     initialValues: getDefaultProjectIds(),
     maxSelections: SELECTION_LIMITS.projects,
@@ -125,11 +125,11 @@ export default function CVExportModal({
   });
   const [collapsedSections, setCollapsedSections] =
     useState<SectionCollapseState>({
-      experience: false,
-      skills: false,
-      education: false,
-      projects: false,
-      certifications: false,
+      experience: true,
+      skills: true,
+      education: true,
+      projects: true,
+      certifications: true,
     });
 
   // Which project's actions are shown in the right panel (wide layout)

@@ -101,6 +101,9 @@ export const en: Record<string, string> = {
   "cvExport.noneActions": "none",
   "cvExport.searchTagAll": "all",
   "cvExport.actionsOf": "actions",
+  "cvExport.sections": "sections",
+  "cvExport.selectAllSections": "all",
+  "cvExport.clearSections": "clear",
   // CV Export modal — template labels
   "cvExport.tplMinimalLabel": "Minimal",
   "cvExport.tplMinimalDesc": "Clean, single-column",

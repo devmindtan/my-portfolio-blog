@@ -155,7 +155,7 @@ export const profile: Profile = {
   experience: [
     {
       role: "Graduation thesis",
-      organization: "Van Lang University",
+      organization: "VLU",
       type: "project",
       period: "2/2026 - 6/2026",
       description:

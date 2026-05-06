@@ -103,6 +103,9 @@ export const vi: Record<string, string> = {
   "cvExport.noneActions": "không chọn",
   "cvExport.searchTagAll": "tất cả",
   "cvExport.actionsOf": "hành động",
+  "cvExport.sections": "mục CV",
+  "cvExport.selectAllSections": "tất cả",
+  "cvExport.clearSections": "xóa",
   // CV Export modal — template labels
   "cvExport.tplMinimalLabel": "Tối giản",
   "cvExport.tplMinimalDesc": "Sạch, một cột",

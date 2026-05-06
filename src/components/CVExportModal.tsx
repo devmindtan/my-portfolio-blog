@@ -18,6 +18,9 @@ import type {
   Certificate,
   TechItem,
 } from "../data/portfolio.types";
+import CVContent from "./cv/CVContent";
+import type { CVSectionKey, SectionSelection, TemplateKey } from "./cv/types";
+import { useSelectableSet } from "../hooks/useSelectableSet";
 
 interface CVExportModalProps {
   profile: Profile;
@@ -27,7 +30,15 @@ interface CVExportModalProps {
   onClose: () => void;
 }
 
-type TemplateKey = "minimal" | "modern" | "executive";
+type SectionCollapseState = Record<CVSectionKey, boolean>;
+
+const SELECTION_LIMITS = {
+  projects: 10,
+  experience: undefined,
+  skills: undefined,
+  education: undefined,
+  certifications: undefined,
+} as const;
 
 export default function CVExportModal({
   profile,
@@ -60,24 +71,66 @@ export default function CVExportModal({
     project.actions.map((_, index) => index);
 
   const getDefaultProjectIds = () =>
-    new Set(projects.slice(0, 10).map((p) => p.id));
+    new Set(projects.slice(0, SELECTION_LIMITS.projects).map((p) => p.id));
 
   const getDefaultProjectActionIndexes = () =>
     Object.fromEntries(
       projects
-        .slice(0, 10)
+        .slice(0, SELECTION_LIMITS.projects)
         .map((project) => [project.id, getAllActionIndexes(project)]),
     ) as Record<string, number[]>;
 
   const [selected, setSelected] = useState<TemplateKey>("minimal");
   const [showProjectPicker, setShowProjectPicker] = useState(true);
-  const [selectedProjectIds, setSelectedProjectIds] = useState<Set<string>>(
-    () => getDefaultProjectIds(),
-  );
+  const projectIdSelection = useSelectableSet<string>({
+    initialValues: getDefaultProjectIds(),
+    maxSelections: SELECTION_LIMITS.projects,
+  });
+  const selectedProjectIds = projectIdSelection.selected;
+  const updateSelectedProjectIds = projectIdSelection.update;
+  const selectAllProjectIds = projectIdSelection.selectAll;
+  const clearProjectIds = projectIdSelection.clear;
   const [selectedProjectActionIndexes, setSelectedProjectActionIndexes] =
     useState<Record<string, number[]>>(() => getDefaultProjectActionIndexes());
   const [projectSearch, setProjectSearch] = useState("");
   const [projectTagFilter, setProjectTagFilter] = useState<string>("all");
+  const experienceSelection = useSelectableSet<number>({
+    initialValues: profile.experience.map((_, index) => index),
+    maxSelections: SELECTION_LIMITS.experience,
+  });
+  const selectedExperienceIndexes = experienceSelection.selected;
+  const educationSelection = useSelectableSet<number>({
+    initialValues: (profile.education ?? []).map((_, index) => index),
+    maxSelections: SELECTION_LIMITS.education,
+  });
+  const selectedEducationIndexes = educationSelection.selected;
+  const certificateSelection = useSelectableSet<number>({
+    initialValues: certificates.map((_, index) => index),
+    maxSelections: SELECTION_LIMITS.certifications,
+  });
+  const selectedCertificateIndexes = certificateSelection.selected;
+  const skillSelection = useSelectableSet<string>({
+    initialValues: (techStack ?? [])
+      .map((item) => item.category)
+      .filter(Boolean),
+    maxSelections: SELECTION_LIMITS.skills,
+  });
+  const selectedSkillCategories = skillSelection.selected;
+  const [selectedSections, setSelectedSections] = useState<SectionSelection>({
+    experience: true,
+    skills: true,
+    education: true,
+    projects: true,
+    certifications: true,
+  });
+  const [collapsedSections, setCollapsedSections] =
+    useState<SectionCollapseState>({
+      experience: false,
+      skills: false,
+      education: false,
+      projects: false,
+      certifications: false,
+    });
 
   // Which project's actions are shown in the right panel (wide layout)
   const [focusedProjectId, setFocusedProjectId] = useState<string | null>(null);
@@ -137,13 +190,13 @@ export default function CVExportModal({
 
   const toggleProject = useCallback(
     (id: string) => {
-      setSelectedProjectIds((prev) => {
+      updateSelectedProjectIds((prev) => {
         const next = new Set(prev);
         if (next.has(id)) {
           next.delete(id);
           // Clear focus if this project was focused
           setFocusedProjectId((f) => (f === id ? null : f));
-        } else if (next.size < 10) {
+        } else if (next.size < SELECTION_LIMITS.projects) {
           next.add(id);
           // Auto-focus newly added project to show its actions
           setFocusedProjectId(id);
@@ -161,7 +214,7 @@ export default function CVExportModal({
         return { ...prev, [id]: getAllActionIndexes(project) };
       });
     },
-    [projects],
+    [projects, updateSelectedProjectIds],
   );
 
   const toggleProjectAction = useCallback(
@@ -189,6 +242,24 @@ export default function CVExportModal({
       ),
     }));
 
+  const selectedProfile = {
+    ...profile,
+    experience: profile.experience.filter((_, index) =>
+      selectedExperienceIndexes.has(index),
+    ),
+    education: (profile.education ?? []).filter((_, index) =>
+      selectedEducationIndexes.has(index),
+    ),
+  };
+
+  const selectedCertificates = certificates.filter((_, index) =>
+    selectedCertificateIndexes.has(index),
+  );
+
+  const selectedTechStack = (techStack ?? []).filter((item) =>
+    selectedSkillCategories.has(item.category),
+  );
+
   useEffect(() => {
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -202,6 +273,47 @@ export default function CVExportModal({
   }, [onClose]);
 
   const focusedProject = projects.find((p) => p.id === focusedProjectId);
+  const skillCategories = Array.from(
+    new Set((techStack ?? []).map((item) => item.category)),
+  );
+
+  const sectionOptions: { key: CVSectionKey; label: string }[] = [
+    { key: "experience", label: t("cv.experience") },
+    { key: "skills", label: t("cv.skills") },
+    { key: "education", label: t("cv.education") },
+    { key: "projects", label: t("cv.projects") },
+    { key: "certifications", label: t("cv.certifications") },
+  ];
+
+  const setAllSections = (value: boolean) => {
+    setSelectedSections({
+      experience: value,
+      skills: value,
+      education: value,
+      projects: value,
+      certifications: value,
+    });
+  };
+
+  const renderSelectionCount = (
+    selectedCount: number,
+    totalCount: number,
+    options?: { maxCount?: number; warnWhenAtMax?: boolean },
+  ) => {
+    const limit = options?.maxCount ?? totalCount;
+    const colorClass =
+      selectedCount === 0
+        ? "text-terminal-error/80"
+        : selectedCount >= limit
+          ? "text-terminal-warning"
+          : "text-terminal-accent/60";
+
+    return (
+      <span className={`font-mono transition-colors ${colorClass}`}>
+        ({selectedCount}/{limit})
+      </span>
+    );
+  };
 
   // Shared search + tag filter bar
   const SearchBar = (
@@ -430,205 +542,580 @@ export default function CVExportModal({
 
           {/* Project picker */}
           <div>
-            {/* Picker header */}
-            <div className="flex items-center justify-between">
-              <span className="section-label text-terminal-info/70">
-                {t("cvExport.projects")}&nbsp;
-                <span
-                  className={`font-mono ${
-                    selectedProjectIds.size >= 10
-                      ? "text-terminal-warning"
-                      : "text-terminal-accent/60"
-                  }`}
-                >
-                  ({selectedProjectIds.size}/10)
+            <div className="mb-3">
+              <div className="flex items-center justify-between mb-2">
+                <span className="section-label text-terminal-info/70">
+                  {t("cvExport.sections")}
                 </span>
-              </span>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => {
-                    setSelectedProjectIds(getDefaultProjectIds());
-                    setSelectedProjectActionIndexes(
-                      getDefaultProjectActionIndexes(),
-                    );
-                  }}
-                  className="text-[9px] text-terminal-muted hover:text-terminal-accent transition-colors"
-                >
-                  {t("cvExport.selectAll")}
-                </button>
-                <button
-                  onClick={() => {
-                    setSelectedProjectIds(new Set());
-                    setSelectedProjectActionIndexes({});
-                    setFocusedProjectId(null);
-                  }}
-                  className="text-[9px] text-terminal-muted hover:text-terminal-error transition-colors"
-                >
-                  {t("cvExport.clear")}
-                </button>
-                <button
-                  onClick={() => setShowProjectPicker((v) => !v)}
-                  className="text-[9px] text-terminal-muted hover:text-terminal-accent transition-colors flex items-center gap-0.5"
-                >
-                  {showProjectPicker ? (
-                    <ChevronUp size={10} />
-                  ) : (
-                    <ChevronDown size={10} />
-                  )}
-                </button>
+                <div className="flex items-center gap-3">
+                  <button
+                    onClick={() => setAllSections(true)}
+                    className="text-[9px] text-terminal-muted hover:text-terminal-accent transition-colors"
+                  >
+                    {t("cvExport.selectAllSections")}
+                  </button>
+                  <button
+                    onClick={() => setAllSections(false)}
+                    className="text-[9px] text-terminal-muted hover:text-terminal-error transition-colors"
+                  >
+                    {t("cvExport.clearSections")}
+                  </button>
+                </div>
               </div>
-            </div>
 
-            {showProjectPicker && (
-              <div className="mt-2 border border-terminal-border/30 rounded-sm">
-                {/* ── WIDE layout: side-by-side ── */}
-                <div className="hidden sm:flex" style={{ minHeight: "220px" }}>
-                  {/* Left: search + list */}
-                  <div className="flex flex-col w-1/2 border-r border-terminal-border/20">
-                    {SearchBar}
-                    {ProjectRows}
+              <div className="flex flex-wrap gap-1.5">
+                {sectionOptions.map((section) => {
+                  const active = selectedSections[section.key];
+                  return (
+                    <button
+                      key={section.key}
+                      onClick={() =>
+                        setSelectedSections((prev) => ({
+                          ...prev,
+                          [section.key]: !prev[section.key],
+                        }))
+                      }
+                      className={`px-2.5 py-1 text-[10px] uppercase tracking-wider border rounded-sm transition-all duration-200 ${
+                        active
+                          ? "border-terminal-accent/40 text-terminal-accent bg-terminal-accent/5"
+                          : "border-terminal-border/40 text-terminal-muted hover:border-terminal-borderHover hover:text-terminal-text"
+                      }`}
+                    >
+                      {section.label}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {selectedSections.experience && profile.experience.length > 0 && (
+                <div className="mt-3 border border-terminal-border/30 rounded-sm p-2 space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setCollapsedSections((prev) => ({
+                          ...prev,
+                          experience: !prev.experience,
+                        }))
+                      }
+                      className="inline-flex items-center gap-1 text-[9px] uppercase tracking-wider text-terminal-info/70 hover:text-terminal-accent transition-colors"
+                    >
+                      {collapsedSections.experience ? (
+                        <ChevronDown size={10} />
+                      ) : (
+                        <ChevronUp size={10} />
+                      )}
+                      {t("cv.experience")}{" "}
+                      {renderSelectionCount(
+                        selectedExperienceIndexes.size,
+                        profile.experience.length,
+                      )}
+                    </button>
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() =>
+                          experienceSelection.selectAll(
+                            profile.experience.map((_, i) => i),
+                          )
+                        }
+                        className="text-[9px] text-terminal-muted hover:text-terminal-accent transition-colors"
+                      >
+                        {t("cvExport.selectAll")}
+                      </button>
+                      <button
+                        onClick={experienceSelection.clear}
+                        className="text-[9px] text-terminal-muted hover:text-terminal-error transition-colors"
+                      >
+                        {t("cvExport.clear")}
+                      </button>
+                    </div>
                   </div>
-
-                  {/* Right: action detail panel */}
-                  <div className="flex flex-col w-1/2">
-                    {focusedProject &&
-                    selectedProjectIds.has(focusedProject.id) ? (
-                      <div className="flex flex-col h-full">
-                        {/* Panel header */}
-                        <div className="px-3 py-2 border-b border-terminal-border/20 flex items-center justify-between">
-                          <div className="min-w-0">
-                            <div className="text-[10px] text-terminal-text font-medium truncate">
-                              {focusedProject.title}
-                            </div>
-                            <div className="text-[8px] uppercase tracking-wider text-terminal-info/60 mt-0.5">
-                              {t("cvExport.actionsOf")} (
-                              {
-                                (
-                                  selectedProjectActionIndexes[
-                                    focusedProject.id
-                                  ] ?? []
-                                ).length
-                              }
-                              /{focusedProject.actions.length} selected)
-                            </div>
+                  {!collapsedSections.experience && (
+                    <div className="max-h-24 overflow-y-auto space-y-1 pr-1">
+                      {profile.experience.map((exp, index) => {
+                        const checked = selectedExperienceIndexes.has(index);
+                        return (
+                          <div
+                            key={`exp-${index}`}
+                            className="flex items-center gap-2 px-2 py-1.5 rounded-sm border border-terminal-border/20 hover:bg-terminal-surface/30"
+                          >
+                            <button
+                              type="button"
+                              onClick={() => experienceSelection.toggle(index)}
+                              className="flex-shrink-0"
+                            >
+                              <div
+                                className={`w-3.5 h-3.5 border rounded-[2px] flex items-center justify-center transition-colors ${
+                                  checked
+                                    ? "border-terminal-accent bg-terminal-accent/20"
+                                    : "border-terminal-border/50"
+                                }`}
+                              >
+                                {checked && (
+                                  <Check
+                                    size={8}
+                                    className="text-terminal-accent"
+                                  />
+                                )}
+                              </div>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => experienceSelection.toggle(index)}
+                              className="flex-1 text-left text-[10px] text-terminal-muted hover:text-terminal-text truncate"
+                            >
+                              {exp.role} - {exp.organization}
+                            </button>
                           </div>
-                          <button
-                            onClick={() => setFocusedProjectId(null)}
-                            className="ml-2 flex-shrink-0 text-terminal-muted hover:text-terminal-error transition-colors"
-                          >
-                            <X size={10} />
-                          </button>
-                        </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
 
-                        {/* Action list */}
-                        <div className="overflow-y-auto flex-1 p-2 space-y-1">
-                          {focusedProject.actions.length === 0 ? (
-                            <div className="text-[9px] text-terminal-muted text-center py-4">
-                              {t("cvExport.noActions")}
-                            </div>
-                          ) : (
-                            focusedProject.actions.map(
-                              (action, actionIndex) => {
-                                const actionChecked = (
-                                  selectedProjectActionIndexes[
-                                    focusedProject.id
-                                  ] ?? []
-                                ).includes(actionIndex);
-                                return (
-                                  <label
-                                    key={`${focusedProject.id}-wide-${actionIndex}`}
-                                    className="flex items-start gap-2 cursor-pointer group"
-                                  >
-                                    <div
-                                      className={`mt-[2px] w-3 h-3 flex-shrink-0 border rounded-[2px] flex items-center justify-center transition-colors ${
-                                        actionChecked
-                                          ? "border-terminal-accent bg-terminal-accent/20"
-                                          : "border-terminal-border/50 group-hover:border-terminal-accent/40"
-                                      }`}
-                                      onClick={() =>
-                                        toggleProjectAction(
-                                          focusedProject.id,
-                                          actionIndex,
-                                        )
-                                      }
-                                    >
-                                      {actionChecked && (
-                                        <Check
-                                          size={7}
-                                          className="text-terminal-accent"
-                                        />
-                                      )}
-                                    </div>
-                                    <span
-                                      className={`text-[9px] leading-4 transition-colors ${
-                                        actionChecked
-                                          ? "text-terminal-text"
-                                          : "text-terminal-muted"
-                                      }`}
-                                      onClick={() =>
-                                        toggleProjectAction(
-                                          focusedProject.id,
-                                          actionIndex,
-                                        )
-                                      }
-                                    >
-                                      {action}
-                                    </span>
-                                  </label>
-                                );
-                              },
+              {selectedSections.skills && skillCategories.length > 0 && (
+                <div className="mt-3 border border-terminal-border/30 rounded-sm p-2 space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setCollapsedSections((prev) => ({
+                          ...prev,
+                          skills: !prev.skills,
+                        }))
+                      }
+                      className="inline-flex items-center gap-1 text-[9px] uppercase tracking-wider text-terminal-info/70 hover:text-terminal-accent transition-colors"
+                    >
+                      {collapsedSections.skills ? (
+                        <ChevronDown size={10} />
+                      ) : (
+                        <ChevronUp size={10} />
+                      )}
+                      {t("cv.skills")}{" "}
+                      {renderSelectionCount(
+                        selectedSkillCategories.size,
+                        skillCategories.length,
+                      )}
+                    </button>
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() =>
+                          skillSelection.selectAll(skillCategories)
+                        }
+                        className="text-[9px] text-terminal-muted hover:text-terminal-accent transition-colors"
+                      >
+                        {t("cvExport.selectAll")}
+                      </button>
+                      <button
+                        onClick={skillSelection.clear}
+                        className="text-[9px] text-terminal-muted hover:text-terminal-error transition-colors"
+                      >
+                        {t("cvExport.clear")}
+                      </button>
+                    </div>
+                  </div>
+                  {!collapsedSections.skills && (
+                    <div className="flex flex-wrap gap-1.5">
+                      {skillCategories.map((cat) => {
+                        const active = selectedSkillCategories.has(cat);
+                        return (
+                          <button
+                            key={`skill-${cat}`}
+                            onClick={() => skillSelection.toggle(cat)}
+                            className={`px-2 py-0.5 text-[9px] uppercase tracking-wider border rounded-sm transition-all ${
+                              active
+                                ? "border-terminal-accent/40 text-terminal-accent bg-terminal-accent/5"
+                                : "border-terminal-border/40 text-terminal-muted hover:text-terminal-text"
+                            }`}
+                          >
+                            {cat}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {selectedSections.education &&
+                (profile.education ?? []).length > 0 && (
+                  <div className="mt-3 border border-terminal-border/30 rounded-sm p-2 space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setCollapsedSections((prev) => ({
+                            ...prev,
+                            education: !prev.education,
+                          }))
+                        }
+                        className="inline-flex items-center gap-1 text-[9px] uppercase tracking-wider text-terminal-info/70 hover:text-terminal-accent transition-colors"
+                      >
+                        {collapsedSections.education ? (
+                          <ChevronDown size={10} />
+                        ) : (
+                          <ChevronUp size={10} />
+                        )}
+                        {t("cv.education")}{" "}
+                        {renderSelectionCount(
+                          selectedEducationIndexes.size,
+                          (profile.education ?? []).length,
+                        )}
+                      </button>
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={() =>
+                            educationSelection.selectAll(
+                              (profile.education ?? []).map((_, i) => i),
                             )
-                          )}
-                        </div>
-
-                        {/* Quick select all/none */}
-                        <div className="px-3 py-1.5 border-t border-terminal-border/20 flex gap-3">
-                          <button
-                            onClick={() =>
-                              setSelectedProjectActionIndexes((prev) => ({
-                                ...prev,
-                                [focusedProject.id]:
-                                  getAllActionIndexes(focusedProject),
-                              }))
-                            }
-                            className="text-[8px] text-terminal-muted hover:text-terminal-accent transition-colors"
-                          >
-                            {t("cvExport.allActions")}
-                          </button>
-                          <button
-                            onClick={() =>
-                              setSelectedProjectActionIndexes((prev) => ({
-                                ...prev,
-                                [focusedProject.id]: [],
-                              }))
-                            }
-                            className="text-[8px] text-terminal-muted hover:text-terminal-error transition-colors"
-                          >
-                            {t("cvExport.noneActions")}
-                          </button>
-                        </div>
+                          }
+                          className="text-[9px] text-terminal-muted hover:text-terminal-accent transition-colors"
+                        >
+                          {t("cvExport.selectAll")}
+                        </button>
+                        <button
+                          onClick={educationSelection.clear}
+                          className="text-[9px] text-terminal-muted hover:text-terminal-error transition-colors"
+                        >
+                          {t("cvExport.clear")}
+                        </button>
                       </div>
-                    ) : (
-                      /* Empty state */
-                      <div className="flex flex-col items-center justify-center h-full text-center px-4 py-6 gap-1.5">
-                        <div className="text-terminal-muted/40 text-[10px] uppercase tracking-wider">
-                          {t("cvExport.actionsPanel")}
-                        </div>
-                        <div className="text-terminal-muted/30 text-[9px]">
-                          {selectedProjectIds.size === 0
-                            ? t("cvExport.selectProjectHint")
-                            : t("cvExport.clickProjectHint")}
-                        </div>
+                    </div>
+                    {!collapsedSections.education && (
+                      <div className="max-h-24 overflow-y-auto space-y-1 pr-1">
+                        {(profile.education ?? []).map((edu, index) => {
+                          const checked = selectedEducationIndexes.has(index);
+                          return (
+                            <div
+                              key={`edu-${index}`}
+                              className="flex items-center gap-2 px-2 py-1.5 rounded-sm border border-terminal-border/20 hover:bg-terminal-surface/30"
+                            >
+                              <button
+                                type="button"
+                                onClick={() => educationSelection.toggle(index)}
+                                className="flex-shrink-0"
+                              >
+                                <div
+                                  className={`w-3.5 h-3.5 border rounded-[2px] flex items-center justify-center transition-colors ${
+                                    checked
+                                      ? "border-terminal-accent bg-terminal-accent/20"
+                                      : "border-terminal-border/50"
+                                  }`}
+                                >
+                                  {checked && (
+                                    <Check
+                                      size={8}
+                                      className="text-terminal-accent"
+                                    />
+                                  )}
+                                </div>
+                              </button>
+                              <button
+                                type="button"
+                                onClick={() => educationSelection.toggle(index)}
+                                className="flex-1 text-left text-[10px] text-terminal-muted hover:text-terminal-text truncate"
+                              >
+                                {edu.degree} - {edu.school}
+                              </button>
+                            </div>
+                          );
+                        })}
                       </div>
                     )}
                   </div>
+                )}
+
+              {selectedSections.certifications && certificates.length > 0 && (
+                <div className="mt-3 border border-terminal-border/30 rounded-sm p-2 space-y-1.5">
+                  <div className="flex items-center justify-between">
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setCollapsedSections((prev) => ({
+                          ...prev,
+                          certifications: !prev.certifications,
+                        }))
+                      }
+                      className="inline-flex items-center gap-1 text-[9px] uppercase tracking-wider text-terminal-info/70 hover:text-terminal-accent transition-colors"
+                    >
+                      {collapsedSections.certifications ? (
+                        <ChevronDown size={10} />
+                      ) : (
+                        <ChevronUp size={10} />
+                      )}
+                      {t("cv.certifications")}{" "}
+                      {renderSelectionCount(
+                        selectedCertificateIndexes.size,
+                        certificates.length,
+                      )}
+                    </button>
+                    <div className="flex items-center gap-3">
+                      <button
+                        onClick={() =>
+                          certificateSelection.selectAll(
+                            certificates.map((_, i) => i),
+                          )
+                        }
+                        className="text-[9px] text-terminal-muted hover:text-terminal-accent transition-colors"
+                      >
+                        {t("cvExport.selectAll")}
+                      </button>
+                      <button
+                        onClick={certificateSelection.clear}
+                        className="text-[9px] text-terminal-muted hover:text-terminal-error transition-colors"
+                      >
+                        {t("cvExport.clear")}
+                      </button>
+                    </div>
+                  </div>
+                  {!collapsedSections.certifications && (
+                    <div className="max-h-24 overflow-y-auto space-y-1 pr-1">
+                      {certificates.map((cert, index) => {
+                        const checked = selectedCertificateIndexes.has(index);
+                        return (
+                          <div
+                            key={`cert-${index}`}
+                            className="flex items-center gap-2 px-2 py-1.5 rounded-sm border border-terminal-border/20 hover:bg-terminal-surface/30"
+                          >
+                            <button
+                              type="button"
+                              onClick={() => certificateSelection.toggle(index)}
+                              className="flex-shrink-0"
+                            >
+                              <div
+                                className={`w-3.5 h-3.5 border rounded-[2px] flex items-center justify-center transition-colors ${
+                                  checked
+                                    ? "border-terminal-accent bg-terminal-accent/20"
+                                    : "border-terminal-border/50"
+                                }`}
+                              >
+                                {checked && (
+                                  <Check
+                                    size={8}
+                                    className="text-terminal-accent"
+                                  />
+                                )}
+                              </div>
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => certificateSelection.toggle(index)}
+                              className="flex-1 text-left text-[10px] text-terminal-muted hover:text-terminal-text truncate"
+                            >
+                              {cert.name}
+                            </button>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {selectedSections.projects && (
+              <div className="mt-3 border border-terminal-border/30 rounded-sm p-2 space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <button
+                    type="button"
+                    onClick={() => setShowProjectPicker((v) => !v)}
+                    className="inline-flex items-center gap-1 text-[9px] uppercase tracking-wider text-terminal-info/70 hover:text-terminal-accent transition-colors"
+                  >
+                    {showProjectPicker ? (
+                      <ChevronUp size={10} />
+                    ) : (
+                      <ChevronDown size={10} />
+                    )}
+                    {t("cvExport.projects")}{" "}
+                    {renderSelectionCount(
+                      selectedProjectIds.size,
+                      projects.length,
+                      {
+                        maxCount: 10,
+                        warnWhenAtMax: true,
+                      },
+                    )}
+                  </button>
+                  <div className="flex items-center gap-3">
+                    <button
+                      onClick={() => {
+                        selectAllProjectIds(
+                          projects.map((project) => project.id),
+                        );
+                        setSelectedProjectActionIndexes(
+                          getDefaultProjectActionIndexes(),
+                        );
+                      }}
+                      className="text-[9px] text-terminal-muted hover:text-terminal-accent transition-colors"
+                    >
+                      {t("cvExport.selectAll")}
+                    </button>
+                    <button
+                      onClick={() => {
+                        clearProjectIds();
+                        setSelectedProjectActionIndexes({});
+                        setFocusedProjectId(null);
+                      }}
+                      className="text-[9px] text-terminal-muted hover:text-terminal-error transition-colors"
+                    >
+                      {t("cvExport.clear")}
+                    </button>
+                  </div>
                 </div>
 
-                {/* ── NARROW layout: stacked (original) ── */}
-                <div className="sm:hidden">
-                  {SearchBar}
-                  {ProjectRows}
-                </div>
+                {showProjectPicker && (
+                  <div className="border border-terminal-border/30 rounded-sm">
+                    {/* ── WIDE layout: side-by-side ── */}
+                    <div className="hidden sm:flex" style={{ height: "320px" }}>
+                      {/* Left: search + list */}
+                      <div className="flex flex-col w-1/2 border-r border-terminal-border/20">
+                        {SearchBar}
+                        {ProjectRows}
+                      </div>
+
+                      {/* Right: action detail panel */}
+                      <div className="flex flex-col w-1/2">
+                        {focusedProject &&
+                        selectedProjectIds.has(focusedProject.id) ? (
+                          <div className="flex flex-col h-full">
+                            {/* Panel header */}
+                            <div className="px-3 py-2 border-b border-terminal-border/20 flex items-center justify-between">
+                              <div className="min-w-0">
+                                <div className="text-[10px] text-terminal-text font-medium truncate">
+                                  {focusedProject.title}
+                                </div>
+                                <div className="text-[8px] uppercase tracking-wider text-terminal-info/60 mt-0.5">
+                                  {t("cvExport.actionsOf")} (
+                                  {
+                                    (
+                                      selectedProjectActionIndexes[
+                                        focusedProject.id
+                                      ] ?? []
+                                    ).length
+                                  }
+                                  /{focusedProject.actions.length} selected)
+                                </div>
+                              </div>
+                              <button
+                                onClick={() => setFocusedProjectId(null)}
+                                className="ml-2 flex-shrink-0 text-terminal-muted hover:text-terminal-error transition-colors"
+                              >
+                                <X size={10} />
+                              </button>
+                            </div>
+
+                            {/* Action list */}
+                            <div className="overflow-y-auto flex-1 p-2 space-y-1">
+                              {focusedProject.actions.length === 0 ? (
+                                <div className="text-[9px] text-terminal-muted text-center py-4">
+                                  {t("cvExport.noActions")}
+                                </div>
+                              ) : (
+                                focusedProject.actions.map(
+                                  (action, actionIndex) => {
+                                    const actionChecked = (
+                                      selectedProjectActionIndexes[
+                                        focusedProject.id
+                                      ] ?? []
+                                    ).includes(actionIndex);
+                                    return (
+                                      <label
+                                        key={`${focusedProject.id}-wide-${actionIndex}`}
+                                        className="flex items-start gap-2 cursor-pointer group"
+                                      >
+                                        <div
+                                          className={`mt-[2px] w-3 h-3 flex-shrink-0 border rounded-[2px] flex items-center justify-center transition-colors ${
+                                            actionChecked
+                                              ? "border-terminal-accent bg-terminal-accent/20"
+                                              : "border-terminal-border/50 group-hover:border-terminal-accent/40"
+                                          }`}
+                                          onClick={() =>
+                                            toggleProjectAction(
+                                              focusedProject.id,
+                                              actionIndex,
+                                            )
+                                          }
+                                        >
+                                          {actionChecked && (
+                                            <Check
+                                              size={7}
+                                              className="text-terminal-accent"
+                                            />
+                                          )}
+                                        </div>
+                                        <span
+                                          className={`text-[9px] leading-4 transition-colors ${
+                                            actionChecked
+                                              ? "text-terminal-text"
+                                              : "text-terminal-muted"
+                                          }`}
+                                          onClick={() =>
+                                            toggleProjectAction(
+                                              focusedProject.id,
+                                              actionIndex,
+                                            )
+                                          }
+                                        >
+                                          {action}
+                                        </span>
+                                      </label>
+                                    );
+                                  },
+                                )
+                              )}
+                            </div>
+
+                            {/* Quick select all/none */}
+                            <div className="px-3 py-1.5 border-t border-terminal-border/20 flex gap-3">
+                              <button
+                                onClick={() =>
+                                  setSelectedProjectActionIndexes((prev) => ({
+                                    ...prev,
+                                    [focusedProject.id]:
+                                      getAllActionIndexes(focusedProject),
+                                  }))
+                                }
+                                className="text-[8px] text-terminal-muted hover:text-terminal-accent transition-colors"
+                              >
+                                {t("cvExport.allActions")}
+                              </button>
+                              <button
+                                onClick={() =>
+                                  setSelectedProjectActionIndexes((prev) => ({
+                                    ...prev,
+                                    [focusedProject.id]: [],
+                                  }))
+                                }
+                                className="text-[8px] text-terminal-muted hover:text-terminal-error transition-colors"
+                              >
+                                {t("cvExport.noneActions")}
+                              </button>
+                            </div>
+                          </div>
+                        ) : (
+                          /* Empty state */
+                          <div className="flex flex-col items-center justify-center h-full text-center px-4 py-6 gap-1.5">
+                            <div className="text-terminal-muted/40 text-[10px] uppercase tracking-wider">
+                              {t("cvExport.actionsPanel")}
+                            </div>
+                            <div className="text-terminal-muted/30 text-[9px]">
+                              {selectedProjectIds.size === 0
+                                ? t("cvExport.selectProjectHint")
+                                : t("cvExport.clickProjectHint")}
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* ── NARROW layout: stacked (original) ── */}
+                    <div className="sm:hidden">
+                      {SearchBar}
+                      {ProjectRows}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -649,10 +1136,11 @@ export default function CVExportModal({
               >
                 <CVContent
                   template={selected}
-                  profile={profile}
+                  profile={selectedProfile}
                   projects={selectedProjects}
-                  certificates={certificates}
-                  techStack={techStack}
+                  certificates={selectedCertificates}
+                  techStack={selectedTechStack}
+                  includedSections={selectedSections}
                   renderMode="preview"
                 />
               </div>
@@ -674,10 +1162,11 @@ export default function CVExportModal({
             <div ref={printRef}>
               <CVContent
                 template={selected}
-                profile={profile}
+                profile={selectedProfile}
                 projects={selectedProjects}
-                certificates={certificates}
-                techStack={techStack}
+                certificates={selectedCertificates}
+                techStack={selectedTechStack}
+                includedSections={selectedSections}
                 renderMode="print"
               />
             </div>
@@ -704,943 +1193,6 @@ export default function CVExportModal({
           </div>
         </div>
       </div>
-    </div>
-  );
-}
-
-// ── CVContent, Section, SidebarSection, SkillsGrid unchanged below ──
-
-function CVContent({
-  template,
-  profile,
-  projects,
-  certificates,
-  techStack,
-  renderMode = "print",
-}: {
-  template: TemplateKey;
-  profile: Profile;
-  projects: Project[];
-  certificates: Certificate[];
-  techStack?: TechItem[];
-  renderMode?: "preview" | "print";
-}) {
-  const { t } = useLanguage();
-  if (template === "minimal") {
-    const minimalPadding = renderMode === "preview" ? "24px " : "0px";
-    return (
-      <div
-        style={{
-          backgroundColor: "#fff",
-          padding: minimalPadding,
-          fontFamily: "Georgia, 'Times New Roman', serif",
-          fontSize: "13px",
-          lineHeight: "1.7",
-          color: "#2c3e50",
-          boxSizing: "border-box",
-        }}
-      >
-        <div style={{ marginBottom: "20px" }}>
-          <h1
-            style={{
-              fontSize: "33px",
-              fontWeight: "bold",
-              margin: "0 0 6px 0",
-              color: "#1a1a1a",
-            }}
-          >
-            {profile.name}
-          </h1>
-          <p
-            style={{
-              fontSize: "15px",
-              fontStyle: "italic",
-              margin: "0 0 12px 0",
-              color: "#555",
-            }}
-          >
-            {profile.title}
-          </p>
-          <div style={{ fontSize: "11px", color: "#777", marginBottom: "4px" }}>
-            {[profile.email, profile.phone, profile.location]
-              .filter(Boolean)
-              .join(" • ")}
-          </div>
-          <div style={{ fontSize: "11px", color: "#777" }}>
-            {[profile.website, profile.linkedin, profile.github]
-              .filter(Boolean)
-              .join(" • ")}
-          </div>
-        </div>
-        <hr
-          style={{
-            margin: "16px 0",
-            border: "none",
-            borderTop: "2px solid #ddd",
-          }}
-        />
-        <Section title={t("cv.summary")}>
-          <p style={{ margin: "0", fontSize: "13px", lineHeight: "1.7" }}>
-            {profile.summary}
-          </p>
-        </Section>
-        <Section title={t("cv.experience")}>
-          {profile.experience.map((exp, i) => (
-            <div key={i} data-cv-item="true" style={{ marginBottom: "14px" }}>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "flex-start",
-                  marginBottom: "4px",
-                }}
-              >
-                <div style={{ fontWeight: "bold", fontSize: "14px", flex: 1 }}>
-                  {exp.role}
-                  {exp.organization && (
-                    <span style={{ fontWeight: "normal" }}>
-                      {" "}
-                      — {exp.organization}
-                    </span>
-                  )}
-                  <span
-                    style={{
-                      fontWeight: "normal",
-                      fontSize: "12px",
-                      textTransform: "uppercase",
-                      color: "#777",
-                      marginLeft: "8px",
-                    }}
-                  >
-                    [{exp.type}]
-                  </span>
-                </div>
-                <div
-                  style={{
-                    fontSize: "12px",
-                    color: "#888",
-                    fontStyle: "italic",
-                    marginLeft: "8px",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {exp.period}
-                </div>
-              </div>
-              <p
-                style={{
-                  margin: "0",
-                  fontSize: "13px",
-                  lineHeight: "1.6",
-                  color: "#444",
-                }}
-              >
-                {exp.description}
-              </p>
-            </div>
-          ))}
-        </Section>
-        {techStack && techStack.length > 0 && (
-          <Section title={t("cv.skills")}>
-            <SkillsGrid techStack={techStack} />
-          </Section>
-        )}
-        {profile.education && profile.education.length > 0 && (
-          <Section title={t("cv.education")}>
-            {profile.education.map((edu, i) => (
-              <div key={i} style={{ marginBottom: "8px", fontSize: "12px" }}>
-                <strong>{edu.degree}</strong> — {edu.school} ({edu.year})
-              </div>
-            ))}
-          </Section>
-        )}
-        {projects.length > 0 && (
-          <Section title={t("cv.projects")}>
-            {projects.map((proj, i) => (
-              <div key={i} data-cv-item="true" style={{ marginBottom: "14px" }}>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "flex-start",
-                    marginBottom: "4px",
-                  }}
-                >
-                  <div
-                    style={{ fontWeight: "bold", fontSize: "14px", flex: 1 }}
-                  >
-                    {proj.title} ({proj.tag})
-                  </div>
-                  <div
-                    style={{
-                      fontSize: "12px",
-                      color: "#888",
-                      marginLeft: "8px",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {proj.created_at}
-                  </div>
-                </div>
-                <p
-                  style={{
-                    margin: "3px 0",
-                    fontSize: "13px",
-                    lineHeight: "1.6",
-                  }}
-                >
-                  <strong>{t("cv.problem")}</strong> {proj.problem}
-                </p>
-                {proj.actions.length > 0 && (
-                  <div style={{ margin: "5px 0" }}>
-                    <div style={{ fontSize: "13px", fontWeight: "bold" }}>
-                      {t("cv.actions")}
-                    </div>
-                    <ul
-                      style={{
-                        margin: "4px 0 0 18px",
-                        padding: 0,
-                        fontSize: "13px",
-                        lineHeight: "1.5",
-                        listStyleType: "disc",
-                        listStylePosition: "outside",
-                      }}
-                    >
-                      {proj.actions.map((action, actionIndex) => (
-                        <li key={`${proj.id}-minimal-action-${actionIndex}`}>
-                          {action}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                {proj.results && proj.results.length > 0 && (
-                  <p
-                    style={{
-                      margin: "3px 0",
-                      fontSize: "13px",
-                      lineHeight: "1.6",
-                    }}
-                  >
-                    <strong>{t("cv.results")}</strong>{" "}
-                    {proj.results
-                      .map((r) => `${r.value} ${r.label}`)
-                      .join(" • ")}
-                  </p>
-                )}
-                <p style={{ margin: "3px 0", fontSize: "12px", color: "#666" }}>
-                  <strong>{t("cv.tech")}</strong> {proj.tech.join(", ")}
-                </p>
-              </div>
-            ))}
-          </Section>
-        )}
-        {certificates.length > 0 && (
-          <Section title={t("cv.certifications")}>
-            {certificates.map((cert, i) => (
-              <div key={i} data-cv-item="true" style={{ marginBottom: "8px" }}>
-                <div style={{ fontWeight: "bold", fontSize: "12px" }}>
-                  {cert.name} — {cert.issuer} ({cert.date})
-                </div>
-                {cert.credentialId && (
-                  <div
-                    style={{
-                      fontSize: "10px",
-                      color: "#777",
-                      marginTop: "2px",
-                    }}
-                  >
-                    ID: {cert.credentialId}
-                  </div>
-                )}
-              </div>
-            ))}
-          </Section>
-        )}
-        <div
-          style={{
-            marginTop: "24px",
-            paddingTop: "8px",
-            borderTop: "1px solid #ddd",
-            fontSize: "10px",
-            color: "#aaa",
-            display: "flex",
-            justifyContent: "space-between",
-          }}
-        >
-          <span>{profile.name}</span>
-          <span>{profile.email}</span>
-        </div>
-      </div>
-    );
-  }
-
-  if (template === "modern") {
-    return (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "stretch",
-          backgroundColor: "#fff",
-          fontFamily: "Georgia, 'Times New Roman', serif",
-          fontSize: "13px",
-          lineHeight: "1.6",
-        }}
-      >
-        <div
-          style={{
-            width: "170px",
-            backgroundColor: "#122430",
-            color: "#bcd6d2",
-            padding: "20px 14px 24px",
-            flexShrink: 0,
-            alignSelf: "stretch",
-          }}
-        >
-          {profile.avatar && (
-            <img
-              src={profile.avatar}
-              alt=""
-              style={{
-                width: "60px",
-                height: "60px",
-                borderRadius: "50%",
-                objectFit: "cover",
-                display: "block",
-                margin: "0 auto 10px",
-              }}
-            />
-          )}
-          <h2
-            style={{
-              fontSize: "13px",
-              fontWeight: "bold",
-              textAlign: "center",
-              color: "#fff",
-              margin: "0 0 4px 0",
-              lineHeight: "1.35",
-            }}
-          >
-            {profile.name}
-          </h2>
-          <p
-            style={{
-              fontSize: "10.5px",
-              fontStyle: "italic",
-              textAlign: "center",
-              margin: "0 0 14px 0",
-              color: "#bcd6d2",
-              lineHeight: "1.35",
-            }}
-          >
-            {profile.title}
-          </p>
-          <SidebarSection title={t("cv.contact")}>
-            <div style={{ fontSize: "9.5px", lineHeight: "1.65" }}>
-              {profile.email && (
-                <div style={{ wordBreak: "break-all" }}>{profile.email}</div>
-              )}
-              {profile.phone && <div>{profile.phone}</div>}
-              {profile.location && <div>{profile.location}</div>}
-              {profile.linkedin && (
-                <div style={{ wordBreak: "break-all", marginTop: "2px" }}>
-                  {profile.linkedin}
-                </div>
-              )}
-              {profile.github && (
-                <div style={{ wordBreak: "break-all" }}>{profile.github}</div>
-              )}
-            </div>
-          </SidebarSection>
-          {profile.education && profile.education.length > 0 && (
-            <SidebarSection title={t("cv.education")}>
-              {profile.education.map((edu, i) => (
-                <div key={i} style={{ marginBottom: "5px", fontSize: "9.5px" }}>
-                  <div
-                    style={{
-                      fontWeight: "bold",
-                      color: "#fff",
-                      lineHeight: "1.35",
-                    }}
-                  >
-                    {edu.degree}
-                  </div>
-                  <div style={{ lineHeight: "1.35", opacity: 0.85 }}>
-                    {edu.school}, {edu.year}
-                  </div>
-                </div>
-              ))}
-            </SidebarSection>
-          )}
-          {certificates.length > 0 && (
-            <SidebarSection title={t("cv.certifications")}>
-              {certificates.map((cert, i) => (
-                <div key={i} style={{ marginBottom: "6px", fontSize: "9.5px" }}>
-                  <div
-                    style={{
-                      fontWeight: "bold",
-                      color: "#fff",
-                      lineHeight: "1.35",
-                    }}
-                  >
-                    {cert.name}
-                  </div>
-                  <div
-                    style={{
-                      lineHeight: "1.3",
-                      opacity: 0.75,
-                      fontSize: "9px",
-                    }}
-                  >
-                    {cert.date}
-                  </div>
-                </div>
-              ))}
-            </SidebarSection>
-          )}
-        </div>
-        <div
-          style={{
-            flex: 1,
-            padding: "20px 24px 24px",
-            color: "#2c3e50",
-            display: "flex",
-            flexDirection: "column",
-          }}
-        >
-          <Section title={t("cv.summary")}>
-            <p style={{ margin: "0", fontSize: "13px", lineHeight: "1.6" }}>
-              {profile.summary}
-            </p>
-          </Section>
-          <Section title={t("cv.experience")}>
-            {profile.experience.map((exp, i) => (
-              <div key={i} data-cv-item="true" style={{ marginBottom: "12px" }}>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "flex-start",
-                    marginBottom: "2px",
-                  }}
-                >
-                  <div
-                    style={{ fontWeight: "bold", fontSize: "14px", flex: 1 }}
-                  >
-                    {exp.role}
-                    {exp.organization && (
-                      <span style={{ fontWeight: "normal" }}>
-                        {" "}
-                        — {exp.organization}
-                      </span>
-                    )}
-                    <span
-                      style={{
-                        fontWeight: "normal",
-                        fontSize: "12px",
-                        textTransform: "uppercase",
-                        color: "#777",
-                        marginLeft: "8px",
-                      }}
-                    >
-                      [{exp.type}]
-                    </span>
-                  </div>
-                  <div
-                    style={{
-                      fontSize: "12px",
-                      color: "#888",
-                      fontStyle: "italic",
-                      marginLeft: "8px",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {exp.period}
-                  </div>
-                </div>
-                <p
-                  style={{
-                    margin: "2px 0 0 0",
-                    fontSize: "13px",
-                    lineHeight: "1.6",
-                  }}
-                >
-                  {exp.description}
-                </p>
-              </div>
-            ))}
-          </Section>
-          {projects.length > 0 && (
-            <Section title={t("cv.projects")}>
-              {projects.map((proj, i) => (
-                <div
-                  key={i}
-                  data-cv-item="true"
-                  style={{ marginBottom: "12px" }}
-                >
-                  <div
-                    style={{
-                      display: "flex",
-                      justifyContent: "space-between",
-                      alignItems: "flex-start",
-                      marginBottom: "3px",
-                    }}
-                  >
-                    <div
-                      style={{ fontWeight: "bold", fontSize: "14px", flex: 1 }}
-                    >
-                      {proj.title}{" "}
-                      <span
-                        style={{
-                          fontSize: "12px",
-                          color: "#0e6e64",
-                          fontWeight: "bold",
-                          textTransform: "uppercase",
-                        }}
-                      >
-                        - {proj.tag}
-                      </span>
-                    </div>
-                    <div
-                      style={{
-                        fontSize: "12px",
-                        color: "#888",
-                        marginLeft: "8px",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      {proj.created_at}
-                    </div>
-                  </div>
-                  <p
-                    style={{
-                      margin: "2px 0",
-                      fontSize: "13px",
-                      lineHeight: "1.5",
-                    }}
-                  >
-                    <strong>{t("cv.problem")}</strong> {proj.problem}
-                  </p>
-                  {proj.actions.length > 0 && (
-                    <div style={{ margin: "4px 0" }}>
-                      <div
-                        style={{
-                          fontSize: "13px",
-                          fontWeight: "bold",
-                          marginBottom: "2px",
-                        }}
-                      >
-                        {t("cv.actions")}
-                      </div>
-                      <ul
-                        style={{
-                          margin: "0 0 0 18px",
-                          padding: 0,
-                          fontSize: "13px",
-                          lineHeight: "1.45",
-                          listStyleType: "disc",
-                          listStylePosition: "outside",
-                        }}
-                      >
-                        {proj.actions.map((action, actionIndex) => (
-                          <li key={`${proj.id}-modern-action-${actionIndex}`}>
-                            {action}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                  {proj.results && proj.results.length > 0 && (
-                    <p
-                      style={{
-                        margin: "2px 0",
-                        fontSize: "13px",
-                        lineHeight: "1.5",
-                        color: "#0e6e64",
-                        fontWeight: "bold",
-                      }}
-                    >
-                      {t("cv.results")}{" "}
-                      {proj.results
-                        .map((r) => `${r.value} ${r.label}`)
-                        .join(" • ")}
-                    </p>
-                  )}
-                  <p
-                    style={{
-                      margin: "2px 0 0 0",
-                      fontSize: "12px",
-                      color: "#888",
-                    }}
-                  >
-                    {t("cv.tech")} {proj.tech.slice(0, 5).join(", ")}
-                  </p>
-                </div>
-              ))}
-            </Section>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  // Executive
-  return (
-    <div
-      style={{
-        backgroundColor: "#fff",
-        fontFamily: "Georgia, 'Times New Roman', serif",
-        fontSize: "13px",
-        lineHeight: "1.6",
-        color: "#2c3e50",
-        boxSizing: "border-box",
-      }}
-    >
-      <div
-        style={{
-          backgroundColor: "#142e5c",
-          color: "#fff",
-          padding: "20px 24px",
-          marginBottom: "16px",
-        }}
-      >
-        <h1
-          style={{ fontSize: "29px", fontWeight: "bold", margin: "0 0 6px 0" }}
-        >
-          {profile.name}
-        </h1>
-        <p
-          style={{
-            fontSize: "15px",
-            fontStyle: "italic",
-            margin: "0 0 8px 0",
-            color: "#d6dce8",
-          }}
-        >
-          {profile.title}
-        </p>
-        <div
-          style={{ fontSize: "11px", color: "#d6dce8", marginBottom: "3px" }}
-        >
-          {[profile.email, profile.phone, profile.location]
-            .filter(Boolean)
-            .join(" | ")}
-        </div>
-        <div style={{ fontSize: "11px", color: "#d6dce8" }}>
-          {[profile.website, profile.linkedin, profile.github]
-            .filter(Boolean)
-            .join(" | ")}
-        </div>
-      </div>
-      <div style={{ padding: "0 24px" }}>
-        <Section title={t("cv.summary")}>
-          <p style={{ margin: "0", fontSize: "13px", lineHeight: "1.6" }}>
-            {profile.summary}
-          </p>
-        </Section>
-        <Section title={t("cv.experience")}>
-          {profile.experience.map((exp, i) => (
-            <div key={i} data-cv-item="true" style={{ marginBottom: "12px" }}>
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "flex-start",
-                  marginBottom: "2px",
-                }}
-              >
-                <div style={{ fontWeight: "bold", fontSize: "14px", flex: 1 }}>
-                  {exp.role}
-                  {exp.organization && (
-                    <span style={{ fontWeight: "normal" }}>
-                      {" "}
-                      — {exp.organization}
-                    </span>
-                  )}
-                  <span
-                    style={{
-                      fontWeight: "normal",
-                      fontSize: "12px",
-                      textTransform: "uppercase",
-                      color: "#777",
-                      marginLeft: "8px",
-                    }}
-                  >
-                    [{exp.type}]
-                  </span>
-                </div>
-                <div
-                  style={{
-                    fontSize: "12px",
-                    color: "#999",
-                    fontStyle: "italic",
-                    marginLeft: "8px",
-                    whiteSpace: "nowrap",
-                  }}
-                >
-                  {exp.period}
-                </div>
-              </div>
-              <p
-                style={{
-                  margin: "2px 0 0 0",
-                  fontSize: "13px",
-                  lineHeight: "1.6",
-                }}
-              >
-                {exp.description}
-              </p>
-            </div>
-          ))}
-        </Section>
-        {techStack && techStack.length > 0 && (
-          <Section title={t("cv.skills")}>
-            <SkillsGrid techStack={techStack} />
-          </Section>
-        )}
-        {profile.education && profile.education.length > 0 && (
-          <Section title={t("cv.education")}>
-            {profile.education.map((edu, i) => (
-              <div key={i} style={{ marginBottom: "6px", fontSize: "12px" }}>
-                <strong>{edu.degree}</strong> — {edu.school} ({edu.year})
-              </div>
-            ))}
-          </Section>
-        )}
-        {projects.length > 0 && (
-          <Section title={t("cv.projects")}>
-            {projects.map((proj, i) => (
-              <div key={i} data-cv-item="true" style={{ marginBottom: "12px" }}>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "flex-start",
-                    marginBottom: "2px",
-                  }}
-                >
-                  <div
-                    style={{ fontWeight: "bold", fontSize: "14px", flex: 1 }}
-                  >
-                    {proj.title} ({proj.tag})
-                  </div>
-                  <div
-                    style={{
-                      fontSize: "12px",
-                      color: "#999",
-                      marginLeft: "8px",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {proj.created_at}
-                  </div>
-                </div>
-                <p
-                  style={{
-                    margin: "2px 0",
-                    fontSize: "13px",
-                    lineHeight: "1.5",
-                  }}
-                >
-                  <strong>{t("cv.problem")}</strong> {proj.problem}
-                </p>
-                {proj.actions.length > 0 && (
-                  <div style={{ margin: "4px 0" }}>
-                    <div
-                      style={{
-                        fontSize: "13px",
-                        fontWeight: "bold",
-                        marginBottom: "2px",
-                      }}
-                    >
-                      {t("cv.actions")}
-                    </div>
-                    <ul
-                      style={{
-                        margin: "0 0 0 18px",
-                        padding: 0,
-                        fontSize: "13px",
-                        lineHeight: "1.45",
-                      }}
-                    >
-                      {proj.actions.map((action, actionIndex) => (
-                        <li key={`${proj.id}-executive-action-${actionIndex}`}>
-                          {action}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-                {proj.results && proj.results.length > 0 && (
-                  <p
-                    style={{
-                      margin: "2px 0",
-                      fontSize: "13px",
-                      lineHeight: "1.5",
-                      color: "#2d569c",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {t("cv.results")}{" "}
-                    {proj.results
-                      .map((r) => `${r.value} ${r.label}`)
-                      .join(" • ")}
-                  </p>
-                )}
-                <p
-                  style={{
-                    margin: "2px 0 0 0",
-                    fontSize: "12px",
-                    color: "#888",
-                  }}
-                >
-                  {t("cv.tech")} {proj.tech.join(", ")}
-                </p>
-              </div>
-            ))}
-          </Section>
-        )}
-        {certificates.length > 0 && (
-          <Section title={t("cv.certifications")}>
-            {certificates.map((cert, i) => (
-              <div
-                key={i}
-                data-cv-item="true"
-                style={{ marginBottom: "6px", fontSize: "12px" }}
-              >
-                <strong>{cert.name}</strong> — {cert.issuer} ({cert.date})
-              </div>
-            ))}
-          </Section>
-        )}
-        <div
-          style={{
-            marginTop: "24px",
-            paddingTop: "8px",
-            borderTop: "1px solid #c8d2e0",
-            fontSize: "10px",
-            color: "#aaa",
-            display: "flex",
-            justifyContent: "space-between",
-          }}
-        >
-          <span>{profile.name}</span>
-          <span>{profile.email}</span>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-function Section({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div style={{ marginBottom: "14px" }}>
-      <h2
-        style={{
-          fontSize: "17px",
-          fontWeight: "bold",
-          color: "#1a1a1a",
-          margin: "0 0 8px 0",
-          paddingBottom: "5px",
-          borderBottom: "2px solid #ddd",
-          textTransform: "uppercase",
-          letterSpacing: "0.8px",
-        }}
-      >
-        {title}
-      </h2>
-      <div style={{ textAlign: "justify", textJustify: "inter-word" }}>
-        {children}
-      </div>
-    </div>
-  );
-}
-
-function SidebarSection({
-  title,
-  children,
-}: {
-  title: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <div style={{ marginBottom: "10px" }}>
-      <div
-        style={{
-          fontSize: "9px",
-          fontWeight: "bold",
-          color: "#b6dcd6",
-          marginBottom: "4px",
-          paddingBottom: "2px",
-          borderBottom: "1px solid rgba(182,220,214,0.3)",
-          textTransform: "uppercase",
-          letterSpacing: "0.3px",
-        }}
-      >
-        {title}
-      </div>
-      {children}
-    </div>
-  );
-}
-
-function SkillsGrid({ techStack }: { techStack: TechItem[] }) {
-  const categories = [
-    "lang",
-    "fe",
-    "be",
-    "db",
-    "infra",
-    "cicd",
-    "data",
-  ] as const;
-  const labels: Record<string, string> = {
-    lang: "Languages",
-    fe: "Frontend",
-    be: "Backend",
-    db: "Database",
-    infra: "Infrastructure",
-    cicd: "CI/CD",
-    data: "Data",
-  };
-  return (
-    <div>
-      {categories.map((cat) => {
-        const items = techStack
-          .filter((t) => t.category === cat)
-          .map((t) => t.name);
-        if (!items.length) return null;
-        return (
-          <div
-            key={cat}
-            style={{
-              marginBottom: "6px",
-              display: "flex",
-              fontSize: "12px",
-              alignItems: "flex-start",
-            }}
-          >
-            <div
-              style={{
-                fontWeight: "bold",
-                width: "120px",
-                paddingRight: "10px",
-                flexShrink: 0,
-                lineHeight: "1.6",
-              }}
-            >
-              {labels[cat]}:
-            </div>
-            <div style={{ flex: 1, lineHeight: "1.6" }}>{items.join(", ")}</div>
-          </div>
-        );
-      })}
     </div>
   );
 }

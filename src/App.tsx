@@ -345,6 +345,7 @@ function App() {
             profile={profile}
             projects={projects}
             certificates={certificates}
+            techStack={techStack}
             onClose={() => setShowCVExport(false)}
           />
         )}

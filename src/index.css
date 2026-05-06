@@ -4,7 +4,7 @@
 
 @layer base {
   * {
-    font-family: 'JetBrains Mono', 'Fira Code', 'SF Mono', Consolas, monospace;
+    font-family: "JetBrains Mono", "Fira Code", "SF Mono", Consolas, monospace;
   }
 
   html {
@@ -50,8 +50,9 @@
   }
 
   .card-glow:hover {
-    box-shadow: 0 0 20px rgba(0, 229, 160, 0.06),
-                inset 0 1px 0 rgba(0, 229, 160, 0.05);
+    box-shadow:
+      0 0 20px rgba(0, 229, 160, 0.06),
+      inset 0 1px 0 rgba(0, 229, 160, 0.05);
   }
 
   .terminal-header {
@@ -118,12 +119,28 @@
     border-color: rgba(0, 229, 160, 0.3);
   }
 
-  .stagger-1 { animation-delay: 0.05s; }
-  .stagger-2 { animation-delay: 0.1s; }
-  .stagger-3 { animation-delay: 0.15s; }
-  .stagger-4 { animation-delay: 0.2s; }
-  .stagger-5 { animation-delay: 0.25s; }
-  .stagger-6 { animation-delay: 0.3s; }
-  .stagger-7 { animation-delay: 0.35s; }
-  .stagger-8 { animation-delay: 0.4s; }
+  .stagger-1 {
+    animation-delay: 0.05s;
+  }
+  .stagger-2 {
+    animation-delay: 0.1s;
+  }
+  .stagger-3 {
+    animation-delay: 0.15s;
+  }
+  .stagger-4 {
+    animation-delay: 0.2s;
+  }
+  .stagger-5 {
+    animation-delay: 0.25s;
+  }
+  .stagger-6 {
+    animation-delay: 0.3s;
+  }
+  .stagger-7 {
+    animation-delay: 0.35s;
+  }
+  .stagger-8 {
+    animation-delay: 0.4s;
+  }
 }

@@ -1,0 +1,1243 @@
+%PDF-1.3
+%ºß¬à
+3 0 obj
+<</Type /Page
+/Parent 1 0 R
+/Resources 2 0 R
+/MediaBox [0 0 595.2799999999999727 841.8899999999999864]
+/Contents 4 0 R
+>>
+endobj
+4 0 obj
+<<
+/Length 7044
+>>
+stream
+0.200025 w
+0 G
+0.09 0.18 0.36 rg
+0. 841.8899999999999864 595.2799999999999727 -74. re
+f
+BT
+/F2 26 Tf
+29.8999999999999986 TL
+1. g
+50. 785.8899999999999864 Td
+(Nguyen Khac Minh Tan) Tj
+ET
+BT
+/F3 13 Tf
+14.9499999999999993 TL
+0.8 0.839 0.933 rg
+50. 746.8899999999999864 Td
+(Full-Stack Developer) Tj
+ET
+BT
+/F1 8 Tf
+9.1999999999999993 TL
+0.8 0.839 0.933 rg
+50. 723.3899999999999864 Td
+(devmind.tan@gamil.com   |   +84 942 510 317   |   Ho Chi Minh City, VN   |   https://my-portfolio-eight-opal-45.vercel.app/   |  ) Tj
+ET
+BT
+/F1 8 Tf
+9.1999999999999993 TL
+0.8 0.839 0.933 rg
+50. 711.3899999999999864 Td
+(linkedin.com/in/devmidtan   |   github.com/devmindtan) Tj
+ET
+BT
+/F2 11 Tf
+12.6499999999999986 TL
+0.094 0.18 0.361 rg
+50. 677.3899999999999864 Td
+(SUMMARY) Tj
+ET
+0.18 0.33 0.6 RG
+0.8 w
+50. 672.3899999999999864 m
+545.2799999999999727 672.3899999999999864 l
+S
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0.118 0.133 0.157 rg
+50. 661.3899999999999864 Td
+(I build systems that handle real traffic at real scale. Production software that processes millions of transactions, serves) Tj
+ET
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0.118 0.133 0.157 rg
+50. 647.1399999999999864 Td
+(millions of users, and stays up when things go wrong. My work sits at the intersection of distributed systems, real-time) Tj
+ET
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0.118 0.133 0.157 rg
+50. 632.8899999999999864 Td
+(data pipelines, and platform engineering.) Tj
+ET
+BT
+/F2 11 Tf
+12.6499999999999986 TL
+0.094 0.18 0.361 rg
+50. 598.6399999999999864 Td
+(EXPERIENCE) Tj
+ET
+0.18 0.33 0.6 RG
+0.8 w
+50. 593.6399999999999864 m
+545.2799999999999727 593.6399999999999864 l
+S
+BT
+/F2 11 Tf
+12.6499999999999986 TL
+0.118 0.133 0.157 rg
+50. 582.6399999999999864 Td
+(Graduation thesis) Tj
+ET
+BT
+/F3 8 Tf
+9.1999999999999993 TL
+0.424 0.455 0.502 rg
+489.67999999999995 582.6399999999999864 Td
+(2/2026 - 6/2026) Tj
+ET
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0.118 0.133 0.157 rg
+50. 566.1399999999999864 Td
+(Develop a project to monitor and predict traffic density using a microservice system.) Tj
+ET
+BT
+/F2 9 Tf
+10.3499999999999996 TL
+0.18 0.329 0.596 rg
+50. 551.8899999999999864 Td
+(•) Tj
+ET
+BT
+/F1 8 Tf
+9.1999999999999993 TL
+0.424 0.455 0.502 rg
+61. 551.8899999999999864 Td
+(github: https://github.com/devmindtan/KLTN_2026) Tj
+ET
+BT
+/F2 9 Tf
+10.3499999999999996 TL
+0.18 0.329 0.596 rg
+50. 539.8899999999999864 Td
+(•) Tj
+ET
+BT
+/F1 8 Tf
+9.1999999999999993 TL
+0.424 0.455 0.502 rg
+61. 539.8899999999999864 Td
+(website: https://smartcity.devmindtan.uk/) Tj
+ET
+BT
+/F2 11 Tf
+12.6499999999999986 TL
+0.118 0.133 0.157 rg
+50. 517.8899999999999864 Td
+(Full-Stack Developer  —  DataFlow Inc) Tj
+ET
+BT
+/F3 8 Tf
+9.1999999999999993 TL
+0.424 0.455 0.502 rg
+502.9599999999999795 517.8899999999999864 Td
+(2018 - 2021) Tj
+ET
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0.118 0.133 0.157 rg
+50. 501.3899999999999864 Td
+(Built real-time analytics platforms and streaming data pipelines. Reduced data lag from 24h to under 30s using Flink) Tj
+ET
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0.118 0.133 0.157 rg
+50. 487.1399999999999864 Td
+(and Kafka.) Tj
+ET
+BT
+/F2 9 Tf
+10.3499999999999996 TL
+0.18 0.329 0.596 rg
+50. 472.8899999999999864 Td
+(•) Tj
+ET
+BT
+/F1 8 Tf
+9.1999999999999993 TL
+0.424 0.455 0.502 rg
+61. 472.8899999999999864 Td
+(Real-time Analytics Pipeline \(Real-time Analytics Pipeline\): #projects) Tj
+ET
+BT
+/F2 11 Tf
+12.6499999999999986 TL
+0.094 0.18 0.361 rg
+50. 432.8899999999999864 Td
+(EDUCATION) Tj
+ET
+0.18 0.33 0.6 RG
+0.8 w
+50. 427.8899999999999864 m
+545.2799999999999727 427.8899999999999864 l
+S
+BT
+/F2 10.5 Tf
+12.0749999999999993 TL
+0.18 0.329 0.596 rg
+50. 416.8899999999999864 Td
+(•) Tj
+ET
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0.118 0.133 0.157 rg
+61. 416.8899999999999864 Td
+(B.S. Software Engineer  —  Van Lang University  \(2026\)) Tj
+ET
+BT
+/F2 11 Tf
+12.6499999999999986 TL
+0.094 0.18 0.361 rg
+50. 382.6399999999999864 Td
+(PROJECTS) Tj
+ET
+0.18 0.33 0.6 RG
+0.8 w
+50. 377.6399999999999864 m
+545.2799999999999727 377.6399999999999864 l
+S
+BT
+/F2 10.5 Tf
+12.0749999999999993 TL
+0.118 0.133 0.157 rg
+50. 366.6399999999999864 Td
+(Payment Gateway Migration  \(fintech\)) Tj
+ET
+BT
+/F3 8 Tf
+9.1999999999999993 TL
+0.424 0.455 0.502 rg
+504.7999999999999545 366.6399999999999864 Td
+(2024-01-15) Tj
+ET
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0.118 0.133 0.157 rg
+50. 350.8899999999999864 Td
+(Problem: Legacy monolith processing 2M+ daily transactions with 0.8% failure rate and 12s avg latency.) Tj
+ET
+BT
+/F1 8.5 Tf
+9.7749999999999986 TL
+0.118 0.133 0.157 rg
+50. 336.6399999999999864 Td
+(Actions: Designed event-driven microservice architecture; Implemented saga pattern for distributed transactions; Built circuit breaker) Tj
+ET
+BT
+/F1 8.5 Tf
+9.7749999999999986 TL
+0.118 0.133 0.157 rg
+50. 323.8899999999999864 Td
+(with adaptive thresholds) Tj
+ET
+BT
+/F2 8.5 Tf
+9.7749999999999986 TL
+0.18 0.329 0.596 rg
+50. 311.1399999999999864 Td
+(Results: 99.97% uptime  |  180ms p99 latency  |  0.01% failure rate) Tj
+ET
+BT
+/F1 8 Tf
+9.1999999999999993 TL
+0.424 0.455 0.502 rg
+50. 296.3899999999999864 Td
+(Tech: Go, Kafka, PostgreSQL, K8s) Tj
+ET
+BT
+/F2 10.5 Tf
+12.0749999999999993 TL
+0.118 0.133 0.157 rg
+50. 274.3899999999999864 Td
+(Real-time Analytics Pipeline  \(data\)) Tj
+ET
+BT
+/F3 8 Tf
+9.1999999999999993 TL
+0.424 0.455 0.502 rg
+504.7999999999999545 274.3899999999999864 Td
+(2024-03-22) Tj
+ET
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0.118 0.133 0.157 rg
+50. 258.6399999999999864 Td
+(Problem: Batch ETL jobs causing 24h data lag, making real-time decisions impossible for ops team.) Tj
+ET
+BT
+/F1 8.5 Tf
+9.7749999999999986 TL
+0.118 0.133 0.157 rg
+50. 244.3899999999999864 Td
+(Actions: Replaced batch with streaming using Flink; Built custom windowed aggregations; Implemented exactly-once semantics) Tj
+ET
+BT
+/F2 8.5 Tf
+9.7749999999999986 TL
+0.18 0.329 0.596 rg
+50. 231.6399999999999864 Td
+(Results: <30s data lag  |  500K events/sec  |  40% cost reduction) Tj
+ET
+BT
+/F1 8 Tf
+9.1999999999999993 TL
+0.424 0.455 0.502 rg
+50. 216.8899999999999864 Td
+(Tech: Flink, Kafka, ClickHouse, Grafana) Tj
+ET
+BT
+/F2 10.5 Tf
+12.0749999999999993 TL
+0.118 0.133 0.157 rg
+50. 194.8899999999999864 Td
+(Auth Platform Redesign  \(security\)) Tj
+ET
+BT
+/F3 8 Tf
+9.1999999999999993 TL
+0.424 0.455 0.502 rg
+504.7999999999999545 194.8899999999999864 Td
+(2024-05-10) Tj
+ET
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0.118 0.133 0.157 rg
+50. 179.1399999999999864 Td
+(Problem: Homegrown auth with 3K LoC, no MFA, and session fixation vulnerabilities across 12 services.) Tj
+ET
+BT
+/F1 8.5 Tf
+9.7749999999999986 TL
+0.118 0.133 0.157 rg
+50. 164.8899999999999864 Td
+(Actions: Implemented OIDC-compliant auth server; Added FIDO2/WebAuthn MFA support; Built token introspection layer for service) Tj
+ET
+BT
+/F1 8.5 Tf
+9.7749999999999986 TL
+0.118 0.133 0.157 rg
+50. 152.1399999999999864 Td
+(mesh) Tj
+ET
+BT
+/F2 8.5 Tf
+9.7749999999999986 TL
+0.18 0.329 0.596 rg
+50. 139.3899999999999864 Td
+(Results: 0 auth vulns  |  2M+ daily logins  |  <50ms token validation) Tj
+ET
+BT
+/F1 8 Tf
+9.1999999999999993 TL
+0.424 0.455 0.502 rg
+50. 124.6399999999999864 Td
+(Tech: Rust, Redis, OAuth2, WebAuthn) Tj
+ET
+endstream
+endobj
+5 0 obj
+<</Type /Page
+/Parent 1 0 R
+/Resources 2 0 R
+/MediaBox [0 0 595.2799999999999727 841.8899999999999864]
+/Contents 6 0 R
+>>
+endobj
+6 0 obj
+<<
+/Length 8674
+>>
+stream
+0.8 w
+0.18 0.33 0.6 RG
+0.09 0.18 0.36 rg
+0. 841.8899999999999864 595.2799999999999727 -4. re
+f
+BT
+/F2 10.5 Tf
+12.0749999999999993 TL
+0.118 0.133 0.157 rg
+50. 785.8899999999999864 Td
+(E-commerce Platform  \(retail\)) Tj
+ET
+BT
+/F3 8 Tf
+9.1999999999999993 TL
+0.424 0.455 0.502 rg
+504.7999999999999545 785.8899999999999864 Td
+(2024-06-01) Tj
+ET
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0.118 0.133 0.157 rg
+50. 770.1399999999999864 Td
+(Problem: Black Friday traffic spikes causing cascading failures, $2M lost revenue per outage minute.) Tj
+ET
+BT
+/F1 8.5 Tf
+9.7749999999999986 TL
+0.118 0.133 0.157 rg
+50. 755.8899999999999864 Td
+(Actions: Implemented adaptive rate limiting; Built inventory reservation with TTL locks; Created chaos engineering test suite) Tj
+ET
+BT
+/F2 8.5 Tf
+9.7749999999999986 TL
+0.18 0.329 0.596 rg
+50. 743.1399999999999864 Td
+(Results: 0 outages  |  10x peak traffic  |  $18M BF revenue) Tj
+ET
+BT
+/F1 8 Tf
+9.1999999999999993 TL
+0.424 0.455 0.502 rg
+50. 728.3899999999999864 Td
+(Tech: Node.js, Redis, RabbitMQ, AWS) Tj
+ET
+BT
+/F2 10.5 Tf
+12.0749999999999993 TL
+0.118 0.133 0.157 rg
+50. 706.3899999999999864 Td
+(CI/CD Pipeline Overhaul  \(devops\)) Tj
+ET
+BT
+/F3 8 Tf
+9.1999999999999993 TL
+0.424 0.455 0.502 rg
+504.7999999999999545 706.3899999999999864 Td
+(2024-07-14) Tj
+ET
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0.118 0.133 0.157 rg
+50. 690.6399999999999864 Td
+(Problem: Build times averaging 45min, flaky tests at 30% failure rate, deploys taking 2h with manual gates.) Tj
+ET
+BT
+/F1 8.5 Tf
+9.7749999999999986 TL
+0.118 0.133 0.157 rg
+50. 676.3899999999999864 Td
+(Actions: Parallelized test suites with deterministic test containers; Implemented canary deployments with automated rollback; Built) Tj
+ET
+BT
+/F1 8.5 Tf
+9.7749999999999986 TL
+0.118 0.133 0.157 rg
+50. 663.6399999999999864 Td
+(custom test impact analysis to skip unaffected suites) Tj
+ET
+BT
+/F2 8.5 Tf
+9.7749999999999986 TL
+0.18 0.329 0.596 rg
+50. 650.8899999999999864 Td
+(Results: 4min build time  |  <1% flaky rate  |  15min deploy time) Tj
+ET
+BT
+/F1 8 Tf
+9.1999999999999993 TL
+0.424 0.455 0.502 rg
+50. 636.1399999999999864 Td
+(Tech: Go, K8s, Terraform, ArgoCD) Tj
+ET
+BT
+/F2 10.5 Tf
+12.0749999999999993 TL
+0.118 0.133 0.157 rg
+50. 614.1399999999999864 Td
+(Healthcare Data Platform  \(healthcare\)) Tj
+ET
+BT
+/F3 8 Tf
+9.1999999999999993 TL
+0.424 0.455 0.502 rg
+504.7999999999999545 614.1399999999999864 Td
+(2024-08-20) Tj
+ET
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0.118 0.133 0.157 rg
+50. 598.3899999999999864 Td
+(Problem: HIPAA-compliant data silos across 8 hospitals, patient records taking 72h to sync between systems.) Tj
+ET
+BT
+/F1 8.5 Tf
+9.7749999999999986 TL
+0.118 0.133 0.157 rg
+50. 584.1399999999999864 Td
+(Actions: Built FHIR-compliant data exchange layer; Implemented field-level encryption with key rotation; Created audit trail with) Tj
+ET
+BT
+/F1 8.5 Tf
+9.7749999999999986 TL
+0.118 0.133 0.157 rg
+50. 571.3899999999999864 Td
+(immutable event log) Tj
+ET
+BT
+/F2 8.5 Tf
+9.7749999999999986 TL
+0.18 0.329 0.596 rg
+50. 558.6399999999999864 Td
+(Results: <5min record sync  |  100% HIPAA compliance  |  8 hospitals live) Tj
+ET
+BT
+/F1 8 Tf
+9.1999999999999993 TL
+0.424 0.455 0.502 rg
+50. 543.8899999999999864 Td
+(Tech: Rust, PostgreSQL, Kafka, AWS) Tj
+ET
+BT
+/F2 10.5 Tf
+12.0749999999999993 TL
+0.118 0.133 0.157 rg
+50. 521.8899999999999864 Td
+(Multi-tenant SaaS Platform  \(saas\)) Tj
+ET
+BT
+/F3 8 Tf
+9.1999999999999993 TL
+0.424 0.455 0.502 rg
+504.7999999999999545 521.8899999999999864 Td
+(2024-09-05) Tj
+ET
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0.118 0.133 0.157 rg
+50. 506.1399999999999864 Td
+(Problem: Single-tenant architecture hitting scaling ceiling at 50 customers, onboarding taking 3 weeks per tenant.) Tj
+ET
+BT
+/F1 8.5 Tf
+9.7749999999999986 TL
+0.118 0.133 0.157 rg
+50. 491.8899999999999864 Td
+(Actions: Designed row-level security with tenant isolation; Built self-service onboarding with infrastructure-as-code; Implemented) Tj
+ET
+BT
+/F1 8.5 Tf
+9.7749999999999986 TL
+0.118 0.133 0.157 rg
+50. 479.1399999999999864 Td
+(tenant-aware connection pooling) Tj
+ET
+BT
+/F2 8.5 Tf
+9.7749999999999986 TL
+0.18 0.329 0.596 rg
+50. 466.3899999999999864 Td
+(Results: 500+ tenants  |  15min onboarding  |  60% infra cost saved) Tj
+ET
+BT
+/F1 8 Tf
+9.1999999999999993 TL
+0.424 0.455 0.502 rg
+50. 451.6399999999999864 Td
+(Tech: TypeScript, PostgreSQL, Redis, Docker) Tj
+ET
+BT
+/F2 10.5 Tf
+12.0749999999999993 TL
+0.118 0.133 0.157 rg
+50. 429.6399999999999864 Td
+(Fraud Detection Engine  \(fintech\)) Tj
+ET
+BT
+/F3 8 Tf
+9.1999999999999993 TL
+0.424 0.455 0.502 rg
+504.7999999999999545 429.6399999999999864 Td
+(2024-10-12) Tj
+ET
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0.118 0.133 0.157 rg
+50. 413.8899999999999864 Td
+(Problem: Rule-based fraud detection missing 35% of fraud cases while generating 90% false positive rate.) Tj
+ET
+BT
+/F1 8.5 Tf
+9.7749999999999986 TL
+0.118 0.133 0.157 rg
+50. 399.6399999999999864 Td
+(Actions: Built real-time feature store from transaction streams; Implemented ML model serving with A/B testing framework; Created) Tj
+ET
+BT
+/F1 8.5 Tf
+9.7749999999999986 TL
+0.118 0.133 0.157 rg
+50. 386.8899999999999864 Td
+(explainability layer for regulatory compliance) Tj
+ET
+BT
+/F2 8.5 Tf
+9.7749999999999986 TL
+0.18 0.329 0.596 rg
+50. 374.1399999999999864 Td
+(Results: 92% detection rate  |  <8% false positive  |  <100ms scoring latency) Tj
+ET
+BT
+/F1 8 Tf
+9.1999999999999993 TL
+0.424 0.455 0.502 rg
+50. 359.3899999999999864 Td
+(Tech: Python, Flink, Kafka, Redis) Tj
+ET
+BT
+/F2 10.5 Tf
+12.0749999999999993 TL
+0.118 0.133 0.157 rg
+50. 337.3899999999999864 Td
+(IoT Fleet Management  \(iot\)) Tj
+ET
+BT
+/F3 8 Tf
+9.1999999999999993 TL
+0.424 0.455 0.502 rg
+504.7999999999999545 337.3899999999999864 Td
+(2024-11-01) Tj
+ET
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0.118 0.133 0.157 rg
+50. 321.6399999999999864 Td
+(Problem: 50K+ devices with unreliable connectivity, 40% telemetry data loss, and no remote update capability.) Tj
+ET
+BT
+/F1 8.5 Tf
+9.7749999999999986 TL
+0.118 0.133 0.157 rg
+50. 307.3899999999999864 Td
+(Actions: Built MQTT broker cluster with store-and-forward; Implemented delta-based OTA update system; Created device shadow) Tj
+ET
+BT
+/F1 8.5 Tf
+9.7749999999999986 TL
+0.118 0.133 0.157 rg
+50. 294.6399999999999864 Td
+(for offline state sync) Tj
+ET
+BT
+/F2 8.5 Tf
+9.7749999999999986 TL
+0.18 0.329 0.596 rg
+50. 281.8899999999999864 Td
+(Results: 99.5% data delivery  |  50K+ devices managed  |  <2GB update size) Tj
+ET
+BT
+/F1 8 Tf
+9.1999999999999993 TL
+0.424 0.455 0.502 rg
+50. 267.1399999999999864 Td
+(Tech: Go, MQTT, DynamoDB, AWS) Tj
+ET
+BT
+/F2 10.5 Tf
+12.0749999999999993 TL
+0.118 0.133 0.157 rg
+50. 245.1399999999999864 Td
+(Content Delivery Network  \(infra\)) Tj
+ET
+BT
+/F3 8 Tf
+9.1999999999999993 TL
+0.424 0.455 0.502 rg
+504.7999999999999545 245.1399999999999864 Td
+(2024-11-18) Tj
+ET
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0.118 0.133 0.157 rg
+50. 229.3899999999999864 Td
+(Problem: Origin server handling 100% of traffic, 800ms avg TTFB for APAC users, $500K/month bandwidth cost.) Tj
+ET
+BT
+/F1 8.5 Tf
+9.7749999999999986 TL
+0.118 0.133 0.157 rg
+50. 215.1399999999999864 Td
+(Actions: Deployed edge nodes across 12 PoPs globally; Built cache invalidation with surrogate key architecture; Implemented origin) Tj
+ET
+BT
+/F1 8.5 Tf
+9.7749999999999986 TL
+0.118 0.133 0.157 rg
+50. 202.3899999999999864 Td
+(shielding with request coalescing) Tj
+ET
+BT
+/F2 8.5 Tf
+9.7749999999999986 TL
+0.18 0.329 0.596 rg
+50. 189.6399999999999864 Td
+(Results: <50ms APAC TTFB  |  95% cache hit rate  |  $120K monthly cost) Tj
+ET
+BT
+/F1 8 Tf
+9.1999999999999993 TL
+0.424 0.455 0.502 rg
+50. 174.8899999999999864 Td
+(Tech: Rust, Nginx, Terraform, AWS) Tj
+ET
+BT
+/F2 10.5 Tf
+12.0749999999999993 TL
+0.118 0.133 0.157 rg
+50. 152.8899999999999864 Td
+(Search Platform Rebuild  \(data\)) Tj
+ET
+BT
+/F3 8 Tf
+9.1999999999999993 TL
+0.424 0.455 0.502 rg
+504.7999999999999545 152.8899999999999864 Td
+(2024-12-03) Tj
+ET
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0.118 0.133 0.157 rg
+50. 137.1399999999999864 Td
+(Problem: MySQL LIKE queries on 50M records, 12s search latency, zero relevance tuning capability.) Tj
+ET
+BT
+/F1 8.5 Tf
+9.7749999999999986 TL
+0.118 0.133 0.157 rg
+50. 122.8899999999999864 Td
+(Actions: Migrated to Elasticsearch with custom analyzers; Built learning-to-rank pipeline from click logs; Implemented type-ahead) Tj
+ET
+BT
+/F1 8.5 Tf
+9.7749999999999986 TL
+0.118 0.133 0.157 rg
+50. 110.1399999999999864 Td
+(with prefix trie index) Tj
+ET
+BT
+/F2 8.5 Tf
+9.7749999999999986 TL
+0.18 0.329 0.596 rg
+50. 97.3899999999999864 Td
+(Results: <80ms search latency  |  3x CTR improvement  |  50M documents indexed) Tj
+ET
+BT
+/F1 8 Tf
+9.1999999999999993 TL
+0.424 0.455 0.502 rg
+50. 82.6399999999999864 Td
+(Tech: Python, Elasticsearch, Kafka, K8s) Tj
+ET
+endstream
+endobj
+7 0 obj
+<</Type /Page
+/Parent 1 0 R
+/Resources 2 0 R
+/MediaBox [0 0 595.2799999999999727 841.8899999999999864]
+/Contents 8 0 R
+>>
+endobj
+8 0 obj
+<<
+/Length 5308
+>>
+stream
+0.8 w
+0.18 0.33 0.6 RG
+0.09 0.18 0.36 rg
+0. 841.8899999999999864 595.2799999999999727 -4. re
+f
+BT
+/F2 10.5 Tf
+12.0749999999999993 TL
+0.118 0.133 0.157 rg
+50. 785.8899999999999864 Td
+(Chat & Notification System  \(saas\)) Tj
+ET
+BT
+/F3 8 Tf
+9.1999999999999993 TL
+0.424 0.455 0.502 rg
+504.7999999999999545 785.8899999999999864 Td
+(2025-01-08) Tj
+ET
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0.118 0.133 0.157 rg
+50. 770.1399999999999864 Td
+(Problem: Polling-based messaging consuming 60% of API capacity, 5s message delivery latency, no offline support.) Tj
+ET
+BT
+/F1 8.5 Tf
+9.7749999999999986 TL
+0.118 0.133 0.157 rg
+50. 755.8899999999999864 Td
+(Actions: Built WebSocket gateway with connection draining; Implemented message queue with delivery guarantees; Created) Tj
+ET
+BT
+/F1 8.5 Tf
+9.7749999999999986 TL
+0.118 0.133 0.157 rg
+50. 743.1399999999999864 Td
+(offline-first client with CRDT sync) Tj
+ET
+BT
+/F2 8.5 Tf
+9.7749999999999986 TL
+0.18 0.329 0.596 rg
+50. 730.3899999999999864 Td
+(Results: <200ms delivery  |  80% API load reduced  |  100K concurrent users) Tj
+ET
+BT
+/F1 8 Tf
+9.1999999999999993 TL
+0.424 0.455 0.502 rg
+50. 715.6399999999999864 Td
+(Tech: TypeScript, Redis, WebSocket, CRDTs) Tj
+ET
+BT
+/F2 10.5 Tf
+12.0749999999999993 TL
+0.118 0.133 0.157 rg
+50. 693.6399999999999864 Td
+(Compliance Automation Platform  \(security\)) Tj
+ET
+BT
+/F3 8 Tf
+9.1999999999999993 TL
+0.424 0.455 0.502 rg
+504.7999999999999545 693.6399999999999864 Td
+(2025-02-14) Tj
+ET
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0.118 0.133 0.157 rg
+50. 677.8899999999999864 Td
+(Problem: SOC2 audit requiring 3 months of manual evidence collection, 200+ controls tracked in spreadsheets.) Tj
+ET
+BT
+/F1 8.5 Tf
+9.7749999999999986 TL
+0.118 0.133 0.157 rg
+50. 663.6399999999999864 Td
+(Actions: Built continuous control monitoring from infrastructure APIs; Implemented evidence auto-collection pipeline; Created drift) Tj
+ET
+BT
+/F1 8.5 Tf
+9.7749999999999986 TL
+0.118 0.133 0.157 rg
+50. 650.8899999999999864 Td
+(detection against compliance baselines) Tj
+ET
+BT
+/F2 8.5 Tf
+9.7749999999999986 TL
+0.18 0.329 0.596 rg
+50. 638.1399999999999864 Td
+(Results: 2 weeks audit prep  |  200+ controls automated  |  98% evidence coverage) Tj
+ET
+BT
+/F1 8 Tf
+9.1999999999999993 TL
+0.424 0.455 0.502 rg
+50. 623.3899999999999864 Td
+(Tech: Go, Terraform, PostgreSQL, AWS) Tj
+ET
+BT
+/F2 10.5 Tf
+12.0749999999999993 TL
+0.118 0.133 0.157 rg
+50. 601.3899999999999864 Td
+(Video Transcoding Pipeline  \(media\)) Tj
+ET
+BT
+/F3 8 Tf
+9.1999999999999993 TL
+0.424 0.455 0.502 rg
+504.7999999999999545 601.3899999999999864 Td
+(2025-03-01) Tj
+ET
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0.118 0.133 0.157 rg
+50. 585.6399999999999864 Td
+(Problem: Manual transcoding workflow, 8h per video, no adaptive bitrate, $200K/year in compute waste.) Tj
+ET
+BT
+/F1 8.5 Tf
+9.7749999999999986 TL
+0.118 0.133 0.157 rg
+50. 571.3899999999999864 Td
+(Actions: Built event-driven transcoding with per-title encoding; Implemented adaptive bitrate ladder optimization; Created) Tj
+ET
+BT
+/F1 8.5 Tf
+9.7749999999999986 TL
+0.118 0.133 0.157 rg
+50. 558.6399999999999864 Td
+(GPU-accelerated preview generation) Tj
+ET
+BT
+/F2 8.5 Tf
+9.7749999999999986 TL
+0.18 0.329 0.596 rg
+50. 545.8899999999999864 Td
+(Results: 15min per video  |  40% storage saved  |  4K max resolution) Tj
+ET
+BT
+/F1 8 Tf
+9.1999999999999993 TL
+0.424 0.455 0.502 rg
+50. 531.1399999999999864 Td
+(Tech: Go, FFmpeg, AWS, Kafka) Tj
+ET
+BT
+/F2 11 Tf
+12.6499999999999986 TL
+0.094 0.18 0.361 rg
+50. 491.1399999999999864 Td
+(CERTIFICATIONS) Tj
+ET
+0.18 0.33 0.6 RG
+0.8 w
+50. 486.1399999999999864 m
+545.2799999999999727 486.1399999999999864 l
+S
+BT
+/F2 10.5 Tf
+12.0749999999999993 TL
+0.18 0.329 0.596 rg
+50. 475.1399999999999864 Td
+(•) Tj
+ET
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0.118 0.133 0.157 rg
+61. 475.1399999999999864 Td
+(Olympic PMNM Contest 2025  —  BTC OLYMPIC TIN HOC SINH VIEN VIET NAM  \(12/12/2025\)) Tj
+ET
+BT
+/F1 8 Tf
+9.1999999999999993 TL
+0.424 0.455 0.502 rg
+61. 460.8899999999999864 Td
+(Ref: https://github.com/devmindtan/UtilityBox/blob/main/Assets/Images/Olympic%20PMNM%20Contest%202025.jpg) Tj
+ET
+BT
+/F2 10.5 Tf
+12.0749999999999993 TL
+0.18 0.329 0.596 rg
+50. 444.8899999999999864 Td
+(•) Tj
+ET
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0.118 0.133 0.157 rg
+61. 444.8899999999999864 Td
+(ICPC Vietnam Southern Provincial PC  —  William B.Poucher, Ph.D ICPC Executive Director  \(11/10/2025\)) Tj
+ET
+BT
+/F1 8 Tf
+9.1999999999999993 TL
+0.424 0.455 0.502 rg
+61. 430.6399999999999864 Td
+(Ref: https://github.com/devmindtan/UtilityBox/blob/main/Assets/Images/2026-ICPC%20Vietnam%20Southern%20Provincial%20PC-Nguyen) Tj
+ET
+BT
+/F1 8 Tf
+9.1999999999999993 TL
+0.424 0.455 0.502 rg
+61. 418.6399999999999864 Td
+(%20Khac%20Minh%20Tan-HONORABLE.pdf) Tj
+ET
+BT
+/F2 10.5 Tf
+12.0749999999999993 TL
+0.18 0.329 0.596 rg
+50. 402.6399999999999864 Td
+(•) Tj
+ET
+BT
+/F1 9.5 Tf
+10.9249999999999989 TL
+0.118 0.133 0.157 rg
+61. 402.6399999999999864 Td
+(ICPC Vietnam National PC  —  William B.Poucher, Ph.D ICPC Executive Director  \(8/11/2025\)) Tj
+ET
+BT
+/F1 8 Tf
+9.1999999999999993 TL
+0.424 0.455 0.502 rg
+61. 388.3899999999999864 Td
+(Ref: https://github.com/devmindtan/UtilityBox/blob/main/Assets/Images/2026-ICPC%20Vietnam%20National%20PC-Nguyen%20Khac%20M) Tj
+ET
+BT
+/F1 8 Tf
+9.1999999999999993 TL
+0.424 0.455 0.502 rg
+61. 376.3899999999999864 Td
+(inh%20Tan-PLACE.pdf) Tj
+ET
+endstream
+endobj
+1 0 obj
+<</Type /Pages
+/Kids [3 0 R 5 0 R 7 0 R ]
+/Count 3
+>>
+endobj
+9 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+10 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+11 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica-Oblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+12 0 obj
+<<
+/Type /Font
+/BaseFont /Helvetica-BoldOblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+13 0 obj
+<<
+/Type /Font
+/BaseFont /Courier
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+14 0 obj
+<<
+/Type /Font
+/BaseFont /Courier-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+15 0 obj
+<<
+/Type /Font
+/BaseFont /Courier-Oblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+16 0 obj
+<<
+/Type /Font
+/BaseFont /Courier-BoldOblique
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+17 0 obj
+<<
+/Type /Font
+/BaseFont /Times-Roman
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+18 0 obj
+<<
+/Type /Font
+/BaseFont /Times-Bold
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+19 0 obj
+<<
+/Type /Font
+/BaseFont /Times-Italic
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+20 0 obj
+<<
+/Type /Font
+/BaseFont /Times-BoldItalic
+/Subtype /Type1
+/Encoding /WinAnsiEncoding
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+21 0 obj
+<<
+/Type /Font
+/BaseFont /ZapfDingbats
+/Subtype /Type1
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+22 0 obj
+<<
+/Type /Font
+/BaseFont /Symbol
+/Subtype /Type1
+/FirstChar 32
+/LastChar 255
+>>
+endobj
+2 0 obj
+<<
+/ProcSet [/PDF /Text /ImageB /ImageC /ImageI]
+/Font <<
+/F1 9 0 R
+/F2 10 0 R
+/F3 11 0 R
+/F4 12 0 R
+/F5 13 0 R
+/F6 14 0 R
+/F7 15 0 R
+/F8 16 0 R
+/F9 17 0 R
+/F10 18 0 R
+/F11 19 0 R
+/F12 20 0 R
+/F13 21 0 R
+/F14 22 0 R
+>>
+/XObject <<
+>>
+>>
+endobj
+23 0 obj
+<<
+/Producer (jsPDF 4.2.1)
+/CreationDate (D:20260505132425-00'00')
+>>
+endobj
+24 0 obj
+<<
+/Type /Catalog
+/Pages 1 0 R
+/OpenAction [3 0 R /FitH null]
+/PageLayout /OneColumn
+>>
+endobj
+xref
+0 25
+0000000000 65535 f 
+0000021608 00000 n 
+0000023441 00000 n 
+0000000015 00000 n 
+0000000152 00000 n 
+0000007248 00000 n 
+0000007385 00000 n 
+0000016111 00000 n 
+0000016248 00000 n 
+0000021677 00000 n 
+0000021802 00000 n 
+0000021933 00000 n 
+0000022067 00000 n 
+0000022205 00000 n 
+0000022329 00000 n 
+0000022458 00000 n 
+0000022590 00000 n 
+0000022726 00000 n 
+0000022854 00000 n 
+0000022981 00000 n 
+0000023110 00000 n 
+0000023243 00000 n 
+0000023345 00000 n 
+0000023693 00000 n 
+0000023779 00000 n 
+trailer
+<<
+/Size 25
+/Root 24 0 R
+/Info 23 0 R
+/ID [ <5929AD63B85CC7CBEE01B2B8EE87C705> <5929AD63B85CC7CBEE01B2B8EE87C705> ]
+>>
+startxref
+23883
+%%EOF

@@ -127,7 +127,7 @@ export interface Certificate {
 export const certificates: Certificate[] = [
   {
     name: "Olympic PMNM Contest 2025",
-    issuer: "BTC OLYMPIC TIN HỌC SINH VIÊN VIỆT NAM",
+    issuer: "BTC OLYMPIC TIN HOC SINH VIEN VIET NAM",
     date: "12/12/2025",
     credentialId: "",
     url: "https://github.com/devmindtan/UtilityBox/blob/main/Assets/Images/Olympic%20PMNM%20Contest%202025.jpg",

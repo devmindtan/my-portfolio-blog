@@ -1,309 +1,135 @@
-import { useState, useCallback, useEffect } from "react";
-import { X, FileText, Download, Eye, Palette } from "lucide-react";
-import type { Profile, Project, Certificate } from "../data/portfolio";
+import { useState, useCallback, useEffect, useRef } from "react";
+import { useReactToPrint } from "react-to-print";
+import {
+  X,
+  FileText,
+  Download,
+  Eye,
+  Palette,
+  Check,
+  ChevronDown,
+  ChevronUp,
+  Search,
+} from "lucide-react";
+import type {
+  Profile,
+  Project,
+  Certificate,
+  TechItem,
+} from "../data/portfolio";
 
 interface CVExportModalProps {
   profile: Profile;
   projects: Project[];
   certificates: Certificate[];
+  techStack?: TechItem[];
   onClose: () => void;
 }
 
-type TemplateKey = "minimal" | "modern" | "terminal";
+type TemplateKey = "minimal" | "modern" | "executive";
 
 const templates: { key: TemplateKey; label: string; desc: string }[] = [
-  {
-    key: "minimal",
-    label: "Minimal",
-    desc: "Clean, single-column, traditional",
-  },
-  { key: "modern", label: "Modern", desc: "Two-column with sidebar" },
-  { key: "terminal", label: "Terminal", desc: "Developer-themed, monospace" },
+  { key: "minimal", label: "Minimal", desc: "Clean, single-column" },
+  { key: "modern", label: "Modern", desc: "Sidebar + content" },
+  { key: "executive", label: "Executive", desc: "Navy header band" },
 ];
 
 export default function CVExportModal({
   profile,
   projects,
   certificates,
+  techStack,
   onClose,
 }: CVExportModalProps) {
-  const [selectedTemplate, setSelectedTemplate] =
-    useState<TemplateKey>("minimal");
-
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    },
-    [onClose],
+  const [selected, setSelected] = useState<TemplateKey>("minimal");
+  const [showProjectPicker, setShowProjectPicker] = useState(false);
+  const [selectedProjectIds, setSelectedProjectIds] = useState<Set<string>>(
+    () => new Set(projects.slice(0, 10).map((p) => p.id)),
   );
+  const [projectSearch, setProjectSearch] = useState("");
+  const [projectTagFilter, setProjectTagFilter] = useState<string>("all");
+  const contentRef = useRef<HTMLDivElement>(null);
+  const printRef = useRef<HTMLDivElement>(null);
+
+  const docTitle = () => `CV_${profile.name.replace(/\s+/g, "_")}_${selected}`;
+
+  const basePageStyle = `
+    * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-sizing: border-box; }
+    [data-cv-item] { break-inside: avoid; page-break-inside: avoid; }
+    html { margin: 0; background: #fff !important; }
+  `;
+
+  // A4 pages, break-inside rules on [data-cv-item] keep items intact
+  const printA4 = useReactToPrint({
+    contentRef: printRef,
+    documentTitle: docTitle,
+    pageStyle: `@page { size: A4 portrait; margin: 20mm 15mm; } ${basePageStyle}`,
+  });
+
+  // Preview: open styled HTML in a new tab — no print dialog, purely visual
+  const handlePreview = () => {
+    // Preview must use preview DOM only (contentRef), fully independent from print DOM
+    if (!contentRef.current) return;
+    const content = contentRef.current.outerHTML;
+    const win = window.open("", "_blank");
+    if (!win) return;
+    win.document.open();
+    win.document.write(`<!DOCTYPE html><html>
+<head>
+  <meta charset="utf-8">
+  <title>CV Preview — ${profile.name}</title>
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; background: #e8e8e8; }
+    .preview-stage { max-width: 980px; margin: 20px auto; padding: 10px; }
+    .cv-wrap { max-width: 880px; margin: 0 auto; background: #fff;
+               box-shadow: 0 4px 24px rgba(0,0,0,0.18); }
+  </style>
+</head>
+<body><div class="preview-stage"><div class="cv-wrap">${content}</div></div></body>
+</html>`);
+    win.document.close();
+  };
+
+  // Download: trigger browser native print dialog → user selects "Save as PDF"
+  const handleDownloadPDF = () => printA4();
+
+  const allTags = Array.from(new Set(projects.map((p) => p.tag))).sort();
+
+  const filteredProjects = projects.filter((p) => {
+    const matchSearch =
+      projectSearch.trim() === "" ||
+      p.title.toLowerCase().includes(projectSearch.toLowerCase()) ||
+      p.tag.toLowerCase().includes(projectSearch.toLowerCase());
+    const matchTag = projectTagFilter === "all" || p.tag === projectTagFilter;
+    return matchSearch && matchTag;
+  });
+
+  const toggleProject = useCallback((id: string) => {
+    setSelectedProjectIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) {
+        next.delete(id);
+      } else if (next.size < 10) {
+        next.add(id);
+      }
+      return next;
+    });
+  }, []);
+
+  const selectedProjects = projects.filter((p) => selectedProjectIds.has(p.id));
 
   useEffect(() => {
-    document.addEventListener("keydown", handleKeyDown);
+    const handleKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", handleKey);
     document.body.style.overflow = "hidden";
     return () => {
-      document.removeEventListener("keydown", handleKeyDown);
+      document.removeEventListener("keydown", handleKey);
       document.body.style.overflow = "";
     };
-  }, [handleKeyDown]);
-
-  function generateHTML(): string {
-    switch (selectedTemplate) {
-      case "minimal":
-        return generateMinimal();
-      case "modern":
-        return generateModern();
-      case "terminal":
-        return generateTerminal();
-    }
-  }
-
-  function generateMinimal(): string {
-    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>CV - ${profile.name}</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:Georgia,serif;color:#1a1a1a;padding:48px 64px;line-height:1.5;font-size:11pt}
-h1{font-size:20pt;margin-bottom:2px;letter-spacing:-0.5pt}
-.subtitle{font-size:10pt;color:#666;margin-bottom:16px}
-.contact{font-size:9pt;color:#555;margin-bottom:24px;display:flex;flex-wrap:wrap;gap:8px 16px}
-.section{margin-bottom:20px}
-.section-title{font-size:11pt;font-weight:700;text-transform:uppercase;letter-spacing:1.5pt;border-bottom:1.5pt solid #1a1a1a;padding-bottom:4px;margin-bottom:10px}
-.section p,.section li{font-size:10pt;line-height:1.6}
-ul{padding-left:18px}
-.job{margin-bottom:14px}
-.job-header{display:flex;justify-content:space-between;align-items:baseline}
-.job-title{font-weight:700;font-size:10.5pt}
-.job-company{font-size:10pt;color:#333}
-.job-period{font-size:9pt;color:#888;white-space:nowrap}
-.project{margin-bottom:10px}
-.project-title{font-weight:700;font-size:10pt}
-.project-tag{font-size:8pt;color:#888;text-transform:uppercase;letter-spacing:0.5pt;margin-left:6px}
-.project p{font-size:9.5pt;color:#333}
-.results{display:flex;gap:16px;margin-top:4px}
-.result-value{font-weight:700;font-size:10pt}
-.result-label{font-size:8pt;color:#888;text-transform:uppercase}
-.tech{font-size:8.5pt;color:#555;margin-top:3px}
-</style></head><body>
-<h1>${profile.name}</h1>
-<div class="subtitle">${profile.title}</div>
-<div class="contact">
-<span>${profile.email}</span><span>${profile.phone}</span><span>${profile.website}</span><span>${profile.location}</span>
-</div>
-<div class="section"><div class="section-title">Summary</div><p>${profile.summary}</p></div>
-<div class="section"><div class="section-title">Experience</div>
-${profile.experience
-  .map(
-    (exp) => `<div class="job">
-<div class="job-header"><div><span class="job-title">${exp.role}</span>${exp.company ? ` <span class="job-company">at ${exp.company}</span>` : ""}</div><span class="job-period">${exp.period}</span></div>
-<p>${exp.description}</p></div>`,
-  )
-  .join("")}
-</div>
-<div class="section"><div class="section-title">Selected Projects</div>
-${projects
-  .slice(0, 6)
-  .map(
-    (p) => `<div class="project">
-<div><span class="project-title">${p.title}</span><span class="project-tag">${p.tag}</span></div>
-<p>${p.problem}</p>
-<div class="results">${p.results.map((r) => `<div><span class="result-value">${r.value}</span> <span class="result-label">${r.label}</span></div>`).join("")}</div>
-<div class="tech">${p.tech.join(" · ")}</div></div>`,
-  )
-  .join("")}
-</div>
-<div class="section"><div class="section-title">Education</div>
-${profile.education.map((e) => `<p><strong>${e.degree}</strong> — ${e.school} (${e.year})</p>`).join("")}
-</div>
-${
-  certificates.length
-    ? `<div class="section"><div class="section-title">Certifications</div>
-${certificates.map((c) => `<p><strong>${c.name}</strong> — ${c.issuer} (${c.date})${c.credentialId ? ` · ${c.credentialId}` : ""}</p>`).join("")}
-</div>`
-    : ""
-}
-</body></html>`;
-  }
-
-  function generateModern(): string {
-    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>CV - ${profile.name}</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Segoe UI',system-ui,sans-serif;color:#2d2d2d;display:flex;min-height:100vh;font-size:10pt;line-height:1.5}
-.sidebar{width:240px;background:#1a1a2e;color:#e0e0e0;padding:36px 24px;flex-shrink:0}
-.sidebar h1{font-size:16pt;color:#fff;margin-bottom:2px}
-.sidebar .subtitle{font-size:9pt;color:#00e5a0;margin-bottom:20px}
-.sidebar .avatar{width:100px;height:100px;border-radius:50%;object-fit:cover;margin-bottom:16px;border:3px solid #00e5a0}
-.sidebar-section{margin-bottom:20px}
-.sidebar-label{font-size:8pt;text-transform:uppercase;letter-spacing:1.5pt;color:#00e5a0;margin-bottom:6px;font-weight:600}
-.sidebar-item{font-size:9pt;margin-bottom:4px;color:#ccc}
-.main{flex:1;padding:36px 40px}
-.section{margin-bottom:22px}
-.section-title{font-size:11pt;font-weight:700;text-transform:uppercase;letter-spacing:1.5pt;color:#1a1a2e;border-bottom:2pt solid #00e5a0;padding-bottom:4px;margin-bottom:12px}
-.job{margin-bottom:14px}
-.job-header{display:flex;justify-content:space-between;align-items:baseline}
-.job-title{font-weight:700;font-size:10.5pt}
-.job-company{font-size:10pt;color:#555}
-.job-period{font-size:9pt;color:#888}
-.project{margin-bottom:10px;padding:8px;background:#f8f8fa;border-radius:4px}
-.project-title{font-weight:700;font-size:10pt}
-.project-tag{font-size:8pt;color:#00b37d;text-transform:uppercase;margin-left:6px}
-.project p{font-size:9.5pt;color:#444;margin-top:2px}
-.results{display:flex;gap:16px;margin-top:4px}
-.result-value{font-weight:700;color:#1a1a2e}
-.result-label{font-size:8pt;color:#888;text-transform:uppercase}
-.tech{font-size:8.5pt;color:#666;margin-top:3px}
-</style></head><body>
-<div class="sidebar">
-<img class="avatar" src="${profile.avatar}" alt="${profile.name}" />
-<h1>${profile.name}</h1>
-<div class="subtitle">${profile.title}</div>
-<div class="sidebar-section"><div class="sidebar-label">Contact</div>
-<div class="sidebar-item">${profile.email}</div>
-<div class="sidebar-item">${profile.phone}</div>
-<div class="sidebar-item">${profile.website}</div>
-<div class="sidebar-item">${profile.location}</div>
-</div>
-<div class="sidebar-section"><div class="sidebar-label">Links</div>
-<div class="sidebar-item">${profile.linkedin}</div>
-<div class="sidebar-item">${profile.github}</div>
-</div>
-<div class="sidebar-section"><div class="sidebar-label">Education</div>
-${profile.education.map((e) => `<div class="sidebar-item"><strong>${e.degree}</strong><br/>${e.school} (${e.year})</div>`).join("")}
-</div>
-${
-  certificates.length
-    ? `<div class="sidebar-section"><div class="sidebar-label">Certifications</div>
-${certificates.map((c) => `<div class="sidebar-item"><strong>${c.name}</strong><br/>${c.issuer} (${c.date})</div>`).join("")}
-</div>`
-    : ""
-}
-</div>
-<div class="main">
-<div class="section"><div class="section-title">Summary</div><p>${profile.summary}</p></div>
-<div class="section"><div class="section-title">Experience</div>
-${profile.experience
-  .map(
-    (exp) => `<div class="job">
-<div class="job-header"><div><span class="job-title">${exp.role}</span>${exp.company ? ` <span class="job-company">at ${exp.company}</span>` : ""}</div><span class="job-period">${exp.period}</span></div>
-<p>${exp.description}</p></div>`,
-  )
-  .join("")}
-</div>
-<div class="section"><div class="section-title">Selected Projects</div>
-${projects
-  .slice(0, 6)
-  .map(
-    (p) => `<div class="project">
-<div><span class="project-title">${p.title}</span><span class="project-tag">${p.tag}</span></div>
-<p>${p.problem}</p>
-<div class="results">${p.results.map((r) => `<div><span class="result-value">${r.value}</span> <span class="result-label">${r.label}</span></div>`).join("")}</div>
-<div class="tech">${p.tech.join(" · ")}</div></div>`,
-  )
-  .join("")}
-</div>
-</div>
-</body></html>`;
-  }
-
-  function generateTerminal(): string {
-    return `<!DOCTYPE html><html><head><meta charset="utf-8"><title>CV - ${profile.name}</title>
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Courier New',Consolas,monospace;background:#0a0a0f;color:#c8c8d4;padding:40px 48px;font-size:10pt;line-height:1.6}
-.header{border:1px solid #2a2a3a;padding:20px;margin-bottom:20px;position:relative}
-.header::before{content:'profile.json';position:absolute;top:-8px;left:12px;background:#0a0a0f;padding:0 6px;font-size:8pt;color:#00e5a0}
-h1{font-size:16pt;color:#00e5a0;margin-bottom:4px}
-.subtitle{font-size:10pt;color:#6b6b80}
-.contact-line{font-size:9pt;color:#6b6b80;margin-top:8px}
-.contact-line span{color:#00e5a0}
-.section{margin-bottom:20px;border:1px solid #2a2a3a;padding:16px;position:relative}
-.section::before{content:attr(data-label);position:absolute;top:-8px;left:12px;background:#0a0a0f;padding:0 6px;font-size:8pt;color:#40aaff;text-transform:uppercase;letter-spacing:1pt}
-.section p,.section li{font-size:9.5pt}
-ul{padding-left:16px;list-style:none}
-ul li::before{content:'> ';color:#00e5a0}
-.job{margin-bottom:12px;padding-bottom:12px;border-bottom:1px dashed #2a2a3a}
-.job:last-child{border-bottom:none;padding-bottom:0}
-.job-title{color:#00e5a0;font-weight:700}
-.job-company{color:#c8c8d4}
-.job-period{color:#6b6b80;float:right}
-.project{margin-bottom:10px}
-.project-title{color:#00e5a0;font-weight:700}
-.project-tag{color:#f0c040;font-size:8pt;text-transform:uppercase;margin-left:6px}
-.results{display:flex;gap:16px;margin-top:4px}
-.result-value{color:#00e5a0;font-weight:700}
-.result-label{color:#6b6b80;font-size:8pt;text-transform:uppercase}
-.tech{color:#6b6b80;font-size:8.5pt;margin-top:3px}
-.tech::before{content:'stack: ';color:#40aaff}
-.comment{color:#6b6b80;font-style:italic;font-size:9pt}
-.comment::before{content:'// ';color:#f0c040}
-</style></head><body>
-<div class="header">
-<h1>${profile.name}</h1>
-<div class="subtitle">${profile.title}</div>
-<div class="contact-line">
-<span>email:</span> ${profile.email} | <span>phone:</span> ${profile.phone} | <span>web:</span> ${profile.website} | <span>loc:</span> ${profile.location}
-</div>
-</div>
-<div class="section" data-label="summary">
-<p>${profile.summary}</p>
-</div>
-<div class="section" data-label="experience">
-${profile.experience
-  .map(
-    (exp) => `<div class="job">
-<span class="job-period">${exp.period}</span>
-<div><span class="job-title">${exp.role}</span>${exp.company ? ` <span class="job-company">@ ${exp.company}</span>` : ""}</div>
-<p>${exp.description}</p>
-</div>`,
-  )
-  .join("")}
-</div>
-<div class="section" data-label="projects">
-${projects
-  .slice(0, 6)
-  .map(
-    (p) => `<div class="project">
-<span class="project-title">${p.title}</span><span class="project-tag">${p.tag}</span>
-<p>${p.problem}</p>
-<div class="results">${p.results.map((r) => `<div><span class="result-value">${r.value}</span> <span class="result-label">${r.label}</span></div>`).join("")}</div>
-<div class="tech">${p.tech.join(" · ")}</div>
-<div class="comment">${p.insight}</div>
-</div>`,
-  )
-  .join("")}
-</div>
-<div class="section" data-label="education">
-${profile.education.map((e) => `<p><span class="job-title">${e.degree}</span> — ${e.school} (${e.year})</p>`).join("")}
-</div>
-${
-  certificates.length
-    ? `<div class="section" data-label="certifications">
-${certificates.map((c) => `<p><span class="job-title">${c.name}</span> — ${c.issuer} (${c.date})${c.credentialId ? ` <span class="tech">${c.credentialId}</span>` : ""}</p>`).join("")}
-</div>`
-    : ""
-}
-</body></html>`;
-  }
-
-  function handlePreview() {
-    const html = generateHTML();
-    const blob = new Blob([html], { type: "text/html" });
-    const url = URL.createObjectURL(blob);
-    window.open(url, "_blank");
-    setTimeout(() => URL.revokeObjectURL(url), 60000);
-  }
-
-  function handleDownload() {
-    const html = generateHTML();
-    const blob = new Blob([html], { type: "text/html" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `CV_${profile.name.replace(/\s+/g, "_")}_${selectedTemplate}.html`;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  }
+  }, [onClose]);
 
   return (
     <div
@@ -313,10 +139,9 @@ ${certificates.map((c) => `<p><span class="job-title">${c.name}</span> — ${c.i
       <div className="absolute inset-0 bg-terminal-bg/80 backdrop-blur-sm" />
 
       <div
-        className="relative w-full sm:max-w-lg max-h-[90vh] sm:max-h-[85vh] overflow-y-auto card-base rounded-t-sm sm:rounded-sm animate-slide-up"
+        className="relative w-full sm:max-w-2xl max-h-[90vh] sm:max-h-[85vh] overflow-y-auto card-base rounded-t-sm sm:rounded-sm animate-slide-up"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
         <div className="terminal-header sticky top-0 bg-terminal-card z-10">
           <div className="terminal-dot bg-terminal-error/80" />
           <div className="terminal-dot bg-terminal-warning/80" />
@@ -334,30 +159,28 @@ ${certificates.map((c) => `<p><span class="job-title">${c.name}</span> — ${c.i
         </div>
 
         <div className="p-4 sm:p-6 space-y-5">
-          {/* Template selection */}
           <div>
             <span className="section-label text-terminal-info/70 flex items-center gap-1.5">
               <Palette size={10} />
               select template
             </span>
-            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 mt-2">
+            <div className="grid grid-cols-3 gap-2 mt-2">
               {templates.map((t) => (
                 <button
                   key={t.key}
-                  onClick={() => setSelectedTemplate(t.key)}
-                  className={`p-3 border rounded-sm text-left transition-all duration-200
-                    ${
-                      selectedTemplate === t.key
-                        ? "border-terminal-accent/40 bg-terminal-accent/5"
-                        : "border-terminal-border/40 hover:border-terminal-borderHover"
-                    }`}
+                  onClick={() => setSelected(t.key)}
+                  className={`p-3 border rounded-sm text-left transition-all ${
+                    selected === t.key
+                      ? "border-terminal-accent/40 bg-terminal-accent/5"
+                      : "border-terminal-border/40"
+                  }`}
                 >
                   <span
-                    className={`text-xs font-semibold block ${selectedTemplate === t.key ? "text-terminal-accent" : "text-terminal-text"}`}
+                    className={`text-xs font-semibold block ${selected === t.key ? "text-terminal-accent" : "text-terminal-text"}`}
                   >
                     {t.label}
                   </span>
-                  <span className="text-[9px] text-terminal-muted mt-0.5 block">
+                  <span className="text-[9px] text-terminal-muted mt-0.5">
                     {t.desc}
                   </span>
                 </button>
@@ -365,112 +188,1094 @@ ${certificates.map((c) => `<p><span class="job-title">${c.name}</span> — ${c.i
             </div>
           </div>
 
-          {/* Template preview card */}
-          <div className="card-base p-4 space-y-2">
+          {/* Project picker */}
+          <div>
             <div className="flex items-center justify-between">
-              <span className="text-[10px] text-terminal-muted uppercase tracking-wider">
-                preview
+              <span className="section-label text-terminal-info/70">
+                projects&nbsp;
+                <span
+                  className={`font-mono ${
+                    selectedProjectIds.size >= 10
+                      ? "text-terminal-warning"
+                      : "text-terminal-accent/60"
+                  }`}
+                >
+                  ({selectedProjectIds.size}/10)
+                </span>
               </span>
-              <span className="text-[9px] text-terminal-accent/50 tabular-nums">
-                {selectedTemplate}.html
-              </span>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() =>
+                    setSelectedProjectIds(
+                      new Set(projects.slice(0, 10).map((p) => p.id)),
+                    )
+                  }
+                  className="text-[9px] text-terminal-muted hover:text-terminal-accent transition-colors"
+                >
+                  all
+                </button>
+                <button
+                  onClick={() => setSelectedProjectIds(new Set())}
+                  className="text-[9px] text-terminal-muted hover:text-terminal-error transition-colors"
+                >
+                  clear
+                </button>
+                <button
+                  onClick={() => setShowProjectPicker((v) => !v)}
+                  className="text-[9px] text-terminal-muted hover:text-terminal-accent transition-colors flex items-center gap-0.5"
+                >
+                  {showProjectPicker ? (
+                    <ChevronUp size={10} />
+                  ) : (
+                    <ChevronDown size={10} />
+                  )}
+                </button>
+              </div>
             </div>
-            <TemplatePreview template={selectedTemplate} profile={profile} />
+            {showProjectPicker && (
+              <div className="mt-2 border border-terminal-border/30 rounded-sm">
+                {/* Search + tag filter */}
+                <div className="p-2 border-b border-terminal-border/20 space-y-1.5">
+                  <div className="flex items-center gap-1.5 bg-terminal-bg/60 border border-terminal-border/30 rounded-sm px-2 py-1">
+                    <Search
+                      size={9}
+                      className="text-terminal-muted flex-shrink-0"
+                    />
+                    <input
+                      type="text"
+                      placeholder="search title or tag…"
+                      value={projectSearch}
+                      onChange={(e) => setProjectSearch(e.target.value)}
+                      className="flex-1 bg-transparent text-[10px] text-terminal-text placeholder:text-terminal-muted/50 outline-none"
+                    />
+                    {projectSearch && (
+                      <button
+                        onClick={() => setProjectSearch("")}
+                        className="text-terminal-muted hover:text-terminal-error transition-colors text-[9px]"
+                      >
+                        ✕
+                      </button>
+                    )}
+                  </div>
+                  <div className="flex flex-wrap gap-1">
+                    {["all", ...allTags].map((tag) => (
+                      <button
+                        key={tag}
+                        onClick={() => setProjectTagFilter(tag)}
+                        className={`px-2 py-0.5 text-[8px] rounded-sm border transition-all ${
+                          projectTagFilter === tag
+                            ? "border-terminal-accent/50 bg-terminal-accent/10 text-terminal-accent"
+                            : "border-terminal-border/30 text-terminal-muted hover:text-terminal-text"
+                        }`}
+                      >
+                        {tag}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                {/* List */}
+                <div className="overflow-y-auto max-h-44">
+                  {filteredProjects.length === 0 && (
+                    <div className="px-3 py-3 text-[10px] text-terminal-muted text-center">
+                      no results
+                    </div>
+                  )}
+                  {filteredProjects.map((proj) => {
+                    const checked = selectedProjectIds.has(proj.id);
+                    const atMax = selectedProjectIds.size >= 10 && !checked;
+                    return (
+                      <label
+                        key={proj.id}
+                        className={`flex items-center gap-2 px-3 py-2 cursor-pointer transition-colors border-b border-terminal-border/20 last:border-0 ${
+                          checked
+                            ? "bg-terminal-accent/5"
+                            : atMax
+                              ? "opacity-40 cursor-not-allowed"
+                              : "hover:bg-terminal-surface/30"
+                        }`}
+                      >
+                        <input
+                          type="checkbox"
+                          className="sr-only"
+                          checked={checked}
+                          disabled={atMax}
+                          onChange={() => toggleProject(proj.id)}
+                        />
+                        <div
+                          className={`w-3.5 h-3.5 border rounded-[2px] flex items-center justify-center flex-shrink-0 transition-colors ${
+                            checked
+                              ? "border-terminal-accent bg-terminal-accent/20"
+                              : "border-terminal-border/50"
+                          }`}
+                        >
+                          {checked && (
+                            <Check size={8} className="text-terminal-accent" />
+                          )}
+                        </div>
+                        <span
+                          className={`text-[10px] flex-1 truncate ${
+                            checked
+                              ? "text-terminal-text"
+                              : "text-terminal-muted"
+                          }`}
+                        >
+                          {proj.title}
+                        </span>
+                        <span className="text-[9px] text-terminal-muted/50 flex-shrink-0 ml-1">
+                          {proj.tag}
+                        </span>
+                      </label>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
           </div>
 
-          {/* Actions */}
-          <div className="flex flex-col sm:flex-row gap-2">
+          <div className="card-base p-4 space-y-2">
+            <div className="flex items-center justify-between text-[10px] text-terminal-muted">
+              <span>LIVE PREVIEW</span>
+              <span className="text-terminal-accent/50">{selected}.pdf</span>
+            </div>
+            <div
+              className="border border-terminal-border/30 rounded-sm overflow-auto bg-white"
+              style={{ maxHeight: "400px" }}
+            >
+              {/* Preview-only render — scrollable but NOT used for capture */}
+              <div
+                ref={contentRef}
+                style={{ width: "100%", maxWidth: "100%", margin: "0 auto" }}
+              >
+                <CVContent
+                  template={selected}
+                  profile={profile}
+                  projects={selectedProjects}
+                  certificates={certificates}
+                  techStack={techStack}
+                  renderMode="preview"
+                />
+              </div>
+            </div>
+          </div>
+
+          {/* Off-screen full-height render used for printing — must have explicit white bg */}
+          <div
+            aria-hidden="true"
+            style={{
+              position: "fixed",
+              left: "-9999px",
+              top: 0,
+              width: "210mm",
+              pointerEvents: "none",
+              backgroundColor: "#fff",
+            }}
+          >
+            <div ref={printRef}>
+              <CVContent
+                template={selected}
+                profile={profile}
+                projects={selectedProjects}
+                certificates={certificates}
+                techStack={techStack}
+                renderMode="print"
+              />
+            </div>
+          </div>
+
+          <div className="flex gap-2">
             <button
               onClick={handlePreview}
               className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-[10px] uppercase tracking-wider
-                         border border-terminal-border/50 text-terminal-muted rounded-sm
-                         hover:border-terminal-accent/30 hover:text-terminal-accent transition-all duration-200"
+                         border border-terminal-border/50 text-terminal-muted rounded-sm hover:text-terminal-accent transition-colors"
             >
               <Eye size={12} />
-              preview in browser
+              preview
             </button>
             <button
-              onClick={handleDownload}
+              onClick={handleDownloadPDF}
               className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 text-[10px] uppercase tracking-wider
-                         bg-terminal-accent/10 border border-terminal-accent/30 text-terminal-accent rounded-sm
-                         hover:bg-terminal-accent/20 transition-all duration-200"
+                         bg-terminal-accent/10 border border-terminal-accent/30 text-terminal-accent rounded-sm hover:bg-terminal-accent/20 transition-colors"
             >
               <Download size={12} />
-              download html
+              download pdf
             </button>
           </div>
-
-          {/* Note */}
-          <p className="text-[9px] text-terminal-muted/40 text-center">
-            Open downloaded HTML in browser, then Ctrl+P to save as PDF
-          </p>
         </div>
       </div>
     </div>
   );
 }
 
-function TemplatePreview({
+function CVContent({
   template,
   profile,
+  projects,
+  certificates,
+  techStack,
+  renderMode = "print",
 }: {
   template: TemplateKey;
   profile: Profile;
+  projects: Project[];
+  certificates: Certificate[];
+  techStack?: TechItem[];
+  renderMode?: "preview" | "print";
 }) {
   if (template === "minimal") {
+    const minimalPadding =
+      renderMode === "preview" ? "14px 14px 14px 14px" : "0px";
+
     return (
       <div
-        className="space-y-1.5 text-[9px]"
-        style={{ fontFamily: "Georgia, serif" }}
+        style={{
+          backgroundColor: "#fff",
+          padding: minimalPadding,
+          fontFamily: "Georgia, 'Times New Roman', serif",
+          fontSize: "13px",
+          lineHeight: "1.7",
+          color: "#2c3e50",
+          boxSizing: "border-box",
+        }}
       >
-        <div className="font-bold text-xs text-terminal-text">
-          {profile.name}
+        {/* Header */}
+        <div style={{ marginBottom: "20px" }}>
+          <h1
+            style={{
+              fontSize: "33px",
+              fontWeight: "bold",
+              margin: "0 0 6px 0",
+              color: "#1a1a1a",
+            }}
+          >
+            {profile.name}
+          </h1>
+          <p
+            style={{
+              fontSize: "15px",
+              fontStyle: "italic",
+              margin: "0 0 12px 0",
+              color: "#555",
+            }}
+          >
+            {profile.title}
+          </p>
+          <div style={{ fontSize: "11px", color: "#777", marginBottom: "4px" }}>
+            {[profile.email, profile.phone, profile.location]
+              .filter(Boolean)
+              .join(" • ")}
+          </div>
+          <div style={{ fontSize: "11px", color: "#777" }}>
+            {[profile.website, profile.linkedin, profile.github]
+              .filter(Boolean)
+              .join(" • ")}
+          </div>
         </div>
-        <div className="text-terminal-muted">{profile.title}</div>
-        <div className="text-terminal-muted/50">
-          {profile.email} · {profile.phone}
-        </div>
-        <div className="border-t border-terminal-border/20 pt-1.5 text-terminal-text/60 leading-relaxed line-clamp-3">
-          {profile.summary}
+
+        <hr
+          style={{
+            margin: "16px 0",
+            border: "none",
+            borderTop: "2px solid #ddd",
+          }}
+        />
+
+        {/* Summary */}
+        <Section title="SUMMARY">
+          <p style={{ margin: "0", fontSize: "13px", lineHeight: "1.7" }}>
+            {profile.summary}
+          </p>
+        </Section>
+
+        {/* Experience */}
+        <Section title="EXPERIENCE">
+          {profile.experience.map((exp, i) => (
+            <div key={i} data-cv-item="true" style={{ marginBottom: "14px" }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                  marginBottom: "4px",
+                }}
+              >
+                <div style={{ fontWeight: "bold", fontSize: "14px", flex: 1 }}>
+                  {exp.role}
+                  {exp.company && (
+                    <span style={{ fontWeight: "normal" }}>
+                      {" "}
+                      — {exp.company}
+                    </span>
+                  )}
+                </div>
+                <div
+                  style={{
+                    fontSize: "12px",
+                    color: "#888",
+                    fontStyle: "italic",
+                    marginLeft: "8px",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {exp.period}
+                </div>
+              </div>
+              <p
+                style={{
+                  margin: "0",
+                  fontSize: "13px",
+                  lineHeight: "1.6",
+                  color: "#444",
+                }}
+              >
+                {exp.description}
+              </p>
+            </div>
+          ))}
+        </Section>
+
+        {/* Skills */}
+        {techStack && techStack.length > 0 && (
+          <Section title="SKILLS">
+            <SkillsGrid techStack={techStack} />
+          </Section>
+        )}
+
+        {/* Education */}
+        {profile.education && profile.education.length > 0 && (
+          <Section title="EDUCATION">
+            {profile.education.map((edu, i) => (
+              <div key={i} style={{ marginBottom: "8px", fontSize: "12px" }}>
+                <strong>{edu.degree}</strong> — {edu.school} ({edu.year})
+              </div>
+            ))}
+          </Section>
+        )}
+
+        {/* Projects */}
+        {projects.length > 0 && (
+          <Section title="PROJECTS">
+            {projects.map((proj, i) => (
+              <div key={i} data-cv-item="true" style={{ marginBottom: "14px" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "flex-start",
+                    marginBottom: "4px",
+                  }}
+                >
+                  <div
+                    style={{ fontWeight: "bold", fontSize: "14px", flex: 1 }}
+                  >
+                    {proj.title} ({proj.tag})
+                  </div>
+                  <div
+                    style={{
+                      fontSize: "12px",
+                      color: "#888",
+                      marginLeft: "8px",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {proj.created_at}
+                  </div>
+                </div>
+                <p
+                  style={{
+                    margin: "3px 0",
+                    fontSize: "13px",
+                    lineHeight: "1.6",
+                  }}
+                >
+                  <strong>Problem:</strong> {proj.problem}
+                </p>
+                {proj.results && proj.results.length > 0 && (
+                  <p
+                    style={{
+                      margin: "3px 0",
+                      fontSize: "13px",
+                      lineHeight: "1.6",
+                    }}
+                  >
+                    <strong>Results:</strong>{" "}
+                    {proj.results
+                      .map((r) => `${r.value} ${r.label}`)
+                      .join(" • ")}
+                  </p>
+                )}
+                <p style={{ margin: "3px 0", fontSize: "12px", color: "#666" }}>
+                  <strong>Tech:</strong> {proj.tech.join(", ")}
+                </p>
+              </div>
+            ))}
+          </Section>
+        )}
+
+        {/* Certificates */}
+        {certificates.length > 0 && (
+          <Section title="CERTIFICATIONS">
+            {certificates.map((cert, i) => (
+              <div key={i} data-cv-item="true" style={{ marginBottom: "8px" }}>
+                <div style={{ fontWeight: "bold", fontSize: "12px" }}>
+                  {cert.name} — {cert.issuer} ({cert.date})
+                </div>
+                {cert.credentialId && (
+                  <div
+                    style={{
+                      fontSize: "10px",
+                      color: "#777",
+                      marginTop: "2px",
+                    }}
+                  >
+                    ID: {cert.credentialId}
+                  </div>
+                )}
+              </div>
+            ))}
+          </Section>
+        )}
+
+        {/* Footer */}
+        <div
+          style={{
+            marginTop: "24px",
+            paddingTop: "8px",
+            borderTop: "1px solid #ddd",
+            fontSize: "10px",
+            color: "#aaa",
+            display: "flex",
+            justifyContent: "space-between",
+          }}
+        >
+          <span>{profile.name}</span>
+          <span>{profile.email}</span>
         </div>
       </div>
     );
   }
+
   if (template === "modern") {
     return (
-      <div className="flex gap-3 text-[9px]">
-        <div className="w-16 flex-shrink-0 bg-terminal-surface rounded-sm p-2 space-y-1">
-          <div className="w-8 h-8 rounded-full bg-terminal-border/30 mx-auto" />
-          <div className="text-center text-terminal-accent text-[8px] font-bold">
-            {profile.name.split(" ")[0]}
-          </div>
-        </div>
-        <div className="space-y-1">
-          <div className="font-bold text-xs text-terminal-text">
+      <div
+        style={{
+          display: "flex",
+          alignItems: "stretch",
+          backgroundColor: "#fff",
+          fontFamily: "Georgia, 'Times New Roman', serif",
+          fontSize: "13px",
+          lineHeight: "1.6",
+        }}
+      >
+        {/* Sidebar */}
+        <div
+          style={{
+            width: "170px",
+            backgroundColor: "#122430",
+            color: "#bcd6d2",
+            padding: "20px 14px 24px",
+            flexShrink: 0,
+            alignSelf: "stretch",
+          }}
+        >
+          {profile.avatar && (
+            <img
+              src={profile.avatar}
+              alt=""
+              style={{
+                width: "60px",
+                height: "60px",
+                borderRadius: "50%",
+                objectFit: "cover",
+                display: "block",
+                margin: "0 auto 10px",
+              }}
+            />
+          )}
+          <h2
+            style={{
+              fontSize: "13px",
+              fontWeight: "bold",
+              textAlign: "center",
+              color: "#fff",
+              margin: "0 0 4px 0",
+              lineHeight: "1.35",
+            }}
+          >
             {profile.name}
-          </div>
-          <div className="text-terminal-muted">{profile.title}</div>
-          <div className="text-terminal-text/60 leading-relaxed line-clamp-2">
-            {profile.summary}
-          </div>
+          </h2>
+          <p
+            style={{
+              fontSize: "10.5px",
+              fontStyle: "italic",
+              textAlign: "center",
+              margin: "0 0 14px 0",
+              color: "#bcd6d2",
+              lineHeight: "1.35",
+            }}
+          >
+            {profile.title}
+          </p>
+
+          <SidebarSection title="CONTACT">
+            <div style={{ fontSize: "9.5px", lineHeight: "1.65" }}>
+              {profile.email && (
+                <div style={{ wordBreak: "break-all" }}>{profile.email}</div>
+              )}
+              {profile.phone && <div>{profile.phone}</div>}
+              {profile.location && <div>{profile.location}</div>}
+              {profile.linkedin && (
+                <div style={{ wordBreak: "break-all", marginTop: "2px" }}>
+                  {profile.linkedin}
+                </div>
+              )}
+              {profile.github && (
+                <div style={{ wordBreak: "break-all" }}>{profile.github}</div>
+              )}
+            </div>
+          </SidebarSection>
+
+          {profile.education && profile.education.length > 0 && (
+            <SidebarSection title="EDUCATION">
+              {profile.education.map((edu, i) => (
+                <div key={i} style={{ marginBottom: "5px", fontSize: "9.5px" }}>
+                  <div
+                    style={{
+                      fontWeight: "bold",
+                      color: "#fff",
+                      lineHeight: "1.35",
+                    }}
+                  >
+                    {edu.degree}
+                  </div>
+                  <div style={{ lineHeight: "1.35", opacity: 0.85 }}>
+                    {edu.school}, {edu.year}
+                  </div>
+                </div>
+              ))}
+            </SidebarSection>
+          )}
+
+          {certificates.length > 0 && (
+            <SidebarSection title="CERTIFICATIONS">
+              {certificates.map((cert, i) => (
+                <div key={i} style={{ marginBottom: "6px", fontSize: "9.5px" }}>
+                  <div
+                    style={{
+                      fontWeight: "bold",
+                      color: "#fff",
+                      lineHeight: "1.35",
+                    }}
+                  >
+                    {cert.name}
+                  </div>
+                  <div
+                    style={{
+                      lineHeight: "1.3",
+                      opacity: 0.75,
+                      fontSize: "9px",
+                    }}
+                  >
+                    {cert.date}
+                  </div>
+                </div>
+              ))}
+            </SidebarSection>
+          )}
+        </div>
+
+        {/* Main Content */}
+        <div
+          style={{
+            flex: 1,
+            padding: "20px 24px 24px",
+            color: "#2c3e50",
+            display: "flex",
+            flexDirection: "column",
+          }}
+        >
+          <Section title="SUMMARY">
+            <p style={{ margin: "0", fontSize: "13px", lineHeight: "1.6" }}>
+              {profile.summary}
+            </p>
+          </Section>
+
+          <Section title="EXPERIENCE">
+            {profile.experience.map((exp, i) => (
+              <div key={i} data-cv-item="true" style={{ marginBottom: "12px" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "flex-start",
+                    marginBottom: "2px",
+                  }}
+                >
+                  <div
+                    style={{ fontWeight: "bold", fontSize: "14px", flex: 1 }}
+                  >
+                    {exp.role}
+                    {exp.company && (
+                      <span style={{ fontWeight: "normal" }}>
+                        {" "}
+                        — {exp.company}
+                      </span>
+                    )}
+                  </div>
+                  <div
+                    style={{
+                      fontSize: "12px",
+                      color: "#888",
+                      fontStyle: "italic",
+                      marginLeft: "8px",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {exp.period}
+                  </div>
+                </div>
+                <p
+                  style={{
+                    margin: "2px 0 0 0",
+                    fontSize: "13px",
+                    lineHeight: "1.6",
+                  }}
+                >
+                  {exp.description}
+                </p>
+              </div>
+            ))}
+          </Section>
+
+          {projects.length > 0 && (
+            <Section title="PROJECTS">
+              {projects.map((proj, i) => (
+                <div
+                  key={i}
+                  data-cv-item="true"
+                  style={{ marginBottom: "12px" }}
+                >
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "flex-start",
+                      marginBottom: "3px",
+                    }}
+                  >
+                    <div
+                      style={{ fontWeight: "bold", fontSize: "14px", flex: 1 }}
+                    >
+                      {proj.title}
+                    </div>
+                    <div
+                      style={{
+                        fontSize: "12px",
+                        color: "#888",
+                        marginLeft: "8px",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      {proj.created_at}
+                    </div>
+                  </div>
+                  <div
+                    style={{
+                      fontSize: "12px",
+                      color: "#0e6e64",
+                      fontWeight: "bold",
+                      marginBottom: "2px",
+                      textTransform: "uppercase",
+                    }}
+                  >
+                    {proj.tag}
+                  </div>
+                  <p
+                    style={{
+                      margin: "2px 0",
+                      fontSize: "13px",
+                      lineHeight: "1.5",
+                    }}
+                  >
+                    <strong>Problem:</strong> {proj.problem}
+                  </p>
+                  {proj.results && proj.results.length > 0 && (
+                    <p
+                      style={{
+                        margin: "2px 0",
+                        fontSize: "13px",
+                        lineHeight: "1.5",
+                        color: "#0e6e64",
+                        fontWeight: "bold",
+                      }}
+                    >
+                      Results:{" "}
+                      {proj.results
+                        .map((r) => `${r.value} ${r.label}`)
+                        .join(" • ")}
+                    </p>
+                  )}
+                  <p
+                    style={{
+                      margin: "2px 0 0 0",
+                      fontSize: "12px",
+                      color: "#888",
+                    }}
+                  >
+                    Tech: {proj.tech.slice(0, 5).join(", ")}
+                  </p>
+                </div>
+              ))}
+            </Section>
+          )}
+
+          {/* Footer */}
+          <div
+            style={{
+              marginTop: "auto",
+              paddingTop: "12px",
+              borderTop: "1px solid rgba(182,220,214,0.25)",
+              fontSize: "9.5px",
+              color: "rgba(190,216,210,0.6)",
+              display: "flex",
+              justifyContent: "space-between",
+              backgroundColor: "transparent",
+            }}
+          ></div>
         </div>
       </div>
     );
   }
+
+  // Executive
   return (
     <div
-      className="space-y-1.5 text-[9px]"
-      style={{ fontFamily: "Consolas, monospace" }}
+      style={{
+        backgroundColor: "#fff",
+        fontFamily: "Georgia, 'Times New Roman', serif",
+        fontSize: "13px",
+        lineHeight: "1.6",
+        color: "#2c3e50",
+        boxSizing: "border-box",
+      }}
     >
-      <div className="text-terminal-accent font-bold text-xs">{`> whoami`}</div>
-      <div className="text-terminal-text">
-        {profile.name} — {profile.title}
+      {/* Header Band */}
+      <div
+        style={{
+          backgroundColor: "#142e5c",
+          color: "#fff",
+          padding: "20px 24px",
+          marginBottom: "16px",
+        }}
+      >
+        <h1
+          style={{ fontSize: "29px", fontWeight: "bold", margin: "0 0 6px 0" }}
+        >
+          {profile.name}
+        </h1>
+        <p
+          style={{
+            fontSize: "15px",
+            fontStyle: "italic",
+            margin: "0 0 8px 0",
+            color: "#d6dce8",
+          }}
+        >
+          {profile.title}
+        </p>
+        <div
+          style={{ fontSize: "11px", color: "#d6dce8", marginBottom: "3px" }}
+        >
+          {[profile.email, profile.phone, profile.location]
+            .filter(Boolean)
+            .join(" | ")}
+        </div>
+        <div style={{ fontSize: "11px", color: "#d6dce8" }}>
+          {[profile.website, profile.linkedin, profile.github]
+            .filter(Boolean)
+            .join(" | ")}
+        </div>
       </div>
-      <div className="text-terminal-muted/50">{`> cat contact.txt`}</div>
-      <div className="text-terminal-text/60">
-        {profile.email} · {profile.location}
+
+      {/* Body */}
+      <div style={{ padding: "0 24px" }}>
+        <Section title="SUMMARY">
+          <p style={{ margin: "0", fontSize: "13px", lineHeight: "1.6" }}>
+            {profile.summary}
+          </p>
+        </Section>
+
+        <Section title="EXPERIENCE">
+          {profile.experience.map((exp, i) => (
+            <div key={i} data-cv-item="true" style={{ marginBottom: "12px" }}>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  alignItems: "flex-start",
+                  marginBottom: "2px",
+                }}
+              >
+                <div style={{ fontWeight: "bold", fontSize: "14px", flex: 1 }}>
+                  {exp.role}
+                  {exp.company && (
+                    <span style={{ fontWeight: "normal" }}>
+                      {" "}
+                      — {exp.company}
+                    </span>
+                  )}
+                </div>
+                <div
+                  style={{
+                    fontSize: "12px",
+                    color: "#999",
+                    fontStyle: "italic",
+                    marginLeft: "8px",
+                    whiteSpace: "nowrap",
+                  }}
+                >
+                  {exp.period}
+                </div>
+              </div>
+              <p
+                style={{
+                  margin: "2px 0 0 0",
+                  fontSize: "13px",
+                  lineHeight: "1.6",
+                }}
+              >
+                {exp.description}
+              </p>
+            </div>
+          ))}
+        </Section>
+
+        {techStack && techStack.length > 0 && (
+          <Section title="SKILLS">
+            <SkillsGrid techStack={techStack} />
+          </Section>
+        )}
+
+        {profile.education && profile.education.length > 0 && (
+          <Section title="EDUCATION">
+            {profile.education.map((edu, i) => (
+              <div key={i} style={{ marginBottom: "6px", fontSize: "12px" }}>
+                <strong>{edu.degree}</strong> — {edu.school} ({edu.year})
+              </div>
+            ))}
+          </Section>
+        )}
+
+        {projects.length > 0 && (
+          <Section title="PROJECTS">
+            {projects.map((proj, i) => (
+              <div key={i} data-cv-item="true" style={{ marginBottom: "12px" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "flex-start",
+                    marginBottom: "2px",
+                  }}
+                >
+                  <div
+                    style={{ fontWeight: "bold", fontSize: "14px", flex: 1 }}
+                  >
+                    {proj.title} ({proj.tag})
+                  </div>
+                  <div
+                    style={{
+                      fontSize: "12px",
+                      color: "#999",
+                      marginLeft: "8px",
+                      whiteSpace: "nowrap",
+                    }}
+                  >
+                    {proj.created_at}
+                  </div>
+                </div>
+                <p
+                  style={{
+                    margin: "2px 0",
+                    fontSize: "13px",
+                    lineHeight: "1.5",
+                  }}
+                >
+                  <strong>Problem:</strong> {proj.problem}
+                </p>
+                {proj.results && proj.results.length > 0 && (
+                  <p
+                    style={{
+                      margin: "2px 0",
+                      fontSize: "13px",
+                      lineHeight: "1.5",
+                      color: "#2d569c",
+                      fontWeight: "bold",
+                    }}
+                  >
+                    Results:{" "}
+                    {proj.results
+                      .map((r) => `${r.value} ${r.label}`)
+                      .join(" • ")}
+                  </p>
+                )}
+                <p
+                  style={{
+                    margin: "2px 0 0 0",
+                    fontSize: "12px",
+                    color: "#888",
+                  }}
+                >
+                  Tech: {proj.tech.join(", ")}
+                </p>
+              </div>
+            ))}
+          </Section>
+        )}
+
+        {certificates.length > 0 && (
+          <Section title="CERTIFICATIONS">
+            {certificates.map((cert, i) => (
+              <div
+                key={i}
+                data-cv-item="true"
+                style={{ marginBottom: "6px", fontSize: "12px" }}
+              >
+                <strong>{cert.name}</strong> — {cert.issuer} ({cert.date})
+              </div>
+            ))}
+          </Section>
+        )}
+
+        {/* Footer */}
+        <div
+          style={{
+            marginTop: "24px",
+            paddingTop: "8px",
+            borderTop: "1px solid #c8d2e0",
+            fontSize: "10px",
+            color: "#aaa",
+            display: "flex",
+            justifyContent: "space-between",
+          }}
+        >
+          <span>{profile.name}</span>
+          <span>{profile.email}</span>
+        </div>
       </div>
-      <div className="text-terminal-muted/30 italic">{`// ${profile.summary.slice(0, 80)}...`}</div>
+    </div>
+  );
+}
+
+function Section({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div style={{ marginBottom: "14px" }}>
+      <h2
+        style={{
+          fontSize: "17px",
+          fontWeight: "bold",
+          color: "#1a1a1a",
+          margin: "0 0 8px 0",
+          paddingBottom: "5px",
+          borderBottom: "2px solid #ddd",
+          textTransform: "uppercase",
+          letterSpacing: "0.8px",
+        }}
+      >
+        {title}
+      </h2>
+      <div style={{ textAlign: "justify", textJustify: "inter-word" }}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function SidebarSection({
+  title,
+  children,
+}: {
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <div style={{ marginBottom: "10px" }}>
+      <div
+        style={{
+          fontSize: "9px",
+          fontWeight: "bold",
+          color: "#b6dcd6",
+          marginBottom: "4px",
+          paddingBottom: "2px",
+          borderBottom: "1px solid rgba(182,220,214,0.3)",
+          textTransform: "uppercase",
+          letterSpacing: "0.3px",
+        }}
+      >
+        {title}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function SkillsGrid({ techStack }: { techStack: TechItem[] }) {
+  const categories = [
+    "lang",
+    "fe",
+    "be",
+    "db",
+    "infra",
+    "cicd",
+    "data",
+  ] as const;
+  const labels: Record<string, string> = {
+    lang: "Languages",
+    fe: "Frontend",
+    be: "Backend",
+    db: "Database",
+    infra: "Infrastructure",
+    cicd: "CI/CD",
+    data: "Data",
+  };
+
+  return (
+    <div>
+      {categories.map((cat) => {
+        const items = techStack
+          .filter((t) => t.category === cat)
+          .map((t) => t.name);
+        if (!items.length) return null;
+        return (
+          <div
+            key={cat}
+            style={{
+              marginBottom: "6px",
+              display: "flex",
+              fontSize: "12px",
+              alignItems: "flex-start",
+            }}
+          >
+            <div
+              style={{
+                fontWeight: "bold",
+                width: "120px",
+                paddingRight: "10px",
+                flexShrink: 0,
+                lineHeight: "1.6",
+              }}
+            >
+              {labels[cat]}:
+            </div>
+            <div style={{ flex: 1, lineHeight: "1.6" }}>{items.join(", ")}</div>
+          </div>
+        );
+      })}
     </div>
   );
 }

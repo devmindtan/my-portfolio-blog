@@ -9,6 +9,7 @@ export default function MinimalTemplate({
   techStack,
   includedSections,
   renderMode = "print",
+  fontFamily = "Georgia, 'Times New Roman', serif",
 }: CVTemplateProps) {
   const { t } = useLanguage();
   const minimalPadding = renderMode === "preview" ? "24px " : "0px";
@@ -18,7 +19,7 @@ export default function MinimalTemplate({
       style={{
         backgroundColor: "#fff",
         padding: minimalPadding,
-        fontFamily: "Georgia, 'Times New Roman', serif",
+        fontFamily,
         fontSize: "13px",
         lineHeight: "1.7",
         color: "#2c3e50",

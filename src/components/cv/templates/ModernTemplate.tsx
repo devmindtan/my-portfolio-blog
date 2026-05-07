@@ -7,6 +7,7 @@ export default function ModernTemplate({
   projects,
   certificates,
   includedSections,
+  fontFamily = "Georgia, 'Times New Roman', serif",
 }: CVTemplateProps) {
   const { t } = useLanguage();
 
@@ -16,7 +17,7 @@ export default function ModernTemplate({
         display: "flex",
         alignItems: "stretch",
         backgroundColor: "#fff",
-        fontFamily: "Georgia, 'Times New Roman', serif",
+        fontFamily,
         fontSize: "13px",
         lineHeight: "1.6",
       }}

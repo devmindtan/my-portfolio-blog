@@ -102,6 +102,7 @@ export const vi: Record<string, string> = {
 
   // CV Export modal — UI
   "cvExport.selectTemplate": "chọn mẫu",
+  "cvExport.selectFont": "chọn phông chữ",
   "cvExport.projects": "dự án",
   "cvExport.selectAll": "tất cả",
   "cvExport.clear": "xóa",

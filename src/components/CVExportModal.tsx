@@ -21,6 +21,8 @@ import type {
 import CVContent from "./cv/CVContent";
 import type { CVSectionKey, SectionSelection, TemplateKey } from "./cv/types";
 import { useSelectableSet } from "../hooks/useSelectableSet";
+import type { FontKey } from "./cv/types";
+import { FONT_CSS } from "./cv/types";
 
 interface CVExportModalProps {
   profile: Profile;
@@ -81,6 +83,7 @@ export default function CVExportModal({
     ) as Record<string, number[]>;
 
   const [selected, setSelected] = useState<TemplateKey>("minimal");
+  const [selectedFont, setSelectedFont] = useState<FontKey>("georgia");
   const [showProjectPicker, setShowProjectPicker] = useState(false);
   const projectIdSelection = useSelectableSet<string>({
     initialValues: getDefaultProjectIds(),
@@ -140,6 +143,12 @@ export default function CVExportModal({
 
   const docTitle = () => `CV_${profile.name.replace(/\s+/g, "_")}_${selected}`;
 
+  const GOOGLE_FONTS_URL =
+    "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Merriweather:wght@400;700&family=Roboto:wght@400;500;700&family=Playfair+Display:wght@400;600;700&display=swap";
+
+  // NOTE: @import is intentionally removed — useReactToPrint copies <link> tags
+  // from document.head into the print iframe, so the Google Fonts <link> in
+  // index.html is sufficient and more reliable than CSS @import.
   const basePageStyle = `
     * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; box-sizing: border-box; }
     [data-cv-item] { break-inside: avoid; page-break-inside: avoid; }
@@ -162,6 +171,9 @@ export default function CVExportModal({
 <head>
   <meta charset="utf-8">
   <title>CV Preview — ${profile.name}</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="${GOOGLE_FONTS_URL}" rel="stylesheet">
   <style>
     * { box-sizing: border-box; }
     html, body { margin: 0; background: #e8e8e8; }
@@ -534,6 +546,53 @@ export default function CVExportModal({
                   </span>
                   <span className="text-[9px] text-terminal-muted mt-0.5">
                     {tpl.desc}
+                  </span>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Font selector */}
+          <div>
+            <span className="section-label text-terminal-info/70 flex items-center gap-1.5">
+              <span style={{ fontSize: 10 }}>Aa</span>
+              {t("cvExport.selectFont")}
+            </span>
+            <div className="grid grid-cols-5 gap-2 mt-2">
+              {(
+                [
+                  { key: "georgia", label: "Georgia", sample: "serif" },
+                  { key: "inter", label: "Inter", sample: "sans" },
+                  {
+                    key: "merriweather",
+                    label: "Merriweather",
+                    sample: "serif",
+                  },
+                  { key: "roboto", label: "Roboto", sample: "sans" },
+                  { key: "playfair", label: "Playfair", sample: "serif" },
+                ] as { key: FontKey; label: string; sample: string }[]
+              ).map((f) => (
+                <button
+                  key={f.key}
+                  onClick={() => setSelectedFont(f.key)}
+                  className={`p-2 border rounded-sm text-left transition-all ${
+                    selectedFont === f.key
+                      ? "border-terminal-accent/40 bg-terminal-accent/5"
+                      : "border-terminal-border/40 hover:border-terminal-border"
+                  }`}
+                >
+                  <span
+                    className={`text-[11px] block font-semibold truncate ${
+                      selectedFont === f.key
+                        ? "text-terminal-accent"
+                        : "text-terminal-text"
+                    }`}
+                    style={{ fontFamily: FONT_CSS[f.key] }}
+                  >
+                    {f.label}
+                  </span>
+                  <span className="text-[8px] text-terminal-muted/60 uppercase tracking-wider">
+                    {f.sample}
                   </span>
                 </button>
               ))}
@@ -1141,6 +1200,7 @@ export default function CVExportModal({
                   certificates={selectedCertificates}
                   techStack={selectedTechStack}
                   includedSections={selectedSections}
+                  fontFamily={FONT_CSS[selectedFont]}
                   renderMode="preview"
                 />
               </div>
@@ -1167,6 +1227,7 @@ export default function CVExportModal({
                 certificates={selectedCertificates}
                 techStack={selectedTechStack}
                 includedSections={selectedSections}
+                fontFamily={FONT_CSS[selectedFont]}
                 renderMode="print"
               />
             </div>

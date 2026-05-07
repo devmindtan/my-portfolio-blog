@@ -13,4 +13,5 @@ export interface CVTemplateProps {
   techStack?: TechItem[];
   includedSections: SectionSelection;
   renderMode?: "preview" | "print";
+  fontFamily?: string;
 }

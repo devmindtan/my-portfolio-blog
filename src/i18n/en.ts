@@ -100,6 +100,7 @@ export const en: Record<string, string> = {
 
   // CV Export modal — UI
   "cvExport.selectTemplate": "select template",
+  "cvExport.selectFont": "select font",
   "cvExport.projects": "projects",
   "cvExport.selectAll": "all",
   "cvExport.clear": "clear",

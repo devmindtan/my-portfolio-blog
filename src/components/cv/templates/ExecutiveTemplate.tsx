@@ -8,6 +8,7 @@ export default function ExecutiveTemplate({
   certificates,
   techStack,
   includedSections,
+  fontFamily = "Georgia, 'Times New Roman', serif",
 }: CVTemplateProps) {
   const { t } = useLanguage();
 
@@ -15,7 +16,7 @@ export default function ExecutiveTemplate({
     <div
       style={{
         backgroundColor: "#fff",
-        fontFamily: "Georgia, 'Times New Roman', serif",
+        fontFamily,
         fontSize: "13px",
         lineHeight: "1.6",
         color: "#2c3e50",

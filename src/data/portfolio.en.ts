@@ -270,14 +270,24 @@ export const projects: Project[] = [
       "Built circuit breaker with adaptive thresholds",
     ],
     results: [
-      { value: "99.97%", label: "uptime" },
-      { value: "180ms", label: "p99 latency" },
-      { value: "0.01%", label: "failure rate" },
+      {
+        value: "99.97%",
+        label: "uptime",
+      },
+      {
+        value: "180ms",
+        label: "p99 latency",
+      },
+      {
+        value: "0.01%",
+        label: "failure rate",
+      },
     ],
     insight: "Idempotency keys are non-negotiable in payment systems.",
     tech: ["Go", "Kafka", "PostgreSQL", "K8s"],
     sort_order: 1,
     created_at: "2024-01-15",
+    blogUrl: "/blog/payment-gateway-migration",
   },
   {
     id: "p02",
@@ -291,14 +301,24 @@ export const projects: Project[] = [
       "Implemented exactly-once semantics",
     ],
     results: [
-      { value: "<30s", label: "data lag" },
-      { value: "500K", label: "events/sec" },
-      { value: "40%", label: "cost reduction" },
+      {
+        value: "<30s",
+        label: "data lag",
+      },
+      {
+        value: "500K",
+        label: "events/sec",
+      },
+      {
+        value: "40%",
+        label: "cost reduction",
+      },
     ],
     insight: "Exactly-once is worth the complexity premium.",
     tech: ["Flink", "Kafka", "ClickHouse", "Grafana"],
     sort_order: 2,
     created_at: "2024-03-22",
+    blogUrl: "/blog/real-time-analytics-pipeline",
   },
   {
     id: "p03",
@@ -312,14 +332,24 @@ export const projects: Project[] = [
       "Built token introspection layer for service mesh",
     ],
     results: [
-      { value: "0", label: "auth vulns" },
-      { value: "2M+", label: "daily logins" },
-      { value: "<50ms", label: "token validation" },
+      {
+        value: "0",
+        label: "auth vulns",
+      },
+      {
+        value: "2M+",
+        label: "daily logins",
+      },
+      {
+        value: "<50ms",
+        label: "token validation",
+      },
     ],
     insight: "Security is a property of the system, not a feature.",
     tech: ["Rust", "Redis", "OAuth2", "WebAuthn"],
     sort_order: 3,
     created_at: "2024-05-10",
+    blogUrl: "/blog/auth-platform-redesign",
   },
   {
     id: "p04",
@@ -333,14 +363,24 @@ export const projects: Project[] = [
       "Created chaos engineering test suite",
     ],
     results: [
-      { value: "0", label: "outages" },
-      { value: "10x", label: "peak traffic" },
-      { value: "$18M", label: "BF revenue" },
+      {
+        value: "0",
+        label: "outages",
+      },
+      {
+        value: "10x",
+        label: "peak traffic",
+      },
+      {
+        value: "$18M",
+        label: "BF revenue",
+      },
     ],
     insight: "Resilience is built by breaking things intentionally first.",
     tech: ["Node.js", "Redis", "RabbitMQ", "AWS"],
     sort_order: 4,
     created_at: "2024-06-01",
+    blogUrl: "/blog/e-commerce-platform",
   },
   {
     id: "p05",
@@ -354,15 +394,25 @@ export const projects: Project[] = [
       "Built custom test impact analysis to skip unaffected suites",
     ],
     results: [
-      { value: "4min", label: "build time" },
-      { value: "<1%", label: "flaky rate" },
-      { value: "15min", label: "deploy time" },
+      {
+        value: "4min",
+        label: "build time",
+      },
+      {
+        value: "<1%",
+        label: "flaky rate",
+      },
+      {
+        value: "15min",
+        label: "deploy time",
+      },
     ],
     insight:
       "Fast feedback loops change developer behavior more than any policy.",
     tech: ["Go", "K8s", "Terraform", "ArgoCD"],
     sort_order: 5,
     created_at: "2024-07-14",
+    blogUrl: "/blog/cicd-pipeline-overhaul",
   },
   {
     id: "p06",
@@ -376,14 +426,24 @@ export const projects: Project[] = [
       "Created audit trail with immutable event log",
     ],
     results: [
-      { value: "<5min", label: "record sync" },
-      { value: "100%", label: "HIPAA compliance" },
-      { value: "8", label: "hospitals live" },
+      {
+        value: "<5min",
+        label: "record sync",
+      },
+      {
+        value: "100%",
+        label: "HIPAA compliance",
+      },
+      {
+        value: "8",
+        label: "hospitals live",
+      },
     ],
     insight: "Compliance is architecture, not paperwork.",
     tech: ["Rust", "PostgreSQL", "Kafka", "AWS"],
     sort_order: 6,
     created_at: "2024-08-20",
+    blogUrl: "/blog/healthcare-data-platform",
   },
   {
     id: "p07",
@@ -397,15 +457,25 @@ export const projects: Project[] = [
       "Implemented tenant-aware connection pooling",
     ],
     results: [
-      { value: "500+", label: "tenants" },
-      { value: "15min", label: "onboarding" },
-      { value: "60%", label: "infra cost saved" },
+      {
+        value: "500+",
+        label: "tenants",
+      },
+      {
+        value: "15min",
+        label: "onboarding",
+      },
+      {
+        value: "60%",
+        label: "infra cost saved",
+      },
     ],
     insight:
       "Multi-tenancy is a data modeling decision, not a deployment strategy.",
     tech: ["TypeScript", "PostgreSQL", "Redis", "Docker"],
     sort_order: 7,
     created_at: "2024-09-05",
+    blogUrl: "/blog/multi-tenant-saas-platform",
   },
   {
     id: "p08",
@@ -419,15 +489,25 @@ export const projects: Project[] = [
       "Created explainability layer for regulatory compliance",
     ],
     results: [
-      { value: "92%", label: "detection rate" },
-      { value: "<8%", label: "false positive" },
-      { value: "<100ms", label: "scoring latency" },
+      {
+        value: "92%",
+        label: "detection rate",
+      },
+      {
+        value: "<8%",
+        label: "false positive",
+      },
+      {
+        value: "<100ms",
+        label: "scoring latency",
+      },
     ],
     insight:
       "Model accuracy means nothing without operational latency budgets.",
     tech: ["Python", "Flink", "Kafka", "Redis"],
     sort_order: 8,
     created_at: "2024-10-12",
+    blogUrl: "/blog/fraud-detection-engine",
   },
   {
     id: "p09",
@@ -441,15 +521,25 @@ export const projects: Project[] = [
       "Created device shadow for offline state sync",
     ],
     results: [
-      { value: "99.5%", label: "data delivery" },
-      { value: "50K+", label: "devices managed" },
-      { value: "<2GB", label: "update size" },
+      {
+        value: "99.5%",
+        label: "data delivery",
+      },
+      {
+        value: "50K+",
+        label: "devices managed",
+      },
+      {
+        value: "<2GB",
+        label: "update size",
+      },
     ],
     insight:
       "Eventually consistent is the only consistency model that works at the edge.",
     tech: ["Go", "MQTT", "DynamoDB", "AWS"],
     sort_order: 9,
     created_at: "2024-11-01",
+    blogUrl: "/blog/iot-fleet-management",
   },
   {
     id: "p10",
@@ -463,14 +553,24 @@ export const projects: Project[] = [
       "Implemented origin shielding with request coalescing",
     ],
     results: [
-      { value: "<50ms", label: "APAC TTFB" },
-      { value: "95%", label: "cache hit rate" },
-      { value: "$120K", label: "monthly cost" },
+      {
+        value: "<50ms",
+        label: "APAC TTFB",
+      },
+      {
+        value: "95%",
+        label: "cache hit rate",
+      },
+      {
+        value: "$120K",
+        label: "monthly cost",
+      },
     ],
     insight: "Cache invalidation is only hard if your keys are wrong.",
     tech: ["Rust", "Nginx", "Terraform", "AWS"],
     sort_order: 10,
     created_at: "2024-11-18",
+    blogUrl: "/blog/content-delivery-network",
   },
   {
     id: "p11",
@@ -484,14 +584,24 @@ export const projects: Project[] = [
       "Implemented type-ahead with prefix trie index",
     ],
     results: [
-      { value: "<80ms", label: "search latency" },
-      { value: "3x", label: "CTR improvement" },
-      { value: "50M", label: "documents indexed" },
+      {
+        value: "<80ms",
+        label: "search latency",
+      },
+      {
+        value: "3x",
+        label: "CTR improvement",
+      },
+      {
+        value: "50M",
+        label: "documents indexed",
+      },
     ],
     insight: "Search quality is a product of iteration, not architecture.",
     tech: ["Python", "Elasticsearch", "Kafka", "K8s"],
     sort_order: 11,
     created_at: "2024-12-03",
+    blogUrl: "/blog/search-platform-rebuild",
   },
   {
     id: "p12",
@@ -505,15 +615,25 @@ export const projects: Project[] = [
       "Created offline-first client with CRDT sync",
     ],
     results: [
-      { value: "<200ms", label: "delivery" },
-      { value: "80%", label: "API load reduced" },
-      { value: "100K", label: "concurrent users" },
+      {
+        value: "<200ms",
+        label: "delivery",
+      },
+      {
+        value: "80%",
+        label: "API load reduced",
+      },
+      {
+        value: "100K",
+        label: "concurrent users",
+      },
     ],
     insight:
       "Offline-first is not a feature, it is the only sane architecture for mobile.",
     tech: ["TypeScript", "Redis", "WebSocket", "CRDTs"],
     sort_order: 12,
     created_at: "2025-01-08",
+    blogUrl: "/blog/chat-notification-system",
   },
   {
     id: "p13",
@@ -527,15 +647,25 @@ export const projects: Project[] = [
       "Created drift detection against compliance baselines",
     ],
     results: [
-      { value: "2 weeks", label: "audit prep" },
-      { value: "200+", label: "controls automated" },
-      { value: "98%", label: "evidence coverage" },
+      {
+        value: "2 weeks",
+        label: "audit prep",
+      },
+      {
+        value: "200+",
+        label: "controls automated",
+      },
+      {
+        value: "98%",
+        label: "evidence coverage",
+      },
     ],
     insight:
       "Compliance should be a byproduct of good infrastructure, not a separate process.",
     tech: ["Go", "Terraform", "PostgreSQL", "AWS"],
     sort_order: 13,
     created_at: "2025-02-14",
+    blogUrl: "/blog/compliance-automation-platform",
   },
   {
     id: "p14",
@@ -549,35 +679,24 @@ export const projects: Project[] = [
       "Created GPU-accelerated preview generation",
     ],
     results: [
-      { value: "15min", label: "per video" },
-      { value: "40%", label: "storage saved" },
-      { value: "4K", label: "max resolution" },
+      {
+        value: "15min",
+        label: "per video",
+      },
+      {
+        value: "40%",
+        label: "storage saved",
+      },
+      {
+        value: "4K",
+        label: "max resolution",
+      },
     ],
     insight: "Per-title encoding pays for itself within a month at scale.",
     tech: ["Go", "FFmpeg", "AWS", "Kafka"],
     sort_order: 14,
     created_at: "2025-03-01",
-  },
-  {
-    id: "p15",
-    title: "Video Transcoding Pipeline Test",
-    tag: "media",
-    problem:
-      "Manual transcoding workflow, 8h per video, no adaptive bitrate, $200K/year in compute waste.",
-    actions: [
-      "Built event-driven transcoding with per-title encoding",
-      "Implemented adaptive bitrate ladder optimization",
-      "Created GPU-accelerated preview generation",
-    ],
-    results: [
-      { value: "15min", label: "per video" },
-      { value: "40%", label: "storage saved" },
-      { value: "4K", label: "max resolution" },
-    ],
-    insight: "Per-title encoding pays for itself within a month at scale.",
-    tech: ["Go", "FFmpeg", "AWS", "Kafka"],
-    sort_order: 15,
-    created_at: "2025-03-01",
+    blogUrl: "/blog/video-transcoding-pipeline",
   },
 ];
 

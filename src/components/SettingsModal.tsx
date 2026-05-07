@@ -1,4 +1,11 @@
-import { X, Languages, PanelTopClose, FileText } from "lucide-react";
+import {
+  X,
+  Languages,
+  PanelTopClose,
+  FileText,
+  SlidersHorizontal,
+  Database,
+} from "lucide-react";
 
 interface SettingsModalProps {
   lang: "en" | "vi";
@@ -6,6 +13,8 @@ interface SettingsModalProps {
   compactView: boolean;
   onToggleCompact: () => void;
   onExportCV: () => void;
+  onOpenAdmin: () => void;
+  onOpenDataViewer: () => void;
   onClose: () => void;
   t: (key: string) => string;
 }
@@ -16,6 +25,8 @@ export default function SettingsModal({
   compactView,
   onToggleCompact,
   onExportCV,
+  onOpenAdmin,
+  onOpenDataViewer,
   onClose,
   t,
 }: SettingsModalProps) {
@@ -73,6 +84,26 @@ export default function SettingsModal({
             <span className="inline-flex items-center gap-2 uppercase tracking-wider">
               <FileText size={13} />
               {t("nav.exportCv")}
+            </span>
+          </button>
+
+          <button
+            onClick={onOpenAdmin}
+            className="w-full flex items-center justify-between px-3 py-2 border border-terminal-border/40 rounded-sm text-xs text-terminal-muted hover:text-terminal-accent hover:border-terminal-accent/40 transition-colors"
+          >
+            <span className="inline-flex items-center gap-2 uppercase tracking-wider">
+              <SlidersHorizontal size={13} />
+              Admin
+            </span>
+          </button>
+
+          <button
+            onClick={onOpenDataViewer}
+            className="w-full flex items-center justify-between px-3 py-2 border border-terminal-border/40 rounded-sm text-xs text-terminal-muted hover:text-terminal-accent hover:border-terminal-accent/40 transition-colors"
+          >
+            <span className="inline-flex items-center gap-2 uppercase tracking-wider">
+              <Database size={13} />
+              Data Viewer
             </span>
           </button>
         </div>

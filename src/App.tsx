@@ -17,6 +17,8 @@ import Footer from "./components/Footer";
 import ScrollToTop from "./components/ScrollToTop";
 import BlogPage from "./components/BlogPage";
 import SettingsModal from "./components/SettingsModal";
+import AdminPage from "./components/AdminPage";
+import DataViewerPage from "./components/DataViewerPage";
 import useCompactView from "./hooks/useCompactView";
 import { useLanguage } from "./contexts/LanguageContext";
 import { portfolioDataEn } from "./data/portfolio.en";
@@ -190,6 +192,16 @@ function App() {
     setShowCVExport(true);
   }, []);
 
+  const handleOpenAdminFromSettings = useCallback(() => {
+    setShowSettings(false);
+    navigate("/admin");
+  }, [navigate]);
+
+  const handleOpenDataViewerFromSettings = useCallback(() => {
+    setShowSettings(false);
+    navigate("/data");
+  }, [navigate]);
+
   const renderGlobalActions = (
     <>
       {showSettings && (
@@ -199,6 +211,8 @@ function App() {
           compactView={compactView}
           onToggleCompact={toggleCompactView}
           onExportCV={handleOpenCVFromSettings}
+          onOpenAdmin={handleOpenAdminFromSettings}
+          onOpenDataViewer={handleOpenDataViewerFromSettings}
           onClose={() => setShowSettings(false)}
           t={t}
         />
@@ -217,6 +231,26 @@ function App() {
   );
 
   const isBlogRoute = pathname.startsWith("/blog");
+  if (pathname === "/admin") {
+    return (
+      <AdminPage
+        onBack={() => {
+          navigate("/");
+        }}
+      />
+    );
+  }
+
+  if (pathname === "/data") {
+    return (
+      <DataViewerPage
+        onBack={() => {
+          navigate("/");
+        }}
+      />
+    );
+  }
+
   if (isBlogRoute) {
     return (
       <div

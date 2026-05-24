@@ -99,6 +99,7 @@ export const siteConfig: SiteConfig = {
   navLinks: [
     { label: "projects", href: "#projects" },
     { label: "blog", href: "/blog" },
+    { label: "websites", href: "#websites" },
     { label: "stack", href: "#stack" },
     { label: "contact", href: "#contact" },
   ],

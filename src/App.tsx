@@ -13,6 +13,7 @@ import ProjectFilter from "./components/ProjectFilter";
 import ProjectDetailModal from "./components/ProjectDetailModal";
 import CVExportModal from "./components/CVExportModal";
 import ContactCard from "./components/ContactCard";
+import WebsiteShowcase from "./components/WebsiteShowcase";
 import Footer from "./components/Footer";
 import ScrollToTop from "./components/ScrollToTop";
 import BlogPage from "./components/BlogPage";
@@ -159,11 +160,13 @@ function App() {
   const navLabelByKey: Record<string, string> = {
     projects: t("nav.projects"),
     blog: t("nav.blog"),
+    websites: t("nav.websites"),
     stack: t("nav.stack"),
     contact: t("nav.contact"),
   };
 
   const sectionProjectsTitle = t("section.projects");
+  const sectionWebsitesTitle = t("section.websites");
   const sectionConnectTitle = t("section.connect");
 
   const navigate = useCallback(
@@ -467,6 +470,21 @@ function App() {
                   />
                 ))
               )}
+
+              {/* Section divider */}
+              <div
+                id="websites"
+                className="col-span-4 flex items-center gap-2 sm:gap-3 py-4 opacity-0 animate-fade-in"
+                style={{ animationDelay: "0.7s" }}
+              >
+                <div className="h-px flex-1 bg-terminal-border/30" />
+                <span className="text-[10px] text-terminal-muted/50 uppercase tracking-[0.15em] sm:tracking-[0.3em]">
+                  {sectionWebsitesTitle}
+                </span>
+                <div className="h-px flex-1 bg-terminal-border/30" />
+              </div>
+
+              <WebsiteShowcase />
 
               {/* Section divider */}
               <div

@@ -2,6 +2,7 @@ export const vi: Record<string, string> = {
   // Nav
   "nav.projects": "Dự án",
   "nav.blog": "BLOG",
+  "nav.websites": "Websites",
   "nav.stack": "Công nghệ",
   "nav.contact": "Liên hệ",
   "nav.exportCv": "Xuất CV",
@@ -15,7 +16,13 @@ export const vi: Record<string, string> = {
 
   // Sections
   "section.projects": "Dự án nổi bật",
+  "section.websites": "Website đã triển khai",
   "section.connect": "Kết nối",
+
+  // Website showcase
+  "website.sectionTitle": "website showcase",
+  "website.items": "trang",
+  "website.pageLabel": "trang",
 
   // Blog
   "blog.title": "Blog Kỹ Thuật",

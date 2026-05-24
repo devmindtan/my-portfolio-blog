@@ -2,6 +2,7 @@ export const en: Record<string, string> = {
   // Nav
   "nav.projects": "Projects",
   "nav.blog": "BLOG",
+  "nav.websites": "Websites",
   "nav.stack": "Stack",
   "nav.contact": "Contact",
   "nav.exportCv": "Export CV",
@@ -15,7 +16,13 @@ export const en: Record<string, string> = {
 
   // Sections
   "section.projects": "Selected Work",
+  "section.websites": "Websites",
   "section.connect": "Connect",
+
+  // Website showcase
+  "website.sectionTitle": "website showcase",
+  "website.items": "sites",
+  "website.pageLabel": "page",
 
   // Blog
   "blog.title": "Engineering Blog",

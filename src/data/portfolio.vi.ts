@@ -347,6 +347,7 @@ export const portfolioDataVi: PortfolioData = {
     navLinks: [
       { label: "dự án", href: "#projects" },
       { label: "blog", href: "/blog" },
+      { label: "websites", href: "#websites" },
       { label: "công nghệ", href: "#stack" },
       { label: "liên hệ", href: "#contact" },
     ],

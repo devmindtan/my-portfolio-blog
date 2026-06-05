@@ -32,14 +32,10 @@ const DEFAULT_HEADINGS_VI: [string, string, string] = [
   "Kết quả và bài học",
 ];
 
-/**
- * Thời gian đọc tùy chỉnh cho từng bài. Mặc định dùng DEFAULT_READ_TIME_VI.
- */
-const DEFAULT_READ_TIME_VI = "Đọc trong 8 phút";
+const DEFAULT_READ_TIME_VI = "Đọc trong 6 phút";
 const CUSTOM_READ_TIMES_VI: Record<string, string> = {
   p01: "Đọc trong 12 phút",
-  p05: "Đọc trong 10 phút",
-  p11: "Đọc trong 11 phút",
+  p07: "Đọc trong 9 phút",
 };
 
 export const createBlogPostsVi = (

@@ -4,7 +4,7 @@ import type {
   Certificate,
   TechItem,
 } from "../../data/portfolio.types";
-import type { SectionSelection } from "./types";
+import type { CVSectionKey, SectionSelection } from "./types";
 
 export interface CVTemplateProps {
   profile: Profile;
@@ -12,6 +12,7 @@ export interface CVTemplateProps {
   certificates: Certificate[];
   techStack?: TechItem[];
   includedSections: SectionSelection;
+  sectionOrder?: CVSectionKey[];
   renderMode?: "preview" | "print";
   fontFamily?: string;
 }

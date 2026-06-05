@@ -11,6 +11,8 @@ import {
   ChevronDown,
   ChevronUp,
   Search,
+  ArrowUp,
+  ArrowDown,
 } from "lucide-react";
 import type {
   Profile,
@@ -19,7 +21,12 @@ import type {
   TechItem,
 } from "../data/portfolio.types";
 import CVContent from "./cv/CVContent";
-import type { CVSectionKey, SectionSelection, TemplateKey } from "./cv/types";
+import {
+  DEFAULT_CV_SECTION_ORDER,
+  type CVSectionKey,
+  type SectionSelection,
+  type TemplateKey,
+} from "./cv/types";
 import { useSelectableSet } from "../hooks/useSelectableSet";
 import type { FontKey } from "./cv/types";
 import { FONT_CSS } from "./cv/types";
@@ -82,6 +89,9 @@ export default function CVExportModal({
         .map((project) => [project.id, getAllActionIndexes(project)]),
     ) as Record<string, number[]>;
 
+  const getDefaultProjectOrder = () =>
+    projects.slice(0, SELECTION_LIMITS.projects).map((project) => project.id);
+
   const [selected, setSelected] = useState<TemplateKey>("minimal");
   const [selectedFont, setSelectedFont] = useState<FontKey>("georgia");
   const [showProjectPicker, setShowProjectPicker] = useState(false);
@@ -95,6 +105,9 @@ export default function CVExportModal({
   const clearProjectIds = projectIdSelection.clear;
   const [selectedProjectActionIndexes, setSelectedProjectActionIndexes] =
     useState<Record<string, number[]>>(() => getDefaultProjectActionIndexes());
+  const [projectOrder, setProjectOrder] = useState<string[]>(
+    getDefaultProjectOrder,
+  );
   const [projectSearch, setProjectSearch] = useState("");
   const [projectTagFilter, setProjectTagFilter] = useState<string>("all");
   const experienceSelection = useSelectableSet<number>({
@@ -134,6 +147,9 @@ export default function CVExportModal({
       projects: true,
       certifications: true,
     });
+  const [sectionOrder, setSectionOrder] = useState<CVSectionKey[]>(
+    DEFAULT_CV_SECTION_ORDER,
+  );
 
   // Which project's actions are shown in the right panel (wide layout)
   const [focusedProjectId, setFocusedProjectId] = useState<string | null>(null);
@@ -215,6 +231,15 @@ export default function CVExportModal({
         }
         return next;
       });
+
+      if (selectedProjectIds.has(id)) {
+        setProjectOrder((prev) => prev.filter((projectId) => projectId !== id));
+      } else if (selectedProjectIds.size < SELECTION_LIMITS.projects) {
+        setProjectOrder((prev) =>
+          prev.includes(id) ? prev : [...prev, id],
+        );
+      }
+
       setSelectedProjectActionIndexes((prev) => {
         const project = projects.find((item) => item.id === id);
         if (!project) return prev;
@@ -226,7 +251,7 @@ export default function CVExportModal({
         return { ...prev, [id]: getAllActionIndexes(project) };
       });
     },
-    [projects, updateSelectedProjectIds],
+    [projects, selectedProjectIds, updateSelectedProjectIds],
   );
 
   const toggleProjectAction = useCallback(
@@ -245,14 +270,37 @@ export default function CVExportModal({
     [],
   );
 
-  const selectedProjects = projects
-    .filter((p) => selectedProjectIds.has(p.id))
+  const orderedSelectedProjectIds = [
+    ...projectOrder.filter((projectId) => selectedProjectIds.has(projectId)),
+    ...Array.from(selectedProjectIds).filter(
+      (projectId) => !projectOrder.includes(projectId),
+    ),
+  ];
+
+  const selectedProjects = orderedSelectedProjectIds
+    .map((projectId) => projects.find((project) => project.id === projectId))
+    .filter((project): project is Project => Boolean(project))
     .map((project) => ({
       ...project,
       actions: project.actions.filter((_, index) =>
         (selectedProjectActionIndexes[project.id] ?? []).includes(index),
       ),
     }));
+
+  const moveProject = (index: number, direction: -1 | 1) => {
+    setProjectOrder((prev) => {
+      const targetIndex = index + direction;
+      if (targetIndex < 0 || targetIndex >= prev.length) return prev;
+
+      const next = [...prev];
+      [next[index], next[targetIndex]] = [next[targetIndex], next[index]];
+      return next;
+    });
+  };
+
+  const resetProjectOrder = () => {
+    setProjectOrder(getDefaultProjectOrder());
+  };
 
   const selectedProfile = {
     ...profile,
@@ -296,6 +344,24 @@ export default function CVExportModal({
     { key: "projects", label: t("cv.projects") },
     { key: "certifications", label: t("cv.certifications") },
   ];
+  const sectionLabelByKey = Object.fromEntries(
+    sectionOptions.map((section) => [section.key, section.label]),
+  ) as Record<CVSectionKey, string>;
+
+  const moveSection = (index: number, direction: -1 | 1) => {
+    setSectionOrder((prev) => {
+      const targetIndex = index + direction;
+      if (targetIndex < 0 || targetIndex >= prev.length) return prev;
+
+      const next = [...prev];
+      [next[index], next[targetIndex]] = [next[targetIndex], next[index]];
+      return next;
+    });
+  };
+
+  const resetSectionOrder = () => {
+    setSectionOrder(DEFAULT_CV_SECTION_ORDER);
+  };
 
   const setAllSections = (value: boolean) => {
     setSelectedSections({
@@ -644,6 +710,62 @@ export default function CVExportModal({
                     </button>
                   );
                 })}
+              </div>
+
+              <div className="mt-3 border border-terminal-border/30 rounded-sm p-2 space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <span className="text-[9px] uppercase tracking-wider text-terminal-info/70">
+                    {t("cvExport.sectionOrder")}
+                  </span>
+                  <button
+                    onClick={resetSectionOrder}
+                    className="text-[9px] text-terminal-muted hover:text-terminal-accent transition-colors"
+                  >
+                    {t("cvExport.resetOrder")}
+                  </button>
+                </div>
+
+                <div className="space-y-1">
+                  {sectionOrder.map((sectionKey, index) => {
+                    const active = selectedSections[sectionKey];
+                    return (
+                      <div
+                        key={`order-${sectionKey}`}
+                        className={`flex items-center justify-between gap-2 px-2 py-1.5 rounded-sm border ${
+                          active
+                            ? "border-terminal-accent/25 bg-terminal-accent/5"
+                            : "border-terminal-border/20"
+                        }`}
+                      >
+                        <span
+                          className={`text-[10px] uppercase tracking-wider ${
+                            active ? "text-terminal-text" : "text-terminal-muted"
+                          }`}
+                        >
+                          {sectionLabelByKey[sectionKey]}
+                        </span>
+                        <div className="flex items-center gap-1">
+                          <button
+                            onClick={() => moveSection(index, -1)}
+                            disabled={index === 0}
+                            className="p-1 text-terminal-muted hover:text-terminal-accent disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                            title={t("cvExport.moveUp")}
+                          >
+                            <ArrowUp size={10} />
+                          </button>
+                          <button
+                            onClick={() => moveSection(index, 1)}
+                            disabled={index === sectionOrder.length - 1}
+                            className="p-1 text-terminal-muted hover:text-terminal-accent disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                            title={t("cvExport.moveDown")}
+                          >
+                            <ArrowDown size={10} />
+                          </button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
               </div>
 
               {selectedSections.experience && profile.experience.length > 0 && (
@@ -1002,6 +1124,11 @@ export default function CVExportModal({
                         selectAllProjectIds(
                           projects.map((project) => project.id),
                         );
+                        setProjectOrder(
+                          projects
+                            .slice(0, SELECTION_LIMITS.projects)
+                            .map((project) => project.id),
+                        );
                         setSelectedProjectActionIndexes(
                           getDefaultProjectActionIndexes(),
                         );
@@ -1013,6 +1140,7 @@ export default function CVExportModal({
                     <button
                       onClick={() => {
                         clearProjectIds();
+                        setProjectOrder([]);
                         setSelectedProjectActionIndexes({});
                         setFocusedProjectId(null);
                       }}
@@ -1022,6 +1150,58 @@ export default function CVExportModal({
                     </button>
                   </div>
                 </div>
+
+                {orderedSelectedProjectIds.length > 0 && (
+                  <div className="border border-terminal-border/30 rounded-sm p-2 space-y-1.5">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[9px] uppercase tracking-wider text-terminal-info/70">
+                        {t("cvExport.projectOrder")}
+                      </span>
+                      <button
+                        onClick={resetProjectOrder}
+                        className="text-[9px] text-terminal-muted hover:text-terminal-accent transition-colors"
+                      >
+                        {t("cvExport.resetOrder")}
+                      </button>
+                    </div>
+
+                    <div className="space-y-1">
+                      {orderedSelectedProjectIds.map((projectId, index) => {
+                        const project = projects.find((p) => p.id === projectId);
+                        if (!project) return null;
+
+                        return (
+                          <div
+                            key={`project-order-${project.id}`}
+                            className="flex items-center justify-between gap-2 px-2 py-1.5 rounded-sm border border-terminal-accent/25 bg-terminal-accent/5"
+                          >
+                            <span className="text-[10px] text-terminal-text truncate">
+                              {project.title}
+                            </span>
+                            <div className="flex items-center gap-1 flex-shrink-0">
+                              <button
+                                onClick={() => moveProject(index, -1)}
+                                disabled={index === 0}
+                                className="p-1 text-terminal-muted hover:text-terminal-accent disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                                title={t("cvExport.moveUp")}
+                              >
+                                <ArrowUp size={10} />
+                              </button>
+                              <button
+                                onClick={() => moveProject(index, 1)}
+                                disabled={index === orderedSelectedProjectIds.length - 1}
+                                className="p-1 text-terminal-muted hover:text-terminal-accent disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                                title={t("cvExport.moveDown")}
+                              >
+                                <ArrowDown size={10} />
+                              </button>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
 
                 {showProjectPicker && (
                   <div className="border border-terminal-border/30 rounded-sm">
@@ -1200,6 +1380,7 @@ export default function CVExportModal({
                   certificates={selectedCertificates}
                   techStack={selectedTechStack}
                   includedSections={selectedSections}
+                  sectionOrder={sectionOrder}
                   fontFamily={FONT_CSS[selectedFont]}
                   renderMode="preview"
                 />
@@ -1227,6 +1408,7 @@ export default function CVExportModal({
                 certificates={selectedCertificates}
                 techStack={selectedTechStack}
                 includedSections={selectedSections}
+                sectionOrder={sectionOrder}
                 fontFamily={FONT_CSS[selectedFont]}
                 renderMode="print"
               />

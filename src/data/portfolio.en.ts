@@ -41,9 +41,9 @@ export const heroLines: HeroLine[] = [
   {
     prompt: "~",
     cmd: "cat focus.txt",
-    output: "distributed systems · real-time data · platform engineering",
+    output: "web platforms · mobile apps · backend microservices",
   },
-  { prompt: "~", cmd: "uptime", output: "4+ years in programing" },
+  { prompt: "~", cmd: "uptime", output: "2+ years shipping real projects" },
 ];
 
 export const welcomeLines: WelcomeLine[] = [
@@ -54,7 +54,7 @@ export const welcomeLines: WelcomeLine[] = [
     className: "text-terminal-accent text-shadow-glow font-bold",
     pauseAfter: 400,
   },
-  { text: "A Software Engineer", pauseAfter: 200 },
+  { text: "A Full-Stack Developer", pauseAfter: 200 },
 ];
 
 export const certificates: Certificate[] = [
@@ -88,10 +88,10 @@ export const certificates: Certificate[] = [
 ];
 
 export const principles: Principle[] = [
-  { label: "simplicity", desc: "The best code is code you don't write." },
-  { label: "resilience", desc: "Design for failure. Expect it. Handle it." },
-  { label: "observability", desc: "You can't fix what you can't see." },
-  { label: "ownership", desc: "You build it, you run it." },
+  { label: "simplicity", desc: "Build only what the product truly needs." },
+  { label: "resilience", desc: "Design offline-first and recover gracefully." },
+  { label: "observability", desc: "Measure before optimizing." },
+  { label: "ownership", desc: "From commit to deployment, keep responsibility end-to-end." },
 ];
 
 export const siteConfig: SiteConfig = {
@@ -113,12 +113,12 @@ export const siteConfig: SiteConfig = {
     year: new Date().getFullYear(),
   },
   status: {
-    text: "Available for new projects",
+    text: "Open to fresher full-stack roles",
     detail: "Response time: ~24h",
   },
   contact: {
     description:
-      "Fresh Graduate | Full-stack Developer & Cloud Native Enthusiast. Available for Fresher Roles & Technical Advisory. Async preferred! ⚡",
+      "Software Engineering graduate focused on full-stack and cloud-native delivery. Open for fresher opportunities and practical collaboration.",
     links: [
       {
         label: "github",
@@ -146,23 +146,23 @@ export const profile: Profile = {
   avatar:
     "https://raw.githubusercontent.com/devmindtan/UtilityBox/main/Assets/Images/avatar.jpg",
   location: "Ho Chi Minh City, VN",
-  email: "devmind.tan@gamil.com",
+  email: "devmind.tan@gmail.com",
   phone: "+84 942 510 317",
-  website: "https://my-portfolio-eight-opal-45.vercel.app/",
-  linkedin: "linkedin.com/in/devmidtan",
+  website: "https://my-portfolio.devmindtan.uk/",
+  linkedin: "linkedin.com/in/devmind-tan",
   github: "github.com/devmindtan",
   summary:
-    "Final-year Software Engineering student with a strong focus on Distributed Systems and Platform Engineering. Experienced in architecting microservices with K3s, optimizing real-time data pipelines using YOLOv11 for traffic analysis, and developing decentralized protocols. Passionate about building resilient, automated infrastructure and solving complex backend challenges at scale.",
+    "Software Engineering graduate with hands-on experience building web, mobile, and microservice systems. I focus on practical product delivery: offline-first apps, secure authentication flows, and data-driven backend services.",
   detail:
-    "My technical foundation is built on a passion for emerging technologies, from decentralized protocols to Computer Vision. Through my graduation project, DatapolisX, and the Verzik protocol, I have gained hands-on experience in solving the 'hard' problems: gas optimization in Solidity, high-concurrency data streaming, and predictive modeling using Random Forest Regressors. I thrive in terminal-centric workflows where I can automate every part of the CI/CD pipeline, allowing me to focus on architecting secure and efficient decentralized solutions.",
+    "My recent work includes a smart traffic thesis platform (KLTN_2026), mobile-first productivity and fitness apps with Expo + Supabase, and authentication prototypes for Google and Microsoft accounts. I am comfortable across frontend, backend, and deployment workflows, especially when projects require integrating multiple services into one reliable product.",
   experience: [
     {
       role: "Graduation thesis",
-      organization: "VLU",
+      organization: "Van Lang University",
       type: "project",
-      period: "2/2026 - 6/2026",
+      period: "02/2026 - 06/2026",
       description:
-        "Develop a project to monitor and predict traffic density using a microservice system.",
+        "Built SmartCity traffic monitoring and prediction platform using a distributed microservice architecture with React, Node.js, Python services, PostgreSQL, MinIO, and Kubernetes manifests.",
       links: [
         {
           label: "github",
@@ -175,12 +175,26 @@ export const profile: Profile = {
       ],
     },
     {
-      role: "Verzik",
-      organization: "VIETFUTURE",
+      role: "Product builder",
+      organization: "Personal Projects",
       type: "project",
-      period: "2/2026 - 8/2026",
+      period: "2025 - 2026",
       description:
-        "Built real-time analytics platforms and streaming data pipelines. Reduced data lag from 24h to under 30s using Flink and Kafka.",
+        "Delivered Expo-based mobile apps with local SQLite, Supabase sync, Google Sign-In, and MinIO image workflows (TaskFlow, Muscle Exercise Manager, Mobile Image Uploader).",
+      links: [
+        {
+          label: "project list",
+          href: "#projects",
+        },
+      ],
+    },
+    {
+      role: "Blockchain prototype contributor",
+      organization: "VIETFUTURE / Verzik",
+      type: "company",
+      period: "2026",
+      description:
+        "Contributed to a blockchain protocol management prototype spanning smart contracts, backend API, and React app with role-based governance flows.",
       links: [
         {
           label: "website",
@@ -188,25 +202,10 @@ export const profile: Profile = {
         },
       ],
     },
-    {
-      role: "Verzik",
-      organization: "VIETFUTURE",
-      type: "company",
-      period: "2/2026",
-      description:
-        "Built real-time analytics platforms and streaming data pipelines. Reduced data lag from 24h to under 30s using Flink and Kafka.",
-      links: [
-        {
-          label: "Real-time Analytics Pipeline",
-          href: "#projects",
-          projectName: "Real-time Analytics Pipeline",
-        },
-      ],
-    },
   ],
   education: [
     {
-      degree: "B.S. Software Engineer",
+      degree: "B.S. Software Engineering",
       school: "Van Lang University",
       year: "2026",
     },
@@ -214,490 +213,201 @@ export const profile: Profile = {
 };
 
 export const stats: Stat[] = [
-  { value: "2+", label: "years shipping" },
-  { value: "20+", label: "projects" },
-  { value: "10+", label: "programming languages" },
-  { value: "100+", label: "commits/month" },
-  { value: "8+ hrs", label: "daily coding" },
-  { value: "high", label: "reliability" },
+  { value: "2+", label: "years building products" },
+  { value: "7", label: "active project repositories" },
+  { value: "3", label: "platforms (web/mobile/backend)" },
+  { value: "5+", label: "auth and data integrations" },
+  { value: "offline-first", label: "preferred architecture" },
+  { value: "24h", label: "average response" },
 ];
 
 export const techStack: TechItem[] = [
   { name: "TypeScript", category: "lang" },
-  { name: "Go", category: "lang" },
-  { name: "Rust", category: "lang" },
+  { name: "JavaScript", category: "lang" },
   { name: "Python", category: "lang" },
-  { name: "Java", category: "lang" },
-  { name: "C++", category: "lang" },
-  { name: "C", category: "lang" },
-  { name: "C#", category: "lang" },
+  { name: "SQL", category: "lang" },
+
   { name: "React", category: "fe" },
-  { name: "Tailwind", category: "fe" },
-  { name: "ShadCN", category: "fe" },
+  { name: "React Native", category: "fe" },
+  { name: "Expo", category: "fe" },
+  { name: "Tailwind CSS", category: "fe" },
   { name: "Mantine", category: "fe" },
-  { name: "Next.js", category: "fe" },
+
   { name: "Node.js", category: "be" },
   { name: "Express", category: "be" },
-  { name: "Flask", category: "be" },
-  { name: "Django", category: "be" },
+  { name: "REST API", category: "be" },
+
   { name: "PostgreSQL", category: "db" },
-  { name: "MongoDB", category: "db" },
-  { name: "MySQL", category: "db" },
-  { name: "SQL Server", category: "db" },
-  { name: "Redis", category: "db" },
-  { name: "Kafka", category: "infra" },
-  { name: "Kubernetes", category: "infra" },
-  { name: "AWS", category: "infra" },
+  { name: "SQLite", category: "db" },
+  { name: "Supabase", category: "db" },
+
   { name: "Docker", category: "infra" },
-  { name: "Terraform", category: "infra" },
-  { name: "Github Action", category: "cicd" },
-  { name: "Jenkins", category: "cicd" },
-  { name: "Cloudflare", category: "net" },
-  { name: "Tailscale", category: "net" },
-  { name: "Flink", category: "data" },
-  { name: "ClickHouse", category: "data" },
+  { name: "Kubernetes", category: "infra" },
+  { name: "MinIO", category: "infra" },
+
+  { name: "GitHub Actions", category: "cicd" },
+
+  { name: "YOLOv11", category: "data" },
+  { name: "scikit-learn", category: "data" },
+
+  { name: "OAuth 2.0", category: "net" },
+  { name: "Socket.IO", category: "net" },
 ];
 
 export const projects: Project[] = [
   {
     id: "p01",
-    title: "Payment Gateway Migration",
-    tag: "fintech",
+    title: "KLTN_2026 - Smart Traffic Monitoring Platform",
+    tag: "data",
     problem:
-      "Legacy monolith processing 2M+ daily transactions with 0.8% failure rate and 12s avg latency.",
+      "Traffic monitoring requires combining realtime camera streams, prediction services, and a dashboard in one coordinated system.",
     actions: [
-      "Designed event-driven microservice architecture",
-      "Implemented saga pattern for distributed transactions",
-      "Built circuit breaker with adaptive thresholds",
+      "Designed a distributed microservice architecture across React web, Node.js API, and Python services",
+      "Integrated camera processing, forecasting, decision analysis, and report generation services",
+      "Prepared Kubernetes manifests and cronjobs for backup, export, sync, and model performance tasks",
     ],
     results: [
-      {
-        value: "99.97%",
-        label: "uptime",
-      },
-      {
-        value: "180ms",
-        label: "p99 latency",
-      },
-      {
-        value: "0.01%",
-        label: "failure rate",
-      },
+      { value: "10+", label: "API route groups" },
+      { value: "9", label: "backend service modules" },
+      { value: "K8s", label: "deployment-ready configs" },
     ],
-    insight: "Idempotency keys are non-negotiable in payment systems.",
-    tech: ["Go", "Kafka", "PostgreSQL", "K8s"],
+    insight:
+      "A graduation thesis becomes production-like only when service boundaries and operational workflows are treated seriously.",
+    tech: ["React", "Node.js", "Python", "PostgreSQL", "MinIO", "Kubernetes"],
     sort_order: 1,
-    created_at: "2024-01-15",
-    blogUrl: "/blog/payment-gateway-migration",
+    created_at: "2026-03-15",
   },
   {
     id: "p02",
-    title: "Real-time Analytics Pipeline",
-    tag: "data",
+    title: "TaskFlow - Offline-first Task Manager",
+    tag: "saas",
     problem:
-      "Batch ETL jobs causing 24h data lag, making real-time decisions impossible for ops team.",
+      "Task management on mobile must stay usable without network while still syncing safely to cloud when online.",
     actions: [
-      "Replaced batch with streaming using Flink",
-      "Built custom windowed aggregations",
-      "Implemented exactly-once semantics",
+      "Implemented local-first data flow with SQLite as the source of truth",
+      "Built automatic dirty-sync to Supabase every 60 seconds with manual sync option",
+      "Separated mobile full logic and web preview-only mode to keep behavior predictable",
     ],
     results: [
-      {
-        value: "<30s",
-        label: "data lag",
-      },
-      {
-        value: "500K",
-        label: "events/sec",
-      },
-      {
-        value: "40%",
-        label: "cost reduction",
-      },
+      { value: "60s", label: "auto-sync interval" },
+      { value: "SQLite", label: "local persistence" },
+      { value: "Supabase", label: "cloud synchronization" },
     ],
-    insight: "Exactly-once is worth the complexity premium.",
-    tech: ["Flink", "Kafka", "ClickHouse", "Grafana"],
+    insight:
+      "Offline-first architecture simplifies user trust: data is always available first, then synchronized.",
+    tech: ["Expo", "React Native", "SQLite", "Supabase", "TypeScript"],
     sort_order: 2,
-    created_at: "2024-03-22",
-    blogUrl: "/blog/real-time-analytics-pipeline",
+    created_at: "2026-01-20",
   },
   {
     id: "p03",
-    title: "Auth Platform Redesign",
-    tag: "security",
+    title: "Muscle Exercise Manager",
+    tag: "healthcare",
     problem:
-      "Homegrown auth with 3K LoC, no MFA, and session fixation vulnerabilities across 12 services.",
+      "Workout tracking apps need fast daily logging, stable offline behavior, and optional media synchronization.",
     actions: [
-      "Implemented OIDC-compliant auth server",
-      "Added FIDO2/WebAuthn MFA support",
-      "Built token introspection layer for service mesh",
+      "Built workout planner, dashboard, body metrics, and workout log flows for mobile-first usage",
+      "Implemented local SQLite storage with cloud sync and dirty-state handling",
+      "Integrated Google Sign-In and MinIO-based image upload for exercise illustrations",
     ],
     results: [
-      {
-        value: "0",
-        label: "auth vulns",
-      },
-      {
-        value: "2M+",
-        label: "daily logins",
-      },
-      {
-        value: "<50ms",
-        label: "token validation",
-      },
+      { value: "offline-first", label: "core workflow" },
+      { value: "Google", label: "auth integration" },
+      { value: "MinIO", label: "media storage" },
     ],
-    insight: "Security is a property of the system, not a feature.",
-    tech: ["Rust", "Redis", "OAuth2", "WebAuthn"],
+    insight:
+      "For lifestyle products, reliability and speed of logging matter more than feature count.",
+    tech: ["Expo", "React Native", "SQLite", "Supabase", "MinIO"],
     sort_order: 3,
-    created_at: "2024-05-10",
-    blogUrl: "/blog/auth-platform-redesign",
+    created_at: "2025-12-10",
   },
   {
     id: "p04",
-    title: "E-commerce Platform",
-    tag: "retail",
+    title: "Mobile Image Uploader",
+    tag: "infra",
     problem:
-      "Black Friday traffic spikes causing cascading failures, $2M lost revenue per outage minute.",
+      "Uploading many images from mobile requires clear queue handling, progress visibility, and robust object storage integration.",
     actions: [
-      "Implemented adaptive rate limiting",
-      "Built inventory reservation with TTL locks",
-      "Created chaos engineering test suite",
+      "Implemented gallery selection and local upload queue with status states",
+      "Built progress screen with per-file tracking and error handling",
+      "Connected direct object operations for MinIO-compatible endpoints (list, upload, delete)",
     ],
     results: [
-      {
-        value: "0",
-        label: "outages",
-      },
-      {
-        value: "10x",
-        label: "peak traffic",
-      },
-      {
-        value: "$18M",
-        label: "BF revenue",
-      },
+      { value: "4", label: "main app screens" },
+      { value: "50MB", label: "size guidance per file" },
+      { value: "live", label: "upload progress feedback" },
     ],
-    insight: "Resilience is built by breaking things intentionally first.",
-    tech: ["Node.js", "Redis", "RabbitMQ", "AWS"],
+    insight:
+      "A transparent queue UX reduces support issues more effectively than retry logic alone.",
+    tech: ["Expo", "React Native", "TypeScript", "MinIO", "zustand"],
     sort_order: 4,
-    created_at: "2024-06-01",
-    blogUrl: "/blog/e-commerce-platform",
+    created_at: "2025-11-05",
   },
   {
     id: "p05",
-    title: "CI/CD Pipeline Overhaul",
-    tag: "devops",
+    title: "Google Connect",
+    tag: "security",
     problem:
-      "Build times averaging 45min, flaky tests at 30% failure rate, deploys taking 2h with manual gates.",
+      "Mobile authentication demos often stop at UI, but practical apps need a complete sign-in context and user state flow.",
     actions: [
-      "Parallelized test suites with deterministic test containers",
-      "Implemented canary deployments with automated rollback",
-      "Built custom test impact analysis to skip unaffected suites",
+      "Integrated Google Sign-In SDK into an Expo Router project",
+      "Implemented auth context for login/logout and user state propagation",
+      "Built login and profile screens to validate end-to-end authentication UX",
     ],
     results: [
-      {
-        value: "4min",
-        label: "build time",
-      },
-      {
-        value: "<1%",
-        label: "flaky rate",
-      },
-      {
-        value: "15min",
-        label: "deploy time",
-      },
+      { value: "Expo", label: "cross-platform baseline" },
+      { value: "Google Sign-In", label: "identity provider" },
+      { value: "AuthContext", label: "session state layer" },
     ],
     insight:
-      "Fast feedback loops change developer behavior more than any policy.",
-    tech: ["Go", "K8s", "Terraform", "ArgoCD"],
+      "Authentication quality is defined by state handling and failure paths, not only successful login.",
+    tech: ["Expo", "React Native", "TypeScript", "Google Sign-In"],
     sort_order: 5,
-    created_at: "2024-07-14",
-    blogUrl: "/blog/cicd-pipeline-overhaul",
+    created_at: "2025-10-12",
   },
   {
     id: "p06",
-    title: "Healthcare Data Platform",
-    tag: "healthcare",
+    title: "Azure Connect",
+    tag: "security",
     problem:
-      "HIPAA-compliant data silos across 8 hospitals, patient records taking 72h to sync between systems.",
+      "University and enterprise users need a simple way to authenticate with Microsoft accounts and inspect granted identity data.",
     actions: [
-      "Built FHIR-compliant data exchange layer",
-      "Implemented field-level encryption with key rotation",
-      "Created audit trail with immutable event log",
+      "Implemented OAuth 2.0 login flow with Microsoft identity platform",
+      "Built Express session management and protected dashboard routing",
+      "Connected Microsoft Graph API endpoint to fetch user profile data",
     ],
     results: [
-      {
-        value: "<5min",
-        label: "record sync",
-      },
-      {
-        value: "100%",
-        label: "HIPAA compliance",
-      },
-      {
-        value: "8",
-        label: "hospitals live",
-      },
+      { value: "OAuth 2.0", label: "Microsoft 365 login" },
+      { value: "/api/me", label: "profile data endpoint" },
+      { value: "Express", label: "session-backed backend" },
     ],
-    insight: "Compliance is architecture, not paperwork.",
-    tech: ["Rust", "PostgreSQL", "Kafka", "AWS"],
+    insight:
+      "Authentication demos become practical only when token flow and session boundaries are explicit.",
+    tech: ["Node.js", "Express", "MSAL", "Microsoft Graph"],
     sort_order: 6,
-    created_at: "2024-08-20",
-    blogUrl: "/blog/healthcare-data-platform",
+    created_at: "2025-09-01",
   },
   {
     id: "p07",
-    title: "Multi-tenant SaaS Platform",
-    tag: "saas",
-    problem:
-      "Single-tenant architecture hitting scaling ceiling at 50 customers, onboarding taking 3 weeks per tenant.",
-    actions: [
-      "Designed row-level security with tenant isolation",
-      "Built self-service onboarding with infrastructure-as-code",
-      "Implemented tenant-aware connection pooling",
-    ],
-    results: [
-      {
-        value: "500+",
-        label: "tenants",
-      },
-      {
-        value: "15min",
-        label: "onboarding",
-      },
-      {
-        value: "60%",
-        label: "infra cost saved",
-      },
-    ],
-    insight:
-      "Multi-tenancy is a data modeling decision, not a deployment strategy.",
-    tech: ["TypeScript", "PostgreSQL", "Redis", "Docker"],
-    sort_order: 7,
-    created_at: "2024-09-05",
-    blogUrl: "/blog/multi-tenant-saas-platform",
-  },
-  {
-    id: "p08",
-    title: "Fraud Detection Engine",
+    title: "Verzik - Blockchain Protocol Prototype",
     tag: "fintech",
     problem:
-      "Rule-based fraud detection missing 35% of fraud cases while generating 90% false positive rate.",
+      "Document verification workflows need stronger integrity guarantees and role-based governance across multiple operators.",
     actions: [
-      "Built real-time feature store from transaction streams",
-      "Implemented ML model serving with A/B testing framework",
-      "Created explainability layer for regulatory compliance",
+      "Built a role-based protocol management app for tenant, operator, and document flows",
+      "Developed supporting backend and blockchain modules with SDK and smart contract tooling",
+      "Prepared subgraph indexing setup for tracking protocol events",
     ],
     results: [
-      {
-        value: "92%",
-        label: "detection rate",
-      },
-      {
-        value: "<8%",
-        label: "false positive",
-      },
-      {
-        value: "<100ms",
-        label: "scoring latency",
-      },
+      { value: "RBAC", label: "governance model" },
+      { value: "Hardhat", label: "contract toolchain" },
+      { value: "Subgraph", label: "event indexing layer" },
     ],
     insight:
-      "Model accuracy means nothing without operational latency budgets.",
-    tech: ["Python", "Flink", "Kafka", "Redis"],
-    sort_order: 8,
-    created_at: "2024-10-12",
-    blogUrl: "/blog/fraud-detection-engine",
-  },
-  {
-    id: "p09",
-    title: "IoT Fleet Management",
-    tag: "iot",
-    problem:
-      "50K+ devices with unreliable connectivity, 40% telemetry data loss, and no remote update capability.",
-    actions: [
-      "Built MQTT broker cluster with store-and-forward",
-      "Implemented delta-based OTA update system",
-      "Created device shadow for offline state sync",
-    ],
-    results: [
-      {
-        value: "99.5%",
-        label: "data delivery",
-      },
-      {
-        value: "50K+",
-        label: "devices managed",
-      },
-      {
-        value: "<2GB",
-        label: "update size",
-      },
-    ],
-    insight:
-      "Eventually consistent is the only consistency model that works at the edge.",
-    tech: ["Go", "MQTT", "DynamoDB", "AWS"],
-    sort_order: 9,
-    created_at: "2024-11-01",
-    blogUrl: "/blog/iot-fleet-management",
-  },
-  {
-    id: "p10",
-    title: "Content Delivery Network",
-    tag: "infra",
-    problem:
-      "Origin server handling 100% of traffic, 800ms avg TTFB for APAC users, $500K/month bandwidth cost.",
-    actions: [
-      "Deployed edge nodes across 12 PoPs globally",
-      "Built cache invalidation with surrogate key architecture",
-      "Implemented origin shielding with request coalescing",
-    ],
-    results: [
-      {
-        value: "<50ms",
-        label: "APAC TTFB",
-      },
-      {
-        value: "95%",
-        label: "cache hit rate",
-      },
-      {
-        value: "$120K",
-        label: "monthly cost",
-      },
-    ],
-    insight: "Cache invalidation is only hard if your keys are wrong.",
-    tech: ["Rust", "Nginx", "Terraform", "AWS"],
-    sort_order: 10,
-    created_at: "2024-11-18",
-    blogUrl: "/blog/content-delivery-network",
-  },
-  {
-    id: "p11",
-    title: "Search Platform Rebuild",
-    tag: "data",
-    problem:
-      "MySQL LIKE queries on 50M records, 12s search latency, zero relevance tuning capability.",
-    actions: [
-      "Migrated to Elasticsearch with custom analyzers",
-      "Built learning-to-rank pipeline from click logs",
-      "Implemented type-ahead with prefix trie index",
-    ],
-    results: [
-      {
-        value: "<80ms",
-        label: "search latency",
-      },
-      {
-        value: "3x",
-        label: "CTR improvement",
-      },
-      {
-        value: "50M",
-        label: "documents indexed",
-      },
-    ],
-    insight: "Search quality is a product of iteration, not architecture.",
-    tech: ["Python", "Elasticsearch", "Kafka", "K8s"],
-    sort_order: 11,
-    created_at: "2024-12-03",
-    blogUrl: "/blog/search-platform-rebuild",
-  },
-  {
-    id: "p12",
-    title: "Chat & Notification System",
-    tag: "saas",
-    problem:
-      "Polling-based messaging consuming 60% of API capacity, 5s message delivery latency, no offline support.",
-    actions: [
-      "Built WebSocket gateway with connection draining",
-      "Implemented message queue with delivery guarantees",
-      "Created offline-first client with CRDT sync",
-    ],
-    results: [
-      {
-        value: "<200ms",
-        label: "delivery",
-      },
-      {
-        value: "80%",
-        label: "API load reduced",
-      },
-      {
-        value: "100K",
-        label: "concurrent users",
-      },
-    ],
-    insight:
-      "Offline-first is not a feature, it is the only sane architecture for mobile.",
-    tech: ["TypeScript", "Redis", "WebSocket", "CRDTs"],
-    sort_order: 12,
-    created_at: "2025-01-08",
-    blogUrl: "/blog/chat-notification-system",
-  },
-  {
-    id: "p13",
-    title: "Compliance Automation Platform",
-    tag: "security",
-    problem:
-      "SOC2 audit requiring 3 months of manual evidence collection, 200+ controls tracked in spreadsheets.",
-    actions: [
-      "Built continuous control monitoring from infrastructure APIs",
-      "Implemented evidence auto-collection pipeline",
-      "Created drift detection against compliance baselines",
-    ],
-    results: [
-      {
-        value: "2 weeks",
-        label: "audit prep",
-      },
-      {
-        value: "200+",
-        label: "controls automated",
-      },
-      {
-        value: "98%",
-        label: "evidence coverage",
-      },
-    ],
-    insight:
-      "Compliance should be a byproduct of good infrastructure, not a separate process.",
-    tech: ["Go", "Terraform", "PostgreSQL", "AWS"],
-    sort_order: 13,
-    created_at: "2025-02-14",
-    blogUrl: "/blog/compliance-automation-platform",
-  },
-  {
-    id: "p14",
-    title: "Video Transcoding Pipeline",
-    tag: "media",
-    problem:
-      "Manual transcoding workflow, 8h per video, no adaptive bitrate, $200K/year in compute waste.",
-    actions: [
-      "Built event-driven transcoding with per-title encoding",
-      "Implemented adaptive bitrate ladder optimization",
-      "Created GPU-accelerated preview generation",
-    ],
-    results: [
-      {
-        value: "15min",
-        label: "per video",
-      },
-      {
-        value: "40%",
-        label: "storage saved",
-      },
-      {
-        value: "4K",
-        label: "max resolution",
-      },
-    ],
-    insight: "Per-title encoding pays for itself within a month at scale.",
-    tech: ["Go", "FFmpeg", "AWS", "Kafka"],
-    sort_order: 14,
-    created_at: "2025-03-01",
-    blogUrl: "/blog/video-transcoding-pipeline",
+      "Blockchain prototypes are valuable when they clarify governance and process rules before mainnet complexity.",
+    tech: ["React", "TypeScript", "Express", "Ethers", "Hardhat", "The Graph"],
+    sort_order: 7,
+    created_at: "2026-02-01",
   },
 ];
 

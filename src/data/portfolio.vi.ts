@@ -7,14 +7,14 @@ const profileVi = {
   ...portfolioDataEn.profile,
   title: "Lập trình viên Full-Stack",
   summary:
-    "Sinh viên năm cuối ngành Kỹ thuật Phần mềm, tập trung mạnh vào Distributed Systems và Platform Engineering. Có kinh nghiệm thiết kế microservices với K3s, tối ưu pipeline dữ liệu thời gian thực bằng YOLOv11 cho bài toán phân tích giao thông, và phát triển giao thức phi tập trung. Đam mê xây dựng hạ tầng tự động, bền bỉ và xử lý bài toán backend phức tạp ở quy mô lớn.",
+    "Kỹ sư phần mềm mới tốt nghiệp với kinh nghiệm thực chiến ở cả web, mobile và backend microservice. Mình tập trung vào triển khai sản phẩm thực tế: ứng dụng offline-first, luồng xác thực an toàn và hệ thống dữ liệu có thể vận hành ổn định.",
   detail:
-    'Nền tảng kỹ thuật của mình được xây dựng từ niềm yêu thích với công nghệ mới, từ giao thức phi tập trung đến Computer Vision. Thông qua đồ án tốt nghiệp DatapolisX và giao thức Verzik, mình có trải nghiệm thực chiến với các bài toán "khó": tối ưu gas trong Solidity, stream dữ liệu đồng thời cao và mô hình dự báo bằng Random Forest Regressor. Mình phù hợp với quy trình làm việc tập trung vào terminal, nơi có thể tự động hóa hầu hết các bước CI/CD để tập trung vào thiết kế giải pháp phi tập trung an toàn và hiệu quả.',
+    "Trong giai đoạn gần đây, mình xây dựng nền tảng đồ án SmartCity (KLTN_2026), các ứng dụng mobile dùng Expo + Supabase, và các project xác thực với Google/Microsoft. Mình có thể đi xuyên suốt từ UI, API đến tích hợp dịch vụ và tổ chức cấu hình triển khai để sản phẩm hoạt động trơn tru.",
   experience: portfolioDataEn.profile.experience.map((item, index) => {
     const descriptions = [
-      "Phát triển hệ thống giám sát và dự đoán mật độ giao thông theo kiến trúc microservice.",
-      "Xây dựng nền tảng phân tích thời gian thực và pipeline dữ liệu streaming. Giảm độ trễ dữ liệu từ 24 giờ xuống dưới 30 giây bằng Flink và Kafka.",
-      "Xây dựng nền tảng phân tích thời gian thực và pipeline dữ liệu streaming. Giảm độ trễ dữ liệu từ 24 giờ xuống dưới 30 giây bằng Flink và Kafka.",
+      "Xây dựng hệ thống SmartCity giám sát và dự đoán lưu lượng giao thông theo kiến trúc microservice phân tán, gồm web dashboard, API server và dịch vụ AI nền.",
+      "Phát triển nhóm ứng dụng mobile theo hướng offline-first (TaskFlow, Muscle Exercise Manager, Mobile Image Uploader) với SQLite cục bộ và đồng bộ Supabase.",
+      "Đóng góp cho prototype Verzik gồm app quản trị giao thức, backend API và thành phần blockchain phục vụ xác thực tài liệu phi tập trung.",
     ];
     return { ...item, description: descriptions[index] ?? item.description };
   }),
@@ -34,237 +34,123 @@ const projectsVi = portfolioDataEn.projects.map((p) => {
     }
   > = {
     p01: {
-      title: "Di Chuyển Cổng Thanh Toán",
+      title: "KLTN_2026 - Nền tảng Giám sát Giao thông Thông minh",
       problem:
-        "Monolith cũ xử lý 2M+ giao dịch/ngày với tỉ lệ lỗi 0.8% và độ trễ trung bình 12 giây.",
+        "Bài toán giao thông cần kết hợp luồng camera thời gian thực, mô hình dự báo và dashboard điều hành trong cùng một hệ thống đồng bộ.",
       actions: [
-        "Thiết kế kiến trúc microservice hướng sự kiện",
-        "Triển khai saga pattern cho giao dịch phân tán",
-        "Xây dựng circuit breaker với ngưỡng thích ứng động",
+        "Thiết kế kiến trúc microservice phân tán cho web React, API Node.js và dịch vụ Python",
+        "Tích hợp các khối xử lý ảnh, dự báo, phân tích quyết định và tạo báo cáo tự động",
+        "Chuẩn bị cấu hình Kubernetes và cronjob cho backup, export, sync và đo hiệu năng mô hình",
       ],
       results: [
-        { value: "99.97%", label: "uptime" },
-        { value: "180ms", label: "độ trễ p99" },
-        { value: "0.01%", label: "tỉ lệ lỗi" },
+        { value: "10+", label: "nhóm API" },
+        { value: "9", label: "service backend" },
+        { value: "K8s", label: "sẵn sàng triển khai" },
       ],
-      insight: "Idempotency key là yêu cầu bắt buộc trong hệ thống thanh toán.",
+      insight:
+        "Đồ án chỉ thật sự mạnh khi ranh giới service và quy trình vận hành được thiết kế rõ ràng ngay từ đầu.",
     },
     p02: {
-      title: "Pipeline Phân Tích Thời Gian Thực",
+      title: "TaskFlow - Quản lý Công việc Offline-first",
       problem:
-        "Batch ETL gây độ trễ dữ liệu 24 giờ, khiến đội vận hành không thể ra quyết định kịp thời.",
+        "Ứng dụng task trên mobile cần hoạt động mượt khi mất mạng nhưng vẫn đảm bảo đồng bộ an toàn khi online.",
       actions: [
-        "Thay thế batch bằng streaming với Flink",
-        "Xây dựng windowed aggregation tuỳ chỉnh",
-        "Triển khai exactly-once semantics",
+        "Triển khai luồng local-first với SQLite làm nguồn dữ liệu chính",
+        "Xây dựng đồng bộ dirty-sync lên Supabase mỗi 60 giây và hỗ trợ sync thủ công",
+        "Tách logic mobile đầy đủ và web preview để giữ hành vi nhất quán",
       ],
       results: [
-        { value: "<30s", label: "độ trễ dữ liệu" },
-        { value: "500K", label: "sự kiện/giây" },
-        { value: "40%", label: "giảm chi phí" },
+        { value: "60s", label: "chu kỳ auto-sync" },
+        { value: "SQLite", label: "lưu trữ cục bộ" },
+        { value: "Supabase", label: "đồng bộ đám mây" },
       ],
-      insight: "Exactly-once xứng đáng với độ phức tạp mà nó mang lại.",
+      insight:
+        "Offline-first giúp người dùng luôn làm việc được ngay, đồng bộ chỉ là bước bổ sung phía sau.",
     },
     p03: {
-      title: "Tái Thiết Kế Nền Tảng Xác Thực",
+      title: "Muscle Exercise Manager",
       problem:
-        "Hệ thống auth tự xây 3K dòng code, không có MFA và lỗ hổng session fixation trên 12 service.",
+        "Ứng dụng theo dõi tập luyện cần thao tác ghi log nhanh, ổn định offline và có thể đồng bộ ảnh minh họa.",
       actions: [
-        "Triển khai auth server chuẩn OIDC",
-        "Thêm hỗ trợ FIDO2/WebAuthn MFA",
-        "Xây dựng token introspection layer cho service mesh",
+        "Xây dựng luồng Weekly Plan, Dashboard, Body Metrics và Workout Log theo mobile-first",
+        "Triển khai SQLite local kết hợp đồng bộ cloud với cơ chế dirty state",
+        "Tích hợp Google Sign-In và upload ảnh lên MinIO cho tài nguyên bài tập",
       ],
       results: [
-        { value: "0", label: "lỗ hổng xác thực" },
-        { value: "2M+", label: "đăng nhập/ngày" },
-        { value: "<50ms", label: "xác thực token" },
+        { value: "offline-first", label: "workflow chính" },
+        { value: "Google", label: "xác thực tài khoản" },
+        { value: "MinIO", label: "lưu trữ media" },
       ],
       insight:
-        "Bảo mật là thuộc tính của hệ thống, không phải một tính năng rời rạc.",
+        "Với sản phẩm lifestyle, tốc độ ghi nhận và độ ổn định quan trọng hơn số lượng tính năng.",
     },
     p04: {
-      title: "Nền Tảng Thương Mại Điện Tử",
+      title: "Mobile Image Uploader",
       problem:
-        "Traffic đột biến dịp Black Friday gây lỗi dây chuyền, mỗi phút sập mất $2M doanh thu.",
+        "Upload nhiều ảnh từ mobile cần hàng chờ rõ ràng, theo dõi tiến trình cụ thể và tích hợp object storage ổn định.",
       actions: [
-        "Triển khai adaptive rate limiting",
-        "Xây dựng inventory reservation với TTL lock",
-        "Tạo bộ test chaos engineering",
+        "Xây dựng luồng chọn ảnh và hàng chờ upload với trạng thái chi tiết",
+        "Triển khai màn hình tiến trình theo từng file kèm xử lý lỗi",
+        "Kết nối thao tác upload, list và delete trực tiếp với endpoint MinIO tương thích S3",
       ],
       results: [
-        { value: "0", label: "sự cố" },
-        { value: "10x", label: "traffic đỉnh điểm" },
-        { value: "$18M", label: "doanh thu BF" },
+        { value: "4", label: "màn hình chính" },
+        { value: "50MB", label: "mức khuyến nghị/file" },
+        { value: "live", label: "theo dõi tiến trình" },
       ],
       insight:
-        "Khả năng phục hồi được xây dựng bằng cách chủ động phá vỡ hệ thống trước.",
+        "UX hàng chờ minh bạch giúp giảm lỗi vận hành và giảm phụ thuộc vào support.",
     },
     p05: {
-      title: "Cải Tổ Pipeline CI/CD",
+      title: "Google Connect",
       problem:
-        "Build mất 45 phút, test flaky 30%, deploy 2 giờ với nhiều bước thủ công.",
+        "Demo đăng nhập mobile thường chỉ dừng ở giao diện, trong khi ứng dụng thật cần quản lý state người dùng đầy đủ.",
       actions: [
-        "Song song hoá test suite với deterministic test container",
-        "Triển khai canary deployment với auto rollback",
-        "Xây dựng test impact analysis để bỏ qua suite không bị ảnh hưởng",
+        "Tích hợp Google Sign-In SDK trong dự án Expo Router",
+        "Xây dựng AuthContext cho login/logout và quản lý user state",
+        "Hoàn thiện luồng màn hình đăng nhập và profile để kiểm tra end-to-end",
       ],
       results: [
-        { value: "4 phút", label: "thời gian build" },
-        { value: "<1%", label: "tỉ lệ flaky" },
-        { value: "15 phút", label: "thời gian deploy" },
+        { value: "Expo", label: "nền tảng đa thiết bị" },
+        { value: "Google Sign-In", label: "nhà cung cấp định danh" },
+        { value: "AuthContext", label: "lớp quản lý phiên" },
       ],
       insight:
-        "Vòng phản hồi nhanh thay đổi hành vi lập trình viên hơn bất kỳ chính sách nào.",
+        "Chất lượng auth nằm ở xử lý trạng thái và lỗi, không chỉ ở trường hợp đăng nhập thành công.",
     },
     p06: {
-      title: "Nền Tảng Dữ Liệu Y Tế",
+      title: "Azure Connect",
       problem:
-        "Dữ liệu bị cô lập HIPAA trên 8 bệnh viện, đồng bộ hồ sơ bệnh nhân mất 72 giờ.",
+        "Người dùng trường học/doanh nghiệp cần đăng nhập Microsoft đơn giản và xem thông tin định danh đã cấp quyền.",
       actions: [
-        "Xây dựng lớp trao đổi dữ liệu chuẩn FHIR",
-        "Triển khai mã hoá cấp trường với key rotation",
-        "Tạo audit trail với event log bất biến",
+        "Triển khai luồng OAuth 2.0 với Microsoft identity platform",
+        "Xây dựng session backend bằng Express và bảo vệ route dashboard",
+        "Kết nối Microsoft Graph API để lấy thông tin user qua endpoint riêng",
       ],
       results: [
-        { value: "<5 phút", label: "đồng bộ hồ sơ" },
-        { value: "100%", label: "tuân thủ HIPAA" },
-        { value: "8", label: "bệnh viện đang dùng" },
+        { value: "OAuth 2.0", label: "đăng nhập Microsoft 365" },
+        { value: "/api/me", label: "endpoint thông tin user" },
+        { value: "Express", label: "backend quản lý session" },
       ],
-      insight: "Tuân thủ là kiến trúc, không phải thủ tục giấy tờ.",
+      insight:
+        "Demo xác thực chỉ đáng tin khi luồng token và session boundary được thể hiện minh bạch.",
     },
     p07: {
-      title: "Nền Tảng SaaS Đa Tenant",
+      title: "Verzik - Prototype Giao thức Blockchain",
       problem:
-        "Kiến trúc single-tenant đạt giới hạn ở 50 khách hàng, onboarding mỗi tenant mất 3 tuần.",
+        "Quy trình xác thực tài liệu cần cơ chế toàn vẹn dữ liệu và quản trị vai trò rõ ràng giữa nhiều operator.",
       actions: [
-        "Thiết kế row-level security với tenant isolation",
-        "Xây dựng self-service onboarding bằng infrastructure-as-code",
-        "Triển khai connection pooling nhận biết tenant",
+        "Xây dựng app quản trị giao thức theo mô hình role-based cho tenant, operator và document",
+        "Phát triển backend và module blockchain kèm SDK, smart contract toolchain",
+        "Chuẩn bị thành phần subgraph để theo dõi event của giao thức",
       ],
       results: [
-        { value: "500+", label: "tenant" },
-        { value: "15 phút", label: "onboarding" },
-        { value: "60%", label: "tiết kiệm hạ tầng" },
+        { value: "RBAC", label: "mô hình quản trị" },
+        { value: "Hardhat", label: "toolchain hợp đồng" },
+        { value: "Subgraph", label: "lớp index sự kiện" },
       ],
       insight:
-        "Multi-tenancy là quyết định mô hình dữ liệu, không phải chiến lược triển khai.",
-    },
-    p08: {
-      title: "Engine Phát Hiện Gian Lận",
-      problem:
-        "Hệ thống phát hiện gian lận dựa trên rule bỏ sót 35% và tạo 90% false positive.",
-      actions: [
-        "Xây dựng feature store thời gian thực từ transaction stream",
-        "Triển khai ML model serving với A/B testing framework",
-        "Tạo explainability layer để tuân thủ quy định",
-      ],
-      results: [
-        { value: "92%", label: "tỉ lệ phát hiện" },
-        { value: "<8%", label: "false positive" },
-        { value: "<100ms", label: "độ trễ chấm điểm" },
-      ],
-      insight:
-        "Độ chính xác của model không có nghĩa gì nếu không đáp ứng ngân sách độ trễ vận hành.",
-    },
-    p09: {
-      title: "Quản Lý Fleet Thiết Bị IoT",
-      problem:
-        "50K+ thiết bị kết nối không ổn định, mất 40% dữ liệu telemetry, không có khả năng cập nhật từ xa.",
-      actions: [
-        "Xây dựng MQTT broker cluster với store-and-forward",
-        "Triển khai hệ thống OTA update dựa trên delta",
-        "Tạo device shadow để đồng bộ trạng thái offline",
-      ],
-      results: [
-        { value: "99.5%", label: "giao nhận dữ liệu" },
-        { value: "50K+", label: "thiết bị quản lý" },
-        { value: "<2GB", label: "kích thước cập nhật" },
-      ],
-      insight:
-        "Eventual consistency là mô hình nhất quán duy nhất hoạt động ở edge.",
-    },
-    p10: {
-      title: "Mạng Phân Phối Nội Dung (CDN)",
-      problem:
-        "Origin server xử lý 100% traffic, TTFB trung bình 800ms ở APAC, chi phí băng thông $500K/tháng.",
-      actions: [
-        "Triển khai edge node tại 12 PoP trên toàn cầu",
-        "Xây dựng cache invalidation với kiến trúc surrogate key",
-        "Triển khai origin shielding với request coalescing",
-      ],
-      results: [
-        { value: "<50ms", label: "TTFB khu vực APAC" },
-        { value: "95%", label: "tỉ lệ cache hit" },
-        { value: "$120K", label: "chi phí/tháng" },
-      ],
-      insight: "Cache invalidation chỉ khó nếu key của bạn sai.",
-    },
-    p11: {
-      title: "Tái Xây Dựng Nền Tảng Tìm Kiếm",
-      problem:
-        "Query LIKE trên MySQL với 50M bản ghi, độ trễ tìm kiếm 12 giây, không thể tinh chỉnh relevance.",
-      actions: [
-        "Chuyển sang Elasticsearch với custom analyzer",
-        "Xây dựng learning-to-rank pipeline từ click log",
-        "Triển khai type-ahead với prefix trie index",
-      ],
-      results: [
-        { value: "<80ms", label: "độ trễ tìm kiếm" },
-        { value: "3x", label: "cải thiện CTR" },
-        { value: "50M", label: "tài liệu đã index" },
-      ],
-      insight:
-        "Chất lượng tìm kiếm là kết quả của lặp đi lặp lại, không phải kiến trúc.",
-    },
-    p12: {
-      title: "Hệ Thống Chat & Thông Báo",
-      problem:
-        "Messaging dựa trên polling tiêu thụ 60% API capacity, độ trễ gửi tin 5 giây, không hỗ trợ offline.",
-      actions: [
-        "Xây dựng WebSocket gateway với connection draining",
-        "Triển khai message queue với đảm bảo delivery",
-        "Tạo client offline-first với CRDT sync",
-      ],
-      results: [
-        { value: "<200ms", label: "thời gian gửi" },
-        { value: "80%", label: "giảm tải API" },
-        { value: "100K", label: "người dùng đồng thời" },
-      ],
-      insight:
-        "Offline-first không phải tính năng, mà là kiến trúc duy nhất hợp lý cho mobile.",
-    },
-    p13: {
-      title: "Nền Tảng Tự Động Hoá Tuân Thủ",
-      problem:
-        "Audit SOC2 cần 3 tháng thu thập bằng chứng thủ công, theo dõi 200+ control trên spreadsheet.",
-      actions: [
-        "Xây dựng giám sát control liên tục từ infrastructure API",
-        "Triển khai pipeline tự động thu thập bằng chứng",
-        "Tạo drift detection so với baseline tuân thủ",
-      ],
-      results: [
-        { value: "2 tuần", label: "chuẩn bị audit" },
-        { value: "200+", label: "control tự động hoá" },
-        { value: "98%", label: "độ phủ bằng chứng" },
-      ],
-      insight:
-        "Tuân thủ nên là sản phẩm phụ của hạ tầng tốt, không phải một quy trình riêng biệt.",
-    },
-    p14: {
-      title: "Pipeline Chuyển Mã Video",
-      problem:
-        "Quy trình chuyển mã thủ công, 8 giờ mỗi video, không có adaptive bitrate, lãng phí $200K/năm.",
-      actions: [
-        "Xây dựng chuyển mã hướng sự kiện với per-title encoding",
-        "Tối ưu adaptive bitrate ladder",
-        "Tạo GPU-accelerated preview generation",
-      ],
-      results: [
-        { value: "15 phút", label: "mỗi video" },
-        { value: "40%", label: "tiết kiệm lưu trữ" },
-        { value: "4K", label: "độ phân giải tối đa" },
-      ],
-      insight: "Per-title encoding hoàn vốn trong vòng một tháng ở quy mô lớn.",
+        "Prototype blockchain hiệu quả khi giúp chốt rule quản trị trước khi đi sâu vào độ phức tạp production.",
     },
   };
 
@@ -288,8 +174,8 @@ const certificatesVi = portfolioDataEn.certificates.map((cert) => {
   const nameMap: Record<string, string> = {
     "Olympic PMNM Contest 2025": "Cuộc thi Olympic PMNM 2025",
     "ICPC Vietnam Southern Provincial PC":
-      "ICPC Việt Nam — Vòng Khu Vực Miền Nam",
-    "ICPC Vietnam National PC": "ICPC Việt Nam — Vòng Quốc Gia",
+      "ICPC Việt Nam - Vòng Khu Vực Miền Nam",
+    "ICPC Vietnam National PC": "ICPC Việt Nam - Vòng Quốc Gia",
   };
   return { ...cert, name: nameMap[cert.name] ?? cert.name };
 });
@@ -302,10 +188,9 @@ export const portfolioDataVi: PortfolioData = {
     {
       prompt: "~",
       cmd: "cat focus.txt",
-      output:
-        "hệ thống phân tán · dữ liệu thời gian thực · platform engineering",
+      output: "nền tảng web · ứng dụng mobile · backend microservices",
     },
-    { prompt: "~", cmd: "uptime", output: "4+ năm lập trình" },
+    { prompt: "~", cmd: "uptime", output: "2+ năm xây dựng sản phẩm" },
   ],
 
   welcomeLines: [
@@ -316,26 +201,29 @@ export const portfolioDataVi: PortfolioData = {
       className: "text-terminal-accent text-shadow-glow font-bold",
       pauseAfter: 400,
     },
-    { text: "Một kỹ sư phần mềm", pauseAfter: 200 },
+    { text: "Một lập trình viên Full-Stack", pauseAfter: 200 },
   ],
 
   principles: [
-    { label: "đơn giản", desc: "Code tốt nhất là code không cần phải viết." },
+    { label: "đơn giản", desc: "Chỉ xây thứ sản phẩm thực sự cần." },
     {
       label: "bền bỉ",
-      desc: "Thiết kế cho thất bại. Dự đoán trước. Xử lý sẵn.",
+      desc: "Thiết kế ưu tiên hoạt động ổn định cả khi offline hoặc lỗi mạng.",
     },
-    { label: "quan sát", desc: "Không nhìn thấy thì không thể sửa." },
-    { label: "trách nhiệm", desc: "Bạn xây dựng nó, bạn vận hành nó." },
+    { label: "quan sát", desc: "Đo được thì mới tối ưu được." },
+    {
+      label: "trách nhiệm",
+      desc: "Theo dự án xuyên suốt từ lúc code đến lúc chạy thực tế.",
+    },
   ],
 
   stats: [
-    { value: "2+", label: "năm phát triển" },
-    { value: "20+", label: "dự án" },
-    { value: "10+", label: "ngôn ngữ lập trình" },
-    { value: "100+", label: "commit/tháng" },
-    { value: "8+ giờ", label: "coding mỗi ngày" },
-    { value: "cao", label: "độ tin cậy" },
+    { value: "2+", label: "năm xây dựng sản phẩm" },
+    { value: "7", label: "repository dự án chính" },
+    { value: "3", label: "nền tảng (web/mobile/backend)" },
+    { value: "5+", label: "tích hợp auth và dữ liệu" },
+    { value: "offline-first", label: "kiến trúc ưa thích" },
+    { value: "24h", label: "thời gian phản hồi trung bình" },
   ],
 
   certificates: certificatesVi,
@@ -352,17 +240,17 @@ export const portfolioDataVi: PortfolioData = {
       { label: "liên hệ", href: "#contact" },
     ],
     sectionTitles: {
-      projects: "công trình tiêu biểu",
+      projects: "dự án tiêu biểu",
       connect: "kết nối",
     },
     status: {
-      text: "Sẵn sàng nhận dự án mới",
+      text: "Sẵn sàng cho vị trí fresher full-stack",
       detail: "Thời gian phản hồi: ~24h",
     },
     contact: {
       ...portfolioDataEn.siteConfig.contact,
       description:
-        "Sinh viên mới tốt nghiệp | Lập trình viên Full-stack và đam mê Cloud Native. Sẵn sàng cho vị trí Fresher và tư vấn kỹ thuật. Ưu tiên trao đổi bất đồng bộ! ⚡",
+        "Kỹ sư phần mềm mới tốt nghiệp, định hướng Full-Stack và Cloud Native. Sẵn sàng cho cơ hội fresher và các dự án thực chiến.",
     },
   },
 

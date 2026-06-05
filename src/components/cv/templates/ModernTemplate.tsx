@@ -1,15 +1,25 @@
 import { useLanguage } from "../../../contexts/LanguageContext";
 import type { CVTemplateProps } from "../templateTypes";
+import { DEFAULT_CV_SECTION_ORDER } from "../types";
 import { Section, SidebarSection } from "./shared";
 
 export default function ModernTemplate({
   profile,
   projects,
   certificates,
+  techStack,
   includedSections,
+  sectionOrder = DEFAULT_CV_SECTION_ORDER,
   fontFamily = "Georgia, 'Times New Roman', serif",
 }: CVTemplateProps) {
   const { t } = useLanguage();
+  const orderedSections = sectionOrder.filter((key) => includedSections[key]);
+  const sidebarOrder = orderedSections.filter(
+    (key) => key === "skills" || key === "education" || key === "certifications",
+  );
+  const mainOrder = orderedSections.filter(
+    (key) => key === "experience" || key === "projects",
+  );
 
   return (
     <div
@@ -87,50 +97,105 @@ export default function ModernTemplate({
             )}
           </div>
         </SidebarSection>
-        {includedSections.education &&
-          profile.education &&
-          profile.education.length > 0 && (
-            <SidebarSection title={t("cv.education")}>
-              {profile.education.map((edu, i) => (
-                <div key={i} style={{ marginBottom: "5px", fontSize: "9.5px" }}>
-                  <div
-                    style={{
-                      fontWeight: "bold",
-                      color: "#fff",
-                      lineHeight: "1.35",
-                    }}
-                  >
-                    {edu.degree}
+        {sidebarOrder.map((sectionKey) => {
+          if (sectionKey === "skills" && techStack && techStack.length > 0) {
+            return (
+              <SidebarSection key={sectionKey} title={t("cv.skills")}>
+                {(() => {
+                  const labels: Record<string, string> = {
+                    lang: "Languages",
+                    fe: "Frontend",
+                    be: "Backend",
+                    db: "Database",
+                    infra: "Infrastructure",
+                    cicd: "CI/CD",
+                    data: "Data",
+                    net: "Network",
+                  };
+                  const categories = Array.from(
+                    new Set(techStack.map((item) => item.category)),
+                  );
+
+                  return categories.map((category) => {
+                    const names = techStack
+                      .filter((item) => item.category === category)
+                      .map((item) => item.name);
+
+                    if (names.length === 0) return null;
+
+                    return (
+                      <div
+                        key={`sidebar-skill-${category}`}
+                        style={{ marginBottom: "5px", fontSize: "9.5px" }}
+                      >
+                        <div style={{ fontWeight: "bold", color: "#fff" }}>
+                          {labels[category] ?? category}:
+                        </div>
+                        <div style={{ opacity: 0.85, lineHeight: "1.35" }}>
+                          {names.join(", ")}
+                        </div>
+                      </div>
+                    );
+                  });
+                })()}
+              </SidebarSection>
+            );
+          }
+
+          if (
+            sectionKey === "education" &&
+            profile.education &&
+            profile.education.length > 0
+          ) {
+            return (
+              <SidebarSection key={sectionKey} title={t("cv.education")}>
+                {profile.education.map((edu, i) => (
+                  <div key={i} style={{ marginBottom: "5px", fontSize: "9.5px" }}>
+                    <div
+                      style={{
+                        fontWeight: "bold",
+                        color: "#fff",
+                        lineHeight: "1.35",
+                      }}
+                    >
+                      {edu.degree}
+                    </div>
+                    <div style={{ lineHeight: "1.35", opacity: 0.85 }}>
+                      {edu.school}, {edu.year}
+                    </div>
                   </div>
-                  <div style={{ lineHeight: "1.35", opacity: 0.85 }}>
-                    {edu.school}, {edu.year}
+                ))}
+              </SidebarSection>
+            );
+          }
+
+          if (sectionKey === "certifications" && certificates.length > 0) {
+            return (
+              <SidebarSection key={sectionKey} title={t("cv.certifications")}>
+                {certificates.map((cert, i) => (
+                  <div key={i} style={{ marginBottom: "6px", fontSize: "9.5px" }}>
+                    <div
+                      style={{
+                        fontWeight: "bold",
+                        color: "#fff",
+                        lineHeight: "1.35",
+                      }}
+                    >
+                      {cert.name}
+                    </div>
+                    <div
+                      style={{ lineHeight: "1.3", opacity: 0.75, fontSize: "9px" }}
+                    >
+                      {cert.date}
+                    </div>
                   </div>
-                </div>
-              ))}
-            </SidebarSection>
-          )}
-        {includedSections.certifications && certificates.length > 0 && (
-          <SidebarSection title={t("cv.certifications")}>
-            {certificates.map((cert, i) => (
-              <div key={i} style={{ marginBottom: "6px", fontSize: "9.5px" }}>
-                <div
-                  style={{
-                    fontWeight: "bold",
-                    color: "#fff",
-                    lineHeight: "1.35",
-                  }}
-                >
-                  {cert.name}
-                </div>
-                <div
-                  style={{ lineHeight: "1.3", opacity: 0.75, fontSize: "9px" }}
-                >
-                  {cert.date}
-                </div>
-              </div>
-            ))}
-          </SidebarSection>
-        )}
+                ))}
+              </SidebarSection>
+            );
+          }
+
+          return null;
+        })}
       </div>
       <div
         style={{
@@ -146,170 +211,179 @@ export default function ModernTemplate({
             {profile.summary}
           </p>
         </Section>
-        {includedSections.experience && (
-          <Section title={t("cv.experience")}>
-            {profile.experience.map((exp, i) => (
-              <div key={i} data-cv-item="true" style={{ marginBottom: "12px" }}>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "flex-start",
-                    marginBottom: "2px",
-                  }}
-                >
-                  <div
-                    style={{ fontWeight: "bold", fontSize: "14px", flex: 1 }}
-                  >
-                    {exp.role}
-                    {exp.organization && (
-                      <span style={{ fontWeight: "normal" }}>
-                        {" "}
-                        - {exp.organization}
-                      </span>
-                    )}
-                    <span
-                      style={{
-                        fontWeight: "normal",
-                        fontSize: "12px",
-                        textTransform: "uppercase",
-                        color: "#777",
-                        marginLeft: "8px",
-                      }}
-                    >
-                      [{exp.type}]
-                    </span>
-                  </div>
-                  <div
-                    style={{
-                      fontSize: "12px",
-                      color: "#888",
-                      fontStyle: "italic",
-                      marginLeft: "8px",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {exp.period}
-                  </div>
-                </div>
-                <p
-                  style={{
-                    margin: "2px 0 0 0",
-                    fontSize: "13px",
-                    lineHeight: "1.6",
-                  }}
-                >
-                  {exp.description}
-                </p>
-              </div>
-            ))}
-          </Section>
-        )}
-        {includedSections.projects && projects.length > 0 && (
-          <Section title={t("cv.projects")}>
-            {projects.map((proj, i) => (
-              <div key={i} data-cv-item="true" style={{ marginBottom: "12px" }}>
-                <div
-                  style={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "flex-start",
-                    marginBottom: "3px",
-                  }}
-                >
-                  <div
-                    style={{ fontWeight: "bold", fontSize: "14px", flex: 1 }}
-                  >
-                    {proj.title}{" "}
-                    <span
-                      style={{
-                        fontSize: "12px",
-                        color: "#0e6e64",
-                        fontWeight: "bold",
-                        textTransform: "uppercase",
-                      }}
-                    >
-                      - {proj.tag}
-                    </span>
-                  </div>
-                  <div
-                    style={{
-                      fontSize: "12px",
-                      color: "#888",
-                      marginLeft: "8px",
-                      whiteSpace: "nowrap",
-                    }}
-                  >
-                    {proj.created_at}
-                  </div>
-                </div>
-                <p
-                  style={{
-                    margin: "2px 0",
-                    fontSize: "13px",
-                    lineHeight: "1.5",
-                  }}
-                >
-                  <strong>{t("cv.problem")}</strong> {proj.problem}
-                </p>
-                {proj.actions.length > 0 && (
-                  <div style={{ margin: "4px 0" }}>
+        {mainOrder.map((sectionKey) => {
+          if (sectionKey === "experience") {
+            return (
+              <Section key={sectionKey} title={t("cv.experience")}>
+                {profile.experience.map((exp, i) => (
+                  <div key={i} data-cv-item="true" style={{ marginBottom: "12px" }}>
                     <div
                       style={{
-                        fontSize: "13px",
-                        fontWeight: "bold",
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "flex-start",
                         marginBottom: "2px",
                       }}
                     >
-                      {t("cv.actions")}
+                      <div
+                        style={{ fontWeight: "bold", fontSize: "14px", flex: 1 }}
+                      >
+                        {exp.role}
+                        {exp.organization && (
+                          <span style={{ fontWeight: "normal" }}>
+                            {" "}
+                            - {exp.organization}
+                          </span>
+                        )}
+                        <span
+                          style={{
+                            fontWeight: "normal",
+                            fontSize: "12px",
+                            textTransform: "uppercase",
+                            color: "#777",
+                            marginLeft: "8px",
+                          }}
+                        >
+                          [{exp.type}]
+                        </span>
+                      </div>
+                      <div
+                        style={{
+                          fontSize: "12px",
+                          color: "#888",
+                          fontStyle: "italic",
+                          marginLeft: "8px",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {exp.period}
+                      </div>
                     </div>
-                    <ul
+                    <p
                       style={{
-                        margin: "0 0 0 18px",
-                        padding: 0,
+                        margin: "2px 0 0 0",
                         fontSize: "13px",
-                        lineHeight: "1.45",
-                        listStyleType: "disc",
-                        listStylePosition: "outside",
+                        lineHeight: "1.6",
                       }}
                     >
-                      {proj.actions.map((action, actionIndex) => (
-                        <li key={`${proj.id}-modern-action-${actionIndex}`}>
-                          {action}
-                        </li>
-                      ))}
-                    </ul>
+                      {exp.description}
+                    </p>
                   </div>
-                )}
-                {proj.results && proj.results.length > 0 && (
-                  <p
-                    style={{
-                      margin: "2px 0",
-                      fontSize: "13px",
-                      lineHeight: "1.5",
-                      color: "#0e6e64",
-                      fontWeight: "bold",
-                    }}
-                  >
-                    {t("cv.results")}{" "}
-                    {proj.results
-                      .map((r) => `${r.value} ${r.label}`)
-                      .join(" • ")}
-                  </p>
-                )}
-                <p
-                  style={{
-                    margin: "2px 0 0 0",
-                    fontSize: "12px",
-                    color: "#888",
-                  }}
-                >
-                  {t("cv.tech")} {proj.tech.slice(0, 5).join(", ")}
-                </p>
-              </div>
-            ))}
-          </Section>
-        )}
+                ))}
+              </Section>
+            );
+          }
+
+          if (sectionKey === "projects" && projects.length > 0) {
+            return (
+              <Section key={sectionKey} title={t("cv.projects")}>
+                {projects.map((proj, i) => (
+                  <div key={i} data-cv-item="true" style={{ marginBottom: "12px" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "flex-start",
+                        marginBottom: "3px",
+                      }}
+                    >
+                      <div
+                        style={{ fontWeight: "bold", fontSize: "14px", flex: 1 }}
+                      >
+                        {proj.title}{" "}
+                        <span
+                          style={{
+                            fontSize: "12px",
+                            color: "#0e6e64",
+                            fontWeight: "bold",
+                            textTransform: "uppercase",
+                          }}
+                        >
+                          - {proj.tag}
+                        </span>
+                      </div>
+                      <div
+                        style={{
+                          fontSize: "12px",
+                          color: "#888",
+                          marginLeft: "8px",
+                          whiteSpace: "nowrap",
+                        }}
+                      >
+                        {proj.created_at}
+                      </div>
+                    </div>
+                    <p
+                      style={{
+                        margin: "2px 0",
+                        fontSize: "13px",
+                        lineHeight: "1.5",
+                      }}
+                    >
+                      <strong>{t("cv.problem")}</strong> {proj.problem}
+                    </p>
+                    {proj.actions.length > 0 && (
+                      <div style={{ margin: "4px 0" }}>
+                        <div
+                          style={{
+                            fontSize: "13px",
+                            fontWeight: "bold",
+                            marginBottom: "2px",
+                          }}
+                        >
+                          {t("cv.actions")}
+                        </div>
+                        <ul
+                          style={{
+                            margin: "0 0 0 18px",
+                            padding: 0,
+                            fontSize: "13px",
+                            lineHeight: "1.45",
+                            listStyleType: "disc",
+                            listStylePosition: "outside",
+                          }}
+                        >
+                          {proj.actions.map((action, actionIndex) => (
+                            <li key={`${proj.id}-modern-action-${actionIndex}`}>
+                              {action}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {proj.results && proj.results.length > 0 && (
+                      <p
+                        style={{
+                          margin: "2px 0",
+                          fontSize: "13px",
+                          lineHeight: "1.5",
+                          color: "#0e6e64",
+                          fontWeight: "bold",
+                        }}
+                      >
+                        {t("cv.results")}{" "}
+                        {proj.results
+                          .map((r) => `${r.value} ${r.label}`)
+                          .join(" • ")}
+                      </p>
+                    )}
+                    <p
+                      style={{
+                        margin: "2px 0 0 0",
+                        fontSize: "12px",
+                        color: "#888",
+                      }}
+                    >
+                      {t("cv.tech")} {proj.tech.slice(0, 5).join(", ")}
+                    </p>
+                  </div>
+                ))}
+              </Section>
+            );
+          }
+
+          return null;
+        })}
       </div>
     </div>
   );

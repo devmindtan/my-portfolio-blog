@@ -128,8 +128,13 @@ export const en: Record<string, string> = {
   "cvExport.searchTagAll": "all",
   "cvExport.actionsOf": "actions",
   "cvExport.sections": "sections",
+  "cvExport.projectOrder": "project order",
   "cvExport.selectAllSections": "all",
   "cvExport.clearSections": "clear",
+  "cvExport.sectionOrder": "section order",
+  "cvExport.resetOrder": "reset",
+  "cvExport.moveUp": "move up",
+  "cvExport.moveDown": "move down",
   // CV Export modal — template labels
   "cvExport.tplMinimalLabel": "Minimal",
   "cvExport.tplMinimalDesc": "Clean, single-column",

@@ -23,3 +23,5 @@ dist-ssr
 .env
 my-agent-skills/*
 my-agent-skills
+projects/*
+projects

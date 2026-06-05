@@ -7,6 +7,14 @@ export type CVSectionKey =
   | "projects"
   | "certifications";
 
+export const DEFAULT_CV_SECTION_ORDER: CVSectionKey[] = [
+  "experience",
+  "skills",
+  "education",
+  "projects",
+  "certifications",
+];
+
 export type SectionSelection = Record<CVSectionKey, boolean>;
 
 export type FontKey =
